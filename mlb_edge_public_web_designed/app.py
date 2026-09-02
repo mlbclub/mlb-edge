@@ -8,7 +8,7 @@ from mlb_model.config import MODEL_FILE, TEAM_GAMES, PICK_RULES_FILE
 from mlb_model.live import predict_date
 from mlb_model.odds import american_from_decimal
 
-st.set_page_config(page_title="MLB Edge V3", page_icon="⚾", layout="wide")
+st.set_page_config(page_title="SPORTS LAB", page_icon="⚾", layout="wide")
 
 
 def pct(x):
@@ -35,7 +35,7 @@ def metric_row(label, away, home, formatter=pct):
     c1.write(label); c2.write(formatter(away)); c3.write(formatter(home))
 
 
-st.title("⚾ MLB Edge V3")
+st.title("⚾ SPORTS LAB")
 st.caption("2024~현재 누적 + 최근 흐름 + 선발/불펜 + 현재 시장배당을 함께 보는 확률 분석 대시보드")
 
 if not Path(MODEL_FILE).exists() or not Path(TEAM_GAMES).exists():
