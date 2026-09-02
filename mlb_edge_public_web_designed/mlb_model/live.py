@@ -1,4 +1,7 @@
 from __future__ import annotations
+from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
+
 import joblib
 import numpy as np
 import pandas as pd
@@ -7,8 +10,10 @@ from .api import MLBStatsAPI
 from .config import TEAM_GAMES, MODEL_FILE, LIVE_PREDICTIONS, DATA_DIR
 from .odds import OddsAPI, find_event, summarize_event
 from .probability import market_probabilities, blend_moneyline
-from .recommend import expected_value, load_rules, choose_recommendation
+from .recommend import expected_value, load_rules, choose_recommendation, qualifies, candidate_score
 from .state import live_feature_row, display_snapshot
+
+KST = ZoneInfo("Asia/Seoul")
 
 
 def _prob_model(bundle, row: dict):
@@ -45,82 +50,139 @@ def build_market_candidates(home, away, probs: dict, odds: dict):
         price = odds.get(f"{side}_ml_odds")
         rule = "underdog_moneyline" if marketp is not None and marketp < 0.5 else "moneyline"
         c = _candidate(side, "moneyline", mp, marketp, price, f"{team} 승", rule_market=rule, book=odds.get(f"{side}_ml_book"))
-        if c: cs.append(c)
+        if c:
+            cs.append(c)
 
-    # Total market - compare on conditional no-push probability for fair market edge, raw win probability for EV.
+    # Totals
     line = odds.get("total_line")
     if line is not None:
         tm = market_probabilities(probs["expected_home_runs"], probs["expected_away_runs"], float(line))
         denom = max(1e-9, tm["over_prob"] + tm["under_prob"])
-        over_cond, under_cond = tm["over_prob"]/denom, tm["under_prob"]/denom
-        c = _candidate("over", "total", over_cond, odds.get("over_market_novig"), odds.get("over_odds"), f"O {line}", tm["push_prob"], "total", odds.get("over_book"))
+        over_cond, under_cond = tm["over_prob"] / denom, tm["under_prob"] / denom
+        c = _candidate("over", "total", over_cond, odds.get("over_market_novig"), odds.get("over_odds"), f"오버 {line:g}", tm["push_prob"], "total", odds.get("over_book"))
         if c:
-            c["raw_hit_prob"] = tm["over_prob"]; c["ev"] = expected_value(tm["over_prob"], c["odds"], tm["push_prob"]); cs.append(c)
-        c = _candidate("under", "total", under_cond, odds.get("under_market_novig"), odds.get("under_odds"), f"U {line}", tm["push_prob"], "total", odds.get("under_book"))
+            c["raw_hit_prob"] = tm["over_prob"]
+            c["ev"] = expected_value(tm["over_prob"], c["odds"], tm["push_prob"])
+            cs.append(c)
+        c = _candidate("under", "total", under_cond, odds.get("under_market_novig"), odds.get("under_odds"), f"언더 {line:g}", tm["push_prob"], "total", odds.get("under_book"))
         if c:
-            c["raw_hit_prob"] = tm["under_prob"]; c["ev"] = expected_value(tm["under_prob"], c["odds"], tm["push_prob"]); cs.append(c)
+            c["raw_hit_prob"] = tm["under_prob"]
+            c["ev"] = expected_value(tm["under_prob"], c["odds"], tm["push_prob"])
+            cs.append(c)
         probs.update(tm)
 
-    # Exact -1.5 markets when a book quotes them.
+    # Exact -1.5 markets when quoted.
     for side, team in (("home", home), ("away", away)):
-        c = _candidate(side, "minus_1_5", probs[f"{side}_minus_1_5"], odds.get(f"{side}_minus_1_5_market_novig"), odds.get(f"{side}_minus_1_5_odds"), f"{team} -1.5", rule_market="minus_1_5", book=odds.get(f"{side}_minus_1_5_book"))
-        if c: cs.append(c)
+        c = _candidate(
+            side, "minus_1_5", probs[f"{side}_minus_1_5"],
+            odds.get(f"{side}_minus_1_5_market_novig"), odds.get(f"{side}_minus_1_5_odds"),
+            f"{team} -1.5", rule_market="minus_1_5", book=odds.get(f"{side}_minus_1_5_book")
+        )
+        if c:
+            cs.append(c)
     return cs
 
 
+def _kst_schedule(api: MLBStatsAPI, target_date: str):
+    """Return games whose actual first-pitch timestamp falls on target KST calendar date.
+
+    MLB schedule dates are US-oriented. A Korean calendar day overlaps two US calendar
+    dates, so query both the target date and the previous US date, merge by gamePk,
+    then filter using the actual UTC gameDate converted to Asia/Seoul.
+    """
+    td = date.fromisoformat(target_date)
+    query_dates = [td - timedelta(days=1), td]
+    seen = set()
+    games = []
+    for qd in query_dates:
+        payload = api.schedule_by_date(qd.isoformat())
+        for day in payload.get("dates", []):
+            for g in day.get("games", []):
+                pk = g.get("gamePk")
+                if pk in seen:
+                    continue
+                try:
+                    kst_dt = datetime.fromisoformat(str(g.get("gameDate")).replace("Z", "+00:00")).astimezone(KST)
+                except Exception:
+                    continue
+                if kst_dt.date() != td:
+                    continue
+                seen.add(pk)
+                games.append(g)
+    games.sort(key=lambda g: g.get("gameDate") or "")
+    return games
+
+
 def predict_date(target_date: str, save=True):
+    """Predict games for a *Korean calendar date* (Asia/Seoul)."""
     team_games = pd.read_csv(TEAM_GAMES, parse_dates=["game_date"])
     team_games["game_date"] = pd.to_datetime(team_games["game_date"], utc=True)
     bundle = joblib.load(MODEL_FILE)
-    schedule = MLBStatsAPI().schedule_by_date(target_date)
+    api = MLBStatsAPI()
+    schedule_games = _kst_schedule(api, target_date)
+
     try:
         odds_events, quota = OddsAPI().current_mlb(markets="h2h,spreads,totals", odds_format="decimal")
     except Exception as e:
         odds_events, quota = [], {}
         print(f"[odds warning] {e}")
+
     rules, rule_meta = load_rules()
     records = []
 
-    for day in schedule.get("dates", []):
-        for g in day.get("games", []):
-            hside, aside = g["teams"]["home"], g["teams"]["away"]
-            home, away = hside["team"], aside["team"]
-            hp = hside.get("probablePitcher") or {}; ap = aside.get("probablePitcher") or {}
-            game_dt = pd.Timestamp(g.get("gameDate"))
-            row = live_feature_row(team_games, home["id"], away["id"], hp.get("id"), ap.get("id"), game_dt)
-            probs = _prob_model(bundle, row)
-            event = find_event(odds_events, home["name"], away["name"])
-            odds = summarize_event(event) if event else {}
-            candidates = build_market_candidates(home["name"], away["name"], probs, odds)
-            rec = choose_recommendation(candidates, rules)
+    for g in schedule_games:
+        hside, aside = g["teams"]["home"], g["teams"]["away"]
+        home, away = hside["team"], aside["team"]
+        hp = hside.get("probablePitcher") or {}
+        ap = aside.get("probablePitcher") or {}
+        game_dt = pd.Timestamp(g.get("gameDate"))
+        row = live_feature_row(team_games, home["id"], away["id"], hp.get("id"), ap.get("id"), game_dt)
+        probs = _prob_model(bundle, row)
+        event = find_event(odds_events, home["name"], away["name"])
+        odds = summarize_event(event) if event else {}
+        candidates = build_market_candidates(home["name"], away["name"], probs, odds)
+        qualified = [c.copy() for c in candidates if qualifies(c, rules)]
+        qualified.sort(key=candidate_score, reverse=True)
+        rec = choose_recommendation(candidates, rules)
 
-            # Market underdog / upset analysis.
-            underdog = None; upset_prob = upset_edge = None
-            if odds.get("home_market_novig") is not None:
-                if odds["home_market_novig"] < odds["away_market_novig"]:
-                    underdog, upset_prob, um = home["name"], probs["home_model"], odds["home_market_novig"]
-                else:
-                    underdog, upset_prob, um = away["name"], probs["away_model"], odds["away_market_novig"]
-                upset_edge = upset_prob - um
+        underdog = None
+        upset_prob = upset_edge = None
+        if odds.get("home_market_novig") is not None and odds.get("away_market_novig") is not None:
+            if odds["home_market_novig"] < odds["away_market_novig"]:
+                underdog, upset_prob, um = home["name"], probs["home_model"], odds["home_market_novig"]
+            else:
+                underdog, upset_prob, um = away["name"], probs["away_model"], odds["away_market_novig"]
+            upset_edge = upset_prob - um
 
-            records.append({
-                "game_pk": g.get("gamePk"), "game_date": str(game_dt), "official_date": target_date,
-                "away": away["name"], "home": home["name"],
-                "away_probable": ap.get("fullName"), "home_probable": hp.get("fullName"),
-                **probs, **odds,
-                "market_underdog": underdog, "upset_prob": upset_prob, "upset_edge": upset_edge,
-                "recommendation": rec.get("pick", "NO BET") if rec.get("label") == "BET" else "NO BET",
-                "recommendation_market": rec.get("market"), "recommendation_prob": rec.get("raw_hit_prob", rec.get("model_prob")),
-                "recommendation_edge": rec.get("edge"), "recommendation_ev": rec.get("ev"),
-                "recommendation_odds": rec.get("odds"), "recommendation_book": rec.get("book"),
-                "candidates": candidates,
-                "home_snapshot": display_snapshot(team_games, home["id"], hp.get("id"), game_dt),
-                "away_snapshot": display_snapshot(team_games, away["id"], ap.get("id"), game_dt),
-            })
+        records.append({
+            "game_pk": g.get("gamePk"),
+            "game_date": str(game_dt),
+            "official_date": g.get("officialDate"),
+            "kst_date": target_date,
+            "status": (g.get("status") or {}).get("detailedState"),
+            "away": away["name"], "home": home["name"],
+            "away_probable": ap.get("fullName"), "home_probable": hp.get("fullName"),
+            **probs, **odds,
+            "market_underdog": underdog, "upset_prob": upset_prob, "upset_edge": upset_edge,
+            "recommendation": rec.get("pick", "NO BET") if rec.get("label") == "BET" else "NO BET",
+            "recommendation_market": rec.get("market"),
+            "recommendation_prob": rec.get("raw_hit_prob", rec.get("model_prob")),
+            "recommendation_edge": rec.get("edge"), "recommendation_ev": rec.get("ev"),
+            "recommendation_odds": rec.get("odds"), "recommendation_book": rec.get("book"),
+            "candidates": candidates,
+            "qualified_candidates": qualified,
+            "home_snapshot": display_snapshot(team_games, home["id"], hp.get("id"), game_dt),
+            "away_snapshot": display_snapshot(team_games, away["id"], ap.get("id"), game_dt),
+        })
+
     if save:
         DATA_DIR.mkdir(parents=True, exist_ok=True)
-        flat = pd.DataFrame([{k:v for k,v in r.items() if k not in ("candidates","home_snapshot","away_snapshot")} for r in records])
+        flat = pd.DataFrame([
+            {k: v for k, v in r.items() if k not in ("candidates", "qualified_candidates", "home_snapshot", "away_snapshot")}
+            for r in records
+        ])
         flat.to_csv(LIVE_PREDICTIONS, index=False)
         print(f"[saved] {LIVE_PREDICTIONS}")
-    if quota: print(f"[odds quota] {quota}")
+    if quota:
+        print(f"[odds quota] {quota}")
     return records, rule_meta
