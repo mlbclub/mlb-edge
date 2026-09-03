@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import html
 import math
 import os
@@ -53,6 +54,14 @@ TEAM_ABBR = {
     "Tampa Bay Rays": "TB", "Texas Rangers": "TEX", "Toronto Blue Jays": "TOR",
     "Washington Nationals": "WSH",
 }
+TEAM_ID = {
+    "Arizona Diamondbacks":109,"Athletics":133,"Oakland Athletics":133,"Atlanta Braves":144,"Baltimore Orioles":110,"Boston Red Sox":111,
+    "Chicago Cubs":112,"Chicago White Sox":145,"Cincinnati Reds":113,"Cleveland Guardians":114,"Colorado Rockies":115,"Detroit Tigers":116,
+    "Houston Astros":117,"Kansas City Royals":118,"Los Angeles Angels":108,"Los Angeles Dodgers":119,"Miami Marlins":146,"Milwaukee Brewers":158,
+    "Minnesota Twins":142,"New York Mets":121,"New York Yankees":147,"Philadelphia Phillies":143,"Pittsburgh Pirates":134,"San Diego Padres":135,
+    "San Francisco Giants":137,"Seattle Mariners":136,"St. Louis Cardinals":138,"Tampa Bay Rays":139,"Texas Rangers":140,"Toronto Blue Jays":141,"Washington Nationals":120,
+}
+
 TEAM_KO = {
     "Arizona Diamondbacks": "애리조나 다이아몬드백스",
     "Athletics": "애슬레틱스", "Oakland Athletics": "오클랜드 애슬레틱스",
@@ -101,9 +110,45 @@ div[role="radiogroup"] input{accent-color:var(--green)!important}
 @media(max-width:1050px){.market-panels{grid-template-columns:1fr}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-grid{grid-template-columns:1.2fr repeat(4,1fr)}}
 @media(max-width:900px){.block-container{padding-left:.72rem!important;padding-right:.72rem!important;padding-top:4rem!important}.topbar{align-items:flex-start}.status-pill{display:none}.page-head{padding:20px 18px;border-radius:18px}.page-head h1{font-size:1.48rem}.page-head p{font-size:.76rem}.bet-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){div[role="radiogroup"]>label{flex:1 1 calc(33.333% - 7px)!important;justify-content:center!important;padding:6px 5px!important}div[role="radiogroup"] label p{font-size:.69rem!important}.brand{font-size:1.08rem}.brand-sub{font-size:.57rem}.brand-ball{width:38px;height:38px}.summary-grid{grid-template-columns:1fr 1fr}.matchup{grid-template-columns:1fr 28px 1fr}.team-name{font-size:.82rem}.market-cols,.market-row{grid-template-columns:minmax(0,1fr) 52px 54px}.detail-grid{grid-template-columns:1fr 1fr}.detail-cell.head{display:none}.profile-grid{grid-template-columns:1fr}.page-head h1{font-size:1.35rem}}
+
+/* V6 visual polish */
+.summary-grid-two{grid-template-columns:repeat(2,minmax(0,1fr));max-width:620px}
+.brand-ball{font-size:0;position:relative;background:linear-gradient(145deg,#102238,#09131f);overflow:hidden}
+.brand-ball:before{content:"SL";font-size:13px;font-weight:950;letter-spacing:-.08em;color:#fff;position:absolute;z-index:2}
+.brand-ball:after{content:"";position:absolute;width:27px;height:27px;border:2px solid #48e792;border-radius:50%;box-shadow:inset 8px 0 0 rgba(100,169,255,.18);transform:rotate(-18deg)}
+/* Naver-like top menu: clear text tabs, no radio-dot appearance */
+div[role="radiogroup"]{background:transparent!important;border:0!important;border-bottom:1px solid #1b2939!important;border-radius:0!important;padding:0 0 9px!important;gap:0!important}
+div[role="radiogroup"]>label{background:transparent!important;border:0!important;border-right:1px solid #182536!important;border-radius:0!important;padding:8px 15px!important;min-height:38px!important}
+div[role="radiogroup"]>label:last-child{border-right:0!important}
+div[role="radiogroup"]>label:has(input:checked){background:transparent!important;border-bottom:2px solid var(--green)!important;box-shadow:none!important}
+div[role="radiogroup"] input{display:none!important}
+div[role="radiogroup"] label p{font-size:.82rem!important;color:#a8b5c5!important}
+div[role="radiogroup"]>label:has(input:checked) p{color:#fff!important}
+.team-name{font-size:1.08rem}.pitcher{font-size:.7rem}.detail-title{font-size:1.02rem!important}.bet-title{font-size:1.24rem}
+@media(max-width:900px){div[role="radiogroup"]{overflow-x:auto!important;flex-wrap:nowrap!important;scrollbar-width:none}div[role="radiogroup"]::-webkit-scrollbar{display:none}div[role="radiogroup"]>label{flex:0 0 auto!important}.team-name{font-size:.94rem}}
+
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
+
+V7_CSS = r"""
+<style>
+.block-container{max-width:1480px;padding-top:5.3rem!important}
+div[role="radiogroup"]{gap:0!important;padding:0 2px!important;background:transparent!important;border:0!important;border-bottom:1px solid #1d2938!important;border-radius:0!important;margin-bottom:22px!important;flex-wrap:wrap!important}
+div[role="radiogroup"]>label{background:transparent!important;border:0!important;border-bottom:3px solid transparent!important;border-radius:0!important;padding:13px 19px 11px!important;min-height:46px!important;cursor:pointer!important}
+div[role="radiogroup"]>label:has(input:checked){background:linear-gradient(180deg,transparent,rgba(72,231,146,.055))!important;border-bottom-color:#48e792!important;box-shadow:none!important}
+div[role="radiogroup"] input{display:none!important}
+div[role="radiogroup"] label p{font-size:.88rem!important;font-weight:900!important;color:#8ea0b5!important}
+div[role="radiogroup"]>label:has(input:checked) p{color:#fff!important}
+.topbar{padding:4px 2px 14px}.brand-lockup{height:58px;max-width:355px;object-fit:contain;object-position:left center;display:block}.status-pill{font-size:.70rem}
+.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 18px}.quick{background:#0d141e;border:1px solid #202d3d;border-radius:16px;padding:14px 15px}.quick span{display:block;color:#718197;font-size:.66rem;margin-bottom:5px}.quick strong{font-size:1.22rem}.quick small{color:#69798d;font-size:.62rem}
+.game-card.simple{padding:18px 19px}.simple-match{display:grid;grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr);align-items:center;gap:12px}.team-line{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:center}.team-line.home{grid-template-columns:auto minmax(0,1fr) 42px;text-align:right}.club-logo-wrap{width:46px;height:46px;display:flex;align-items:center;justify-content:center;flex:0 0 46px}.club-logo{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 4px 9px rgba(0,0,0,.28))}.club-logo-fallback{align-items:center;justify-content:center;border:1px solid #2a3a4d;border-radius:50%;background:#0b1420;color:#a9bad0;font-size:.62rem;font-weight:950;letter-spacing:.02em}.club-name{font-size:1.02rem;font-weight:950;line-height:1.2}.club-sub{font-size:.66rem;color:#74859b;margin-top:3px}.win-box{text-align:right}.team-line.home .win-box{text-align:left}.win-score{font-size:1.08rem;font-weight:950;color:#fff}.win-score.hot{color:#48e792}.win-odds{font-size:.72rem;color:#9fc7f5;margin-top:2px}.simple-vs{text-align:center;color:#526277;font-weight:900;font-size:.72rem}.simple-divider{height:1px;background:#1a2634;margin:14px 0}.simple-bottom{display:grid;grid-template-columns:minmax(0,1.4fr) repeat(2,minmax(0,1fr));gap:8px}.guide-box{border:1px solid rgba(72,231,146,.28);background:linear-gradient(145deg,rgba(72,231,146,.08),#091019);border-radius:12px;padding:11px 12px}.guide-label{font-size:.57rem;color:#61d99a;font-weight:900;letter-spacing:.08em}.guide-pick{font-size:.93rem;font-weight:950;margin-top:4px}.guide-meta{font-size:.64rem;color:#8191a6;margin-top:3px}.mini-box{background:#090f16;border:1px solid #1a2735;border-radius:12px;padding:11px}.mini-box span{display:block;color:#6f8094;font-size:.58rem;margin-bottom:5px}.mini-box strong{font-size:.78rem}.bet-card{padding:19px}.bet-title{font-size:1.3rem}.grade{display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:5px 8px;border-radius:999px;background:#173125;color:#5cf0a2;font-size:.66rem;font-weight:950;margin-left:7px}.deadline{font-size:.63rem;color:#8091a6;margin-top:4px}.hero-pick{border:1px solid rgba(72,231,146,.35);background:radial-gradient(circle at 85% 10%,rgba(72,231,146,.13),transparent 28%),linear-gradient(135deg,#111c29,#0a1119);border-radius:20px;padding:20px 22px;margin:0 0 14px}.hero-pick .label{font-size:.62rem;color:#48e792;font-weight:950;letter-spacing:.12em}.hero-pick .pick{font-size:1.55rem;font-weight:950;margin:7px 0 8px}.hero-pick .meta{color:#91a1b4;font-size:.74rem}.participate-banner{border:1px solid #24405a;background:#0d1722;border-radius:16px;padding:14px 16px;margin:15px 0}.participate-banner strong{font-size:.93rem}.participate-banner span{display:block;color:#7f90a4;font-size:.68rem;margin-top:4px}
+@media(max-width:900px){.block-container{padding-top:4.8rem!important}.topbar{align-items:flex-start}.brand-lockup{height:47px;max-width:260px}.status-pill{font-size:.6rem;padding:7px 9px}.quick-grid{grid-template-columns:repeat(2,1fr)}.simple-match{grid-template-columns:1fr;gap:9px}.simple-vs{display:none}.team-line.home{grid-template-columns:42px minmax(0,1fr) auto;text-align:left}.team-line.home .club-logo{grid-column:1}.team-line.home>div:nth-child(2){grid-column:2}.team-line.home .win-box{grid-column:3;text-align:right}.simple-bottom{grid-template-columns:1fr}.bet-stats{grid-template-columns:repeat(2,1fr)!important}}
+@media(max-width:560px){div[role="radiogroup"]>label{padding:10px 11px 8px!important}div[role="radiogroup"] label p{font-size:.75rem!important}.quick-grid{grid-template-columns:1fr 1fr}.page-head{padding:20px}.page-head h1{font-size:1.5rem}.club-name{font-size:.92rem}.topbar{gap:8px}.status-pill{max-width:46%;overflow:hidden;text-overflow:ellipsis}.brand-lockup{max-width:210px}}
+</style>
+"""
+st.markdown(V7_CSS, unsafe_allow_html=True)
+
 
 
 def valid_number(x):
@@ -141,6 +186,52 @@ def team_abbr(name: str):
     return TEAM_ABBR.get(name, "".join(p[0] for p in name.split()[-2:]).upper()[:3])
 
 
+def team_logo(name: str):
+    """Primary team mark: MLB's static team-logo CDN."""
+    tid = TEAM_ID.get(name)
+    if not tid:
+        return ""
+    return f"https://www.mlbstatic.com/team-logos/{tid}.svg"
+
+
+def team_logo_fallback(name: str):
+    """Secondary image source used only when the MLB CDN image cannot load."""
+    abbr = team_abbr(name).lower()
+    return f"https://a.espncdn.com/i/teamlogos/mlb/500/{abbr}.png"
+
+
+def logo_img(name: str):
+    src = team_logo(name)
+    if not src:
+        return f'<div class="club-logo club-logo-fallback">{html.escape(team_abbr(name))}</div>'
+    fallback = team_logo_fallback(name)
+    alt = html.escape(team_ko(name))
+    # onerror swaps to a second independent logo CDN. If that also fails, show the team abbreviation.
+    return (
+        f'<span class="club-logo-wrap"><img class="club-logo" src="{src}" alt="{alt}" '
+        f'onerror="if(!this.dataset.fb){{this.dataset.fb=1;this.src=\'{fallback}\';}}else{{this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';}}">'
+        f'<span class="club-logo club-logo-fallback" style="display:none">{html.escape(team_abbr(name))}</span></span>'
+    )
+
+
+def pick_grade(prob):
+    p = float(prob or 0)
+    if p >= .70:
+        return "A+"
+    if p >= .66:
+        return "A"
+    if p >= .63:
+        return "B+"
+    return "B"
+
+
+def brand_lockup_data_uri():
+    path = Path(__file__).resolve().parent / "assets" / "sports_lab_lockup.png"
+    if not path.exists():
+        return ""
+    return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+
+
 def game_dt_kst(g):
     try:
         return datetime.fromisoformat(str(g.get("game_date")).replace("Z", "+00:00")).astimezone(KST)
@@ -161,7 +252,7 @@ def pick_ko(text: str | None):
 
 
 def market_ko(m):
-    return {"moneyline": "승·패", "total": "언더·오버", "minus_1_5": "-1.5"}.get(m, "시장")
+    return {"moneyline": "승·패", "total": "언더·오버", "minus_1_5": "핸디캡"}.get(m, "시장")
 
 
 def page_header(eyebrow, title, desc):
@@ -178,44 +269,35 @@ def market_panel(title, subtitle, rows):
 
 def game_card_html(g, selected_map):
     aw, hw = float(g.get("away_model") or 0), float(g.get("home_model") or 0)
-    up, op = g.get("under_prob"), g.get("over_prob")
-    am, hm = g.get("away_minus_1_5"), g.get("home_minus_1_5")
     line = g.get("total_line")
     selected = selected_map.get(g.get("game_pk"))
-    bet_name = pick_ko(selected.get("pick")) if selected else "배팅 기준 미달"
-    edge = pct(selected.get("edge"), True) if selected else "-"
-    pc = "" if selected else " no"
-    ml = market_panel(
-        "승 · 패", "양 팀 소수 배당",
-        [
-            (team_ko(g["away"]), score100(aw), price(g.get("away_ml_odds")), aw >= hw),
-            (team_ko(g["home"]), score100(hw), price(g.get("home_ml_odds")), hw > aw),
-        ],
-    )
-    total = market_panel(
-        "언더 · 오버", f"기준 {line:g}" if valid_number(line) else "기준점 미확인",
-        [
-            ("언더", score100(up), price(g.get("under_odds")), valid_number(up) and (not valid_number(op) or up >= op)),
-            ("오버", score100(op), price(g.get("over_odds")), valid_number(op) and (not valid_number(up) or op > up)),
-        ],
-    )
-    runline = market_panel(
-        "-1.5 핸디캡", "각 팀 -1.5 기준",
-        [
-            (f"{team_ko(g['away'])} -1.5", score100(am), price(g.get("away_minus_1_5_odds")), valid_number(am) and (not valid_number(hm) or am >= hm)),
-            (f"{team_ko(g['home'])} -1.5", score100(hm), price(g.get("home_minus_1_5_odds")), valid_number(hm) and (not valid_number(am) or hm > am)),
-        ],
-    )
-    return f'''<div class="game-card">
-<div class="game-top"><div class="game-time">{game_time(g)}</div><div class="market-badge">KST · LIVE ODDS</div></div>
-<div class="matchup"><div class="team-box"><div class="team-name">{html.escape(team_ko(g['away']))}</div><div class="pitcher">{html.escape(g.get('away_probable') or '선발 미정')}</div></div><div class="versus">VS</div><div class="team-box home"><div class="team-name">{html.escape(team_ko(g['home']))}</div><div class="pitcher">{html.escape(g.get('home_probable') or '선발 미정')}</div></div></div>
-<div class="market-panels">{ml}{total}{runline}</div>
-<div class="bet-strip"><div><div class="bet-kicker">SPORTS LAB BETTING PICK</div><div class="bet-name{pc}">{html.escape(bet_name)}</div></div><div class="bet-meta"><strong>{edge}</strong><span>시장 대비 EDGE</span></div></div>
+    selected_prob = candidate_hit_prob(selected) if selected else None
+    pick_name = pick_ko(selected.get("pick")) if selected else "오늘 배팅 기준 미달"
+    pick_odds = price(selected.get("odds")) if selected else "-"
+    total_hint = "-"
+    if valid_number(line):
+        side = "언더" if float(g.get("under_prob") or 0) >= float(g.get("over_prob") or 0) else "오버"
+        pp = g.get("under_prob") if side == "언더" else g.get("over_prob")
+        total_hint = f"{side} {float(line):g} · {score100(pp)}"
+    guide_meta = ("적중점수 " + score100(selected_prob) + " · 배당 " + pick_odds) if selected else "추천 기준을 통과한 픽이 없습니다."
+    return f'''<div class="game-card simple">
+<div class="game-top"><div class="game-time">{game_time(g)}</div><div class="market-badge">KST · 현재 배당</div></div>
+<div class="simple-match">
+<div class="team-line">{logo_img(g['away'])}<div><div class="club-name">{html.escape(team_ko(g['away']))}</div><div class="club-sub">{html.escape(g.get('away_probable') or '선발 미정')}</div></div><div class="win-box"><div class="win-score{' hot' if aw>=hw else ''}">{score100(aw)}</div><div class="win-odds">배당 {price(g.get('away_ml_odds'))}</div></div></div>
+<div class="simple-vs">VS</div>
+<div class="team-line home"><div class="win-box"><div class="win-score{' hot' if hw>aw else ''}">{score100(hw)}</div><div class="win-odds">배당 {price(g.get('home_ml_odds'))}</div></div><div><div class="club-name">{html.escape(team_ko(g['home']))}</div><div class="club-sub">{html.escape(g.get('home_probable') or '선발 미정')}</div></div>{logo_img(g['home'])}</div>
+</div>
+<div class="simple-divider"></div>
+<div class="simple-bottom"><div class="guide-box"><div class="guide-label">SPORTS LAB GUIDE</div><div class="guide-pick">{html.escape(pick_name)}</div><div class="guide-meta">{html.escape(guide_meta)}</div></div><div class="mini-box"><span>언더 · 오버</span><strong>{html.escape(total_hint)}</strong></div><div class="mini-box"><span>핸디캡</span><strong>상세 분석 탭</strong></div></div>
 </div>'''
 
 
 def bet_card_html(g, c, rank):
-    return f'''<div class="bet-card"><div class="bet-rank">BET #{rank} · {market_ko(c.get('market'))}</div><div class="bet-match">{game_time(g)} · {html.escape(team_ko(g['away']))} vs {html.escape(team_ko(g['home']))}</div><div class="bet-title">{html.escape(pick_ko(c.get('pick')))}</div><div class="bet-stats"><div class="bet-stat"><span>적중확률 점수</span><strong>{score100(candidate_hit_prob(c))}</strong></div><div class="bet-stat"><span>현재 배당</span><strong>{price(c.get('odds'))}</strong></div><div class="bet-stat"><span>시장대비 EDGE</span><strong class="green">{pct(c.get('edge'), True)}</strong></div><div class="bet-stat"><span>기대값 EV</span><strong class="green">{pct(c.get('ev'), True)}</strong></div></div></div>'''
+    prob = candidate_hit_prob(c)
+    grade = pick_grade(prob)
+    dt = game_dt_kst(g)
+    deadline = dt.strftime("%m/%d %H:%M KST") if dt else "경기 시작 전"
+    return f'''<div class="bet-card"><div class="bet-rank">BET #{rank} · {market_ko(c.get('market'))}<span class="grade">{grade}</span></div><div class="bet-match">{html.escape(team_ko(g['away']))} vs {html.escape(team_ko(g['home']))}</div><div class="bet-title">{html.escape(pick_ko(c.get('pick')))}</div><div class="deadline">참여 마감 · {deadline}</div><div class="bet-stats"><div class="bet-stat"><span>적중확률</span><strong>{score100(prob)}</strong></div><div class="bet-stat"><span>현재 배당</span><strong>{price(c.get('odds'))}</strong></div><div class="bet-stat"><span>신뢰등급</span><strong class="green">{grade}</strong></div><div class="bet-stat"><span>시장 우위</span><strong class="green">{pct(c.get('edge'), True)}</strong></div></div></div>'''
 
 
 def detail_card(g, title, cols, rows):
@@ -223,7 +305,7 @@ def detail_card(g, title, cols, rows):
     body = ''
     for label, vals in rows:
         body += f'<div class="detail-cell label">{html.escape(label)}</div>' + ''.join(f'<div class="detail-cell value">{html.escape(str(v))}</div>' for v in vals)
-    return f'''<div class="detail-card"><div class="detail-head"><div class="detail-title">{html.escape(title)}</div><div class="detail-time">{game_time(g)}</div></div><div class="detail-grid"><div class="detail-cell head"></div>{headers}{body}</div></div>'''
+    return f'''<div class="detail-card"><div class="detail-head"><div class="detail-title">{html.escape(title)}</div><div class="detail-time">{game_time(g)}</div></div><div class="detail-grid" style="grid-template-columns:1.35fr repeat({len(cols)},minmax(0,1fr))"><div class="detail-cell head"></div>{headers}{body}</div></div>'''
 
 
 # ---------- Auth session ----------
@@ -255,13 +337,15 @@ def ensure_profile():
 
 
 # ---------- Header / Navigation ----------
-user_tag = auth_user().get("email") if logged_in() else "로그인 필요"
+user_tag = auth_user().get("email") if logged_in() else "로그인"
+lockup = brand_lockup_data_uri()
+brand_html = f'<img class="brand-lockup" src="{lockup}" alt="SPORTS LAB">' if lockup else '<div class="brand">SPORTS <em>LAB</em></div>'
 st.markdown(
-    f'<div class="topbar"><div class="brand-wrap"><div class="brand-ball">⚾</div><div><div class="brand">SPORTS <em>LAB</em></div><div class="brand-sub">스포츠랩 · MLB DATA ANALYSIS</div></div></div><div class="status-pill"><span class="live-dot"></span>{NOW_KST:%Y.%m.%d %H:%M} KST · {html.escape(user_tag)}</div></div>',
+    f'<div class="topbar"><div class="brand-wrap">{brand_html}</div><div class="status-pill"><span class="live-dot"></span>{NOW_KST:%Y.%m.%d %H:%M} KST · {html.escape(user_tag)}</div></div>',
     unsafe_allow_html=True,
 )
 
-NAV = ["오늘 경기", "배팅 경기", "승 · 패", "언더 · 오버", "-1.5", "픽 히스토리", "마이페이지", "내 결과", "뱅크롤", "모델 근거", "로그인"]
+NAV = ["오늘 경기", "배팅 경기", "승 · 패", "언더 · 오버", "핸디캡", "픽 히스토리", "마이페이지", "로그인"]
 page = st.radio("페이지", NAV, horizontal=True, label_visibility="collapsed")
 
 # Login page does not require a trained model or Odds key.
@@ -369,30 +453,54 @@ if page == "오늘 경기":
     if not games:
         st.info("선택한 한국시간 날짜에 예정된 MLB 정규시즌 경기가 없습니다.")
     else:
-        st.markdown(f'<div class="summary-grid"><div class="summary-card"><div class="summary-label">경기 수</div><div class="summary-value">{len(games)}경기</div><div class="summary-sub">KST 기준</div></div><div class="summary-card"><div class="summary-label">오늘 배팅 경기</div><div class="summary-value green">{len(betting_picks)}개</div><div class="summary-sub">최대 10개 · 경기당 1픽</div></div><div class="summary-card"><div class="summary-label">배당 표시</div><div class="summary-value">Decimal</div><div class="summary-sub">홈/원정 모두 표기</div></div><div class="summary-card"><div class="summary-label">배당 갱신</div><div class="summary-value">5분</div><div class="summary-sub">현재 시장 배당</div></div></div>', unsafe_allow_html=True)
+        ml_count = sum(1 for _, c in betting_picks if c.get("market") == "moneyline")
+        total_count = sum(1 for _, c in betting_picks if c.get("market") == "total")
+        avg_prob = (sum(candidate_hit_prob(c) for _, c in betting_picks) / len(betting_picks)) if betting_picks else 0
+        st.markdown(f'<div class="quick-grid"><div class="quick"><span>오늘 전체 경기</span><strong>{len(games)}경기</strong><small>KST 기준</small></div><div class="quick"><span>배팅 경기</span><strong class="green">{len(betting_picks)}개</strong><small>최대 10개</small></div><div class="quick"><span>승·패 비중</span><strong>{ml_count}개</strong><small>O/U {total_count}개</small></div><div class="quick"><span>평균 적중점수</span><strong>{avg_prob*100:.0f}점</strong><small>선정 픽 기준</small></div></div>', unsafe_allow_html=True)
         for g in games:
             st.markdown(game_card_html(g, selected_map), unsafe_allow_html=True)
 
 elif page == "배팅 경기":
-    page_header("BETTING BOARD", "오늘의 배팅 경기", "백테스트/최적화 기준을 먼저 통과한 뒤 적중률 우선 강화기준을 한 번 더 적용합니다. 같은 경기에서는 가장 적합한 1픽만 선정하며 하루 최대 10픽입니다.")
+    page_header("BETTING GUIDE", "오늘의 배팅 경기", "승·패를 우선으로 선정하고, 언더·오버는 신호가 매우 강한 경우에만 포함합니다. 기준을 통과한 경기만 최대 10개까지 보여줍니다.")
     floors = BETTING_FLOORS
-    st.caption(f"현재 강화기준 · 승패 {floors['moneyline']['min_hit_prob']*100:.0f}점+ / O·U {floors['total']['min_hit_prob']*100:.0f}점+ / -1.5 {floors['minus_1_5']['min_hit_prob']*100:.0f}점+ · Edge/EV 추가 검증")
+    if betting_picks:
+        g0, c0 = betting_picks[0]
+        st.markdown(f'<div class="hero-pick"><div class="label">TODAY BEST PICK · {pick_grade(candidate_hit_prob(c0))}</div><div class="pick">{html.escape(pick_ko(c0.get("pick")))}</div><div class="meta">{html.escape(team_ko(g0["away"]))} vs {html.escape(team_ko(g0["home"]))} · 적중확률 {score100(candidate_hit_prob(c0))} · 현재 배당 {price(c0.get("odds"))}</div></div>', unsafe_allow_html=True)
     if not betting_picks:
         st.info("오늘은 강화 배팅 기준을 통과한 경기가 없습니다. 억지로 픽 수를 채우지 않습니다.")
     else:
         for rank, (g, c) in enumerate(betting_picks, start=1):
             st.markdown(bet_card_html(g, c, rank), unsafe_allow_html=True)
 
+        st.markdown("### 오늘 가이드")
+        if not logged_in():
+            st.markdown('<div class="participate-banner"><strong>로그인 후 오늘 배팅 가이드를 내 기록에 저장할 수 있습니다.</strong><span>참여한 날짜만 개인 적중내역과 정산에 포함됩니다.</span></div>', unsafe_allow_html=True)
+        elif auth.enabled:
+            try:
+                prof = ensure_profile()
+                unit_stake = float(prof.get("unit_stake") or 100_000)
+                total_exposure = unit_stake * len(betting_picks)
+                done = auth.get_participation_for_date(st.session_state.auth_session["access_token"], auth_user()["id"], str(TARGET_DATE))
+                st.markdown(f'<div class="participate-banner"><strong>{len(betting_picks)}픽 × {money(unit_stake)} · 총 {money(total_exposure)}</strong><span>참여 시 현재 배당이 개인 기록에 고정됩니다.</span></div>', unsafe_allow_html=True)
+                if done:
+                    st.success("오늘 배팅 참여 완료 · 이미 개인 기록에 저장되어 있습니다.")
+                elif st.button("오늘 배팅 참여하기", type="primary", use_container_width=True, key="participate_today"):
+                    auth.participate(st.session_state.auth_session["access_token"], auth_user()["id"], str(TARGET_DATE), betting_picks, unit_stake)
+                    st.success("오늘 배팅 참여가 기록되었습니다.")
+                    st.rerun()
+            except Exception as e:
+                st.error(f"참여 기록 저장 실패: {e}")
+
 elif page == "승 · 패":
     page_header("MONEYLINE", "승 · 패 확률과 양 팀 배당", "양 팀 모두 같은 구조로 적중점수, 현재 소수 배당, 시장확률, Edge를 비교합니다.")
     for g in games:
         ae=(g.get("away_model")-g.get("away_market_novig")) if valid_number(g.get("away_market_novig")) else None
         he=(g.get("home_model")-g.get("home_market_novig")) if valid_number(g.get("home_market_novig")) else None
-        st.markdown(detail_card(g, f"{team_ko(g['away'])} vs {team_ko(g['home'])}", [team_ko(g['away']), team_ko(g['home']), "", ""], [
-            ("적중점수", [score100(g.get('away_model')), score100(g.get('home_model')), "", ""]),
-            ("현재 배당", [price(g.get('away_ml_odds')), price(g.get('home_ml_odds')), "", ""]),
-            ("시장확률", [pct(g.get('away_market_novig')), pct(g.get('home_market_novig')), "", ""]),
-            ("Edge", [pct(ae, True), pct(he, True), "", ""]),
+        st.markdown(detail_card(g, f"{team_ko(g['away'])} vs {team_ko(g['home'])}", [team_ko(g['away']), team_ko(g['home'])], [
+            ("적중점수", [score100(g.get('away_model')), score100(g.get('home_model'))]),
+            ("현재 배당", [price(g.get('away_ml_odds')), price(g.get('home_ml_odds'))]),
+            ("시장확률", [pct(g.get('away_market_novig')), pct(g.get('home_market_novig'))]),
+            ("Edge", [pct(ae, True), pct(he, True)]),
         ]), unsafe_allow_html=True)
 
 elif page == "언더 · 오버":
@@ -405,13 +513,26 @@ elif page == "언더 · 오버":
             ("시장확률", [pct(g.get('under_market_novig')), pct(g.get('over_market_novig')), "-", "-"]),
         ]), unsafe_allow_html=True)
 
-elif page == "-1.5":
-    page_header("RUN LINE", "-1.5 핸디캡 적중확률", "원정과 홈 -1.5 모두 적중점수와 현재 소수 배당을 동일한 구조로 표시합니다.")
+elif page == "핸디캡":
+    page_header("HANDICAP", "핸디캡 적중확률", "현재 시장이 ±1.5인 경기에서는 정배 -1.5와 상대 역배 +1.5를 한 쌍으로 비교합니다. 시장 라인이 다른 경우 현재 핸디캡 라인을 그대로 표시합니다.")
     for g in games:
-        st.markdown(detail_card(g, f"{team_ko(g['away'])} vs {team_ko(g['home'])}", [f"{team_ko(g['away'])} -1.5", f"{team_ko(g['home'])} -1.5", "", ""], [
-            ("적중점수", [score100(g.get('away_minus_1_5')), score100(g.get('home_minus_1_5')), "", ""]),
-            ("현재 배당", [price(g.get('away_minus_1_5_odds')), price(g.get('home_minus_1_5_odds')), "", ""]),
-            ("시장확률", [pct(g.get('away_minus_1_5_market_novig')), pct(g.get('home_minus_1_5_market_novig')), "", ""]),
+        hp = g.get("home_spread_line"); ap = g.get("away_spread_line")
+        hprob = g.get("home_spread_market_novig"); aprob = g.get("away_spread_market_novig")
+        # Model cover probabilities are only explicitly available for -1.5. For +1.5,
+        # the complement of the opponent -1.5 cover probability is exact for baseball.
+        if valid_number(hp) and abs(float(hp) + 1.5) < 1e-9:
+            hm = g.get("home_minus_1_5"); am = 1.0 - float(hm) if valid_number(hm) else None
+        elif valid_number(ap) and abs(float(ap) + 1.5) < 1e-9:
+            am = g.get("away_minus_1_5"); hm = 1.0 - float(am) if valid_number(am) else None
+        else:
+            hm = g.get("home_minus_1_5") if valid_number(hp) and float(hp) < 0 else None
+            am = g.get("away_minus_1_5") if valid_number(ap) and float(ap) < 0 else None
+        hlabel = f"{team_ko(g['home'])} {float(hp):+g}" if valid_number(hp) else team_ko(g['home'])
+        alabel = f"{team_ko(g['away'])} {float(ap):+g}" if valid_number(ap) else team_ko(g['away'])
+        st.markdown(detail_card(g, f"{team_ko(g['away'])} vs {team_ko(g['home'])}", [alabel, hlabel], [
+            ("적중점수", [score100(am), score100(hm)]),
+            ("현재 배당", [price(g.get('away_spread_odds')), price(g.get('home_spread_odds'))]),
+            ("시장확률", [pct(aprob), pct(hprob)]),
         ]), unsafe_allow_html=True)
 
 elif page == "픽 히스토리":
@@ -432,7 +553,7 @@ elif page == "픽 히스토리":
             st.warning(f"히스토리를 불러오지 못했습니다: {e}")
 
 elif page == "마이페이지":
-    page_header("MY PAGE", "내 Seed · 기준금액 설정", "회원가입 이후에도 Seed와 단폴더 기준금액을 언제든 수정할 수 있습니다. 수정은 이후 개인 참여 기록부터 적용됩니다.")
+    page_header("MY PAGE", "내 설정 · 참여 기록", "Seed와 단폴더 기준금액을 관리하고, 내가 실제로 참여한 날짜의 결과만 확인합니다.")
     if not logged_in():
         st.warning("로그인 후 이용할 수 있습니다. 상단의 '로그인' 메뉴에서 로그인해 주세요.")
     elif not auth.enabled:
@@ -452,6 +573,18 @@ elif page == "마이페이지":
                 auth.upsert_profile(st.session_state.auth_session["access_token"], auth_user()["id"], seed, unit)
                 st.success("Seed와 단폴더 기준금액을 수정했습니다.")
                 st.rerun()
+
+            st.markdown("### 최근 참여 결과")
+            rows = auth.get_user_results(st.session_state.auth_session["access_token"], auth_user()["id"], limit=30)
+            if not rows:
+                st.markdown('<div class="empty-box">아직 참여 기록이 없습니다. 배팅 경기에서 참여한 날짜만 여기에 기록됩니다.</div>', unsafe_allow_html=True)
+            else:
+                for r in rows[:7]:
+                    picks = r.get("participation_picks") or []
+                    wins = sum(1 for x in picks if (x.get("result") or "").upper() == "WIN")
+                    losses = sum(1 for x in picks if (x.get("result") or "").upper() == "LOSS")
+                    pnl = sum(float(x.get("pnl") or 0) for x in picks)
+                    st.markdown(f'<div class="detail-card"><div class="detail-head"><div class="detail-title">{html.escape(str(r.get("pick_date") or ""))}</div><div class="detail-time">{wins}승 {losses}패 · {money(pnl)}</div></div></div>', unsafe_allow_html=True)
         except Exception as e:
             st.error(f"회원정보를 불러오지 못했습니다: {e}")
 
@@ -471,7 +604,7 @@ elif page == "내 결과":
                     st.markdown(f"### {r.get('pick_date')}")
                     picks = r.get("participation_picks") or []
                     for p in picks:
-                        sp = p.get("site_picks") or {}
+                        sp = p.get("site_picks") or p
                         st.write(f"{sp.get('pick','-')} · 배당 {price(p.get('locked_odds'))} · {p.get('result') or 'PENDING'} · 손익 {money(p.get('pnl') or 0)}")
         except Exception as e:
             st.warning(f"내 결과를 불러오지 못했습니다: {e}")
@@ -497,14 +630,14 @@ elif page == "모델 근거":
     for g in games:
         a,h=g["away_snapshot"],g["home_snapshot"]
         dec3=lambda x:"-" if not valid_number(x) else f"{float(x):.3f}"
-        st.markdown(detail_card(g, f"{team_ko(g['away'])} vs {team_ko(g['home'])}", [team_ko(g['away']), team_ko(g['home']), "", ""], [
-            ("최근10G 승률", [pct(a.get('record_recent10')), pct(h.get('record_recent10')), "", ""]),
-            ("2024~ 누적승률", [pct(a.get('record_history')), pct(h.get('record_history')), "", ""]),
-            ("최근10G 타율", [dec3(a.get('bat_avg_recent10')), dec3(h.get('bat_avg_recent10')), "", ""]),
-            ("최근10G OPS", [dec3(a.get('bat_ops_recent10')), dec3(h.get('bat_ops_recent10')), "", ""]),
-            ("불펜 최근10G ERA", [num(a.get('bullpen_era_recent10')), num(h.get('bullpen_era_recent10')), "", ""]),
-            ("선발 최근5G ERA", [num(a.get('starter_era_recent5')), num(h.get('starter_era_recent5')), "", ""]),
-            ("선발 최근5G WHIP", [num(a.get('starter_whip_recent5')), num(h.get('starter_whip_recent5')), "", ""]),
+        st.markdown(detail_card(g, f"{team_ko(g['away'])} vs {team_ko(g['home'])}", [team_ko(g['away']), team_ko(g['home'])], [
+            ("최근10G 승률", [pct(a.get('record_recent10')), pct(h.get('record_recent10'))]),
+            ("2024~ 누적승률", [pct(a.get('record_history')), pct(h.get('record_history'))]),
+            ("최근10G 타율", [dec3(a.get('bat_avg_recent10')), dec3(h.get('bat_avg_recent10'))]),
+            ("최근10G OPS", [dec3(a.get('bat_ops_recent10')), dec3(h.get('bat_ops_recent10'))]),
+            ("불펜 최근10G ERA", [num(a.get('bullpen_era_recent10')), num(h.get('bullpen_era_recent10'))]),
+            ("선발 최근5G ERA", [num(a.get('starter_era_recent5')), num(h.get('starter_era_recent5'))]),
+            ("선발 최근5G WHIP", [num(a.get('starter_whip_recent5')), num(h.get('starter_whip_recent5'))]),
         ]), unsafe_allow_html=True)
 
 st.markdown('<div class="footer-note"><b>SPORTS LAB · 스포츠랩</b>은 통계·머신러닝 기반 분석 정보 서비스입니다. 표시 확률과 배팅 경기는 결과나 수익을 보장하지 않으며, 배당은 조회 시점과 제공처에 따라 달라질 수 있습니다.</div>', unsafe_allow_html=True)
