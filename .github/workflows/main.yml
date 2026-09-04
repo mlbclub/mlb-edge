@@ -54,6 +54,12 @@ jobs:
           OPENBLAS_NUM_THREADS: '2'
         run: python run_pipeline.py
 
+      - name: Generate current KST predictions and recommendations
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          OMP_NUM_THREADS: '2'
+        run: python predict_today.py
+
       - name: Save updated model to GitHub
         run: |
           git config user.name "mlb-edge-bot"
@@ -65,6 +71,7 @@ jobs:
           git add data/features_v3.csv
           git add models/market_model_v3.joblib
           git add data/robust_ablation_report.csv
+          git add data/today_market_predictions.csv
 
           for f in \
             data/current_odds_history.csv \

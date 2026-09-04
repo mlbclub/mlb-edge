@@ -21,6 +21,7 @@ for secret_name in ("ODDS_API_KEY", "SUPABASE_URL", "SUPABASE_ANON_KEY"):
 from mlb_model.auth import SupabaseAuth
 from mlb_model.config import MODEL_FILE, TEAM_GAMES, PICK_RULES_FILE
 from mlb_model.live import predict_date
+from mlb_model.runtime import prediction_revision
 from mlb_model.recommend import (
     BETTING_FLOORS,
     betting_rank_score,
@@ -430,11 +431,11 @@ with c3:
 TARGET_DATE = st.session_state.board_date
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_day(d: str):
+def load_day(d: str, revision):
     return predict_date(d, save=False)
 
 try:
-    games, rule_meta = load_day(str(TARGET_DATE))
+    games, rule_meta = load_day(str(TARGET_DATE), prediction_revision())
 except Exception as e:
     st.error(f"경기 분석을 불러오지 못했습니다: {e}")
     st.stop()

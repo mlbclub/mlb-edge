@@ -1,10 +1,11 @@
 from __future__ import annotations
-from datetime import date
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import pandas as pd
 from mlb_model.live import predict_date
 
 if __name__ == "__main__":
-    games, _ = predict_date(str(date.today()), save=True)
+    games, _ = predict_date(str(datetime.now(ZoneInfo('Asia/Seoul')).date()), save=True)
     rows=[]
     for g in games:
         rows.append({

@@ -6,6 +6,7 @@ import streamlit as st
 
 from mlb_model.config import MODEL_FILE, TEAM_GAMES, PICK_RULES_FILE
 from mlb_model.live import predict_date
+from mlb_model.runtime import prediction_revision
 from mlb_model.odds import american_from_decimal
 
 st.set_page_config(page_title="SPORTS LAB", page_icon="⚾", layout="wide")
@@ -52,14 +53,14 @@ with st.sidebar:
         st.info("기본 추천 기준 적용 중\n과거 배당 백테스트 후 자동 교체 가능")
 
 @st.cache_data(ttl=120, show_spinner=False)
-def load_day(d):
+def load_day(d, revision):
     return predict_date(str(d), save=True)
 
 if refresh:
     load_day.clear()
 
 try:
-    games, rule_meta = load_day(target)
+    games, rule_meta = load_day(target, prediction_revision())
 except Exception as e:
     st.error(f"분석 중 오류: {e}")
     st.stop()

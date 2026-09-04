@@ -257,6 +257,9 @@ def build_market_candidates(home, away, probs: dict, odds: dict):
         probs.update(tm)
         probs["over_model"] = over_cond
         probs["under_model"] = under_cond
+        # Display and recommendations share the final unconditional hit chance.
+        probs['over_prob'] = over_cond * nonpush
+        probs['under_prob'] = under_cond * nonpush
 
     for side, team in (("home", home), ("away", away)):
         c = _candidate(
