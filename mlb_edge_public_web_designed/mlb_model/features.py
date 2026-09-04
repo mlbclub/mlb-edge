@@ -3,18 +3,22 @@ import numpy as np
 import pandas as pd
 import warnings
 from pandas.errors import PerformanceWarning
+
 warnings.simplefilter("ignore", PerformanceWarning)
 
 from .config import ENRICHED_GAMES, TEAM_GAMES, FEATURES, WINDOWS, STARTER_WINDOWS, DATA_DIR
 
-EPS = 1e-9
-
 TEAM_METRICS = [
     "win", "runs_for", "runs_against", "run_diff",
-    "bat_avg", "bat_obp", "bat_slg", "bat_ops", "bat_hr_rate", "bat_k_rate",
-    "bullpen_era", "bullpen_whip", "bullpen_k9", "bullpen_bb9", "bullpen_hr9",
+    "bat_avg", "bat_obp", "bat_slg", "bat_ops", "bat_hr_rate", "bat_k_rate", "bat_bb_rate",
+    "bullpen_era", "bullpen_whip", "bullpen_k9", "bullpen_bb9", "bullpen_hr9", "bullpen_pitches_per_ip",
 ]
-STARTER_METRICS = ["starter_era", "starter_whip", "starter_k9", "starter_bb9", "starter_hr9", "starter_ip"]
+STARTER_METRICS = [
+    "starter_era", "starter_whip", "starter_k9", "starter_bb9", "starter_hr9", "starter_ip",
+    "starter_pitches", "starter_batters", "starter_pitches_per_ip", "starter_k_bb",
+]
+H2H_METRICS = ["win", "runs_for", "runs_against", "run_diff", "game_total"]
+VENUE_METRICS = ["win", "runs_for", "runs_against", "run_diff", "bat_ops", "bullpen_era"]
 
 
 def _safe_div(a, b):
@@ -31,6 +35,7 @@ def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
         "team_id": df[f"{side}_team_id"].astype(int),
         "team": df[f"{side}_team"],
         "opponent_id": df[f"{opp}_team_id"].astype(int),
+        "venue_id": pd.to_numeric(df.get("venue_id"), errors="coerce"),
         "is_home": 1 if side == "home" else 0,
         "runs_for": df[f"{side}_score"].astype(float),
         "runs_against": df[f"{opp}_score"].astype(float),
@@ -51,6 +56,8 @@ def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
         "starter_bb_raw": df[f"{side}_starter_bb"].astype(float),
         "starter_k_raw": df[f"{side}_starter_k"].astype(float),
         "starter_hr_raw": df[f"{side}_starter_hr"].astype(float),
+        "starter_pitches_raw": pd.to_numeric(df.get(f"{side}_starter_pitches"), errors="coerce"),
+        "starter_batters_raw": pd.to_numeric(df.get(f"{side}_starter_batters"), errors="coerce"),
         "bullpen_ip_raw": df[f"{side}_bullpen_ip"].astype(float),
         "bullpen_er_raw": df[f"{side}_bullpen_er"].astype(float),
         "bullpen_h_raw": df[f"{side}_bullpen_h"].astype(float),
@@ -58,14 +65,18 @@ def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
         "bullpen_k_raw": df[f"{side}_bullpen_k"].astype(float),
         "bullpen_hr_raw": df[f"{side}_bullpen_hr"].astype(float),
         "bullpen_pitches_raw": df[f"{side}_bullpen_pitches"].astype(float),
+        "bullpen_batters_raw": pd.to_numeric(df.get(f"{side}_bullpen_batters"), errors="coerce"),
     })
     x["run_diff"] = x["runs_for"] - x["runs_against"]
+    x["game_total"] = x["runs_for"] + x["runs_against"]
+    pa = x["bat_ab"] + x["bat_bb"] + x["bat_hbp"] + x["bat_sf"]
     x["bat_avg"] = _safe_div(x["bat_h"], x["bat_ab"])
-    x["bat_obp"] = _safe_div(x["bat_h"] + x["bat_bb"] + x["bat_hbp"], x["bat_ab"] + x["bat_bb"] + x["bat_hbp"] + x["bat_sf"])
+    x["bat_obp"] = _safe_div(x["bat_h"] + x["bat_bb"] + x["bat_hbp"], pa)
     x["bat_slg"] = _safe_div(x["bat_tb"], x["bat_ab"])
     x["bat_ops"] = x["bat_obp"] + x["bat_slg"]
     x["bat_hr_rate"] = _safe_div(x["bat_hr"], x["bat_ab"])
-    x["bat_k_rate"] = _safe_div(x["bat_so"], x["bat_ab"] + x["bat_bb"] + x["bat_hbp"] + x["bat_sf"])
+    x["bat_k_rate"] = _safe_div(x["bat_so"], pa)
+    x["bat_bb_rate"] = _safe_div(x["bat_bb"], pa)
 
     bip = x["bullpen_ip_raw"]
     x["bullpen_era"] = _safe_div(9 * x["bullpen_er_raw"], bip)
@@ -73,6 +84,7 @@ def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
     x["bullpen_k9"] = _safe_div(9 * x["bullpen_k_raw"], bip)
     x["bullpen_bb9"] = _safe_div(9 * x["bullpen_bb_raw"], bip)
     x["bullpen_hr9"] = _safe_div(9 * x["bullpen_hr_raw"], bip)
+    x["bullpen_pitches_per_ip"] = _safe_div(x["bullpen_pitches_raw"], bip)
 
     sip = x["starter_ip_raw"]
     x["starter_era"] = _safe_div(9 * x["starter_er_raw"], sip)
@@ -81,6 +93,11 @@ def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
     x["starter_bb9"] = _safe_div(9 * x["starter_bb_raw"], sip)
     x["starter_hr9"] = _safe_div(9 * x["starter_hr_raw"], sip)
     x["starter_ip"] = sip
+    x["starter_pitches"] = x["starter_pitches_raw"]
+    x["starter_batters"] = x["starter_batters_raw"]
+    x["starter_pitches_per_ip"] = _safe_div(x["starter_pitches_raw"], sip)
+    x["starter_k_bb"] = _safe_div(x["starter_k_raw"], x["starter_bb_raw"].replace(0, np.nan))
+    x["starter_k_bb"] = x["starter_k_bb"].where(x["starter_bb_raw"] > 0, x["starter_k_raw"])
     return x
 
 
@@ -90,8 +107,8 @@ def make_team_long(enriched: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([home, away], ignore_index=True).sort_values(["game_date", "game_pk", "is_home"]).reset_index(drop=True)
 
 
-def _prior_expanding(grouped, col):
-    return grouped[col].transform(lambda s: s.shift(1).expanding(min_periods=5).mean())
+def _prior_expanding(grouped, col, min_periods=5):
+    return grouped[col].transform(lambda s: s.shift(1).expanding(min_periods=min_periods).mean())
 
 
 def _prior_ewm(grouped, col, span=60):
@@ -105,6 +122,18 @@ def add_pregame_features(long: pd.DataFrame) -> pd.DataFrame:
 
     x["history_games"] = tg.cumcount()
     x["season_games"] = sg.cumcount()
+    prev_dt = tg["game_date"].shift(1)
+    x["rest_days"] = ((x["game_date"] - prev_dt).dt.total_seconds() / 86400.0).clip(lower=0, upper=7)
+    x["back_to_back"] = (x["rest_days"] < 1.45).astype(float)
+    x["short_rest"] = (x["rest_days"] < 0.80).astype(float)
+
+    venue_games = x[["game_pk", "game_date", "venue_id", "game_total"]].drop_duplicates("game_pk").sort_values(["venue_id", "game_date", "game_pk"])
+    vgg = venue_games.groupby("venue_id", group_keys=False, sort=False)
+    venue_games["park_total_history"] = vgg["game_total"].transform(lambda s: s.shift(1).expanding(min_periods=8).mean())
+    venue_games["park_total_r30"] = vgg["game_total"].transform(lambda s: s.shift(1).rolling(30, min_periods=8).mean())
+    x = x.merge(venue_games[["game_pk", "park_total_history", "park_total_r30"]], on="game_pk", how="left")
+    tg = x.sort_values(["team_id", "game_date", "game_pk"]).groupby("team_id", group_keys=False, sort=False)
+    sg = x.sort_values(["team_id", "game_date", "game_pk"]).groupby(["season", "team_id"], group_keys=False, sort=False)
 
     for col in TEAM_METRICS:
         for w in WINDOWS:
@@ -114,14 +143,31 @@ def add_pregame_features(long: pd.DataFrame) -> pd.DataFrame:
         x[f"{col}_season"] = _prior_expanding(sg, col)
         x[f"{col}_ewm60"] = _prior_ewm(tg, col, 60)
 
-    # Bullpen workload: recent use can matter even when performance ratios look good.
+    for col in ("win", "runs_for", "runs_against", "run_diff", "bat_ops", "bat_hr_rate", "bullpen_era", "bullpen_whip"):
+        x[f"{col}_momentum"] = x[f"{col}_r5"] - x[f"{col}_r20"]
+
     x["bullpen_pitches_usage_1"] = tg["bullpen_pitches_raw"].transform(lambda s: s.shift(1).rolling(1, min_periods=1).sum())
+    x["bullpen_pitches_usage_2"] = tg["bullpen_pitches_raw"].transform(lambda s: s.shift(1).rolling(2, min_periods=1).sum())
     x["bullpen_pitches_usage_3"] = tg["bullpen_pitches_raw"].transform(lambda s: s.shift(1).rolling(3, min_periods=1).sum())
     x["bullpen_ip_usage_3"] = tg["bullpen_ip_raw"].transform(lambda s: s.shift(1).rolling(3, min_periods=1).sum())
 
-    # Starter history follows the pitcher across teams. The current game's line is never included.
+    vg = x.groupby(["team_id", "is_home"], group_keys=False, sort=False)
+    for col in VENUE_METRICS:
+        x[f"venue_{col}_history"] = _prior_expanding(vg, col, min_periods=3)
+        x[f"venue_{col}_r10"] = vg[col].transform(lambda s: s.shift(1).rolling(10, min_periods=3).mean())
+
+    hg = x.groupby(["team_id", "opponent_id"], group_keys=False, sort=False)
+    x["h2h_games"] = hg.cumcount()
+    for col in H2H_METRICS:
+        x[f"h2h_{col}_history"] = _prior_expanding(hg, col, min_periods=2)
+        x[f"h2h_{col}_r5"] = hg[col].transform(lambda s: s.shift(1).rolling(5, min_periods=2).mean())
+
     x = x.sort_values(["starter_id", "game_date", "game_pk"])
     valid = x["starter_id"].notna()
+    starter_prev_dt = pd.Series(pd.NaT, index=x.index, dtype="datetime64[ns, UTC]")
+    starter_prev_dt.loc[valid] = x.loc[valid].groupby("starter_id", sort=False)["game_date"].shift(1)
+    x["starter_rest_days"] = ((x["game_date"] - starter_prev_dt).dt.total_seconds() / 86400.0).clip(lower=0, upper=14)
+
     for col in STARTER_METRICS:
         for w in STARTER_WINDOWS:
             arr = pd.Series(np.nan, index=x.index, dtype=float)
@@ -137,18 +183,22 @@ def add_pregame_features(long: pd.DataFrame) -> pd.DataFrame:
         arr.loc[valid] = vals
         x[f"{col}_history"] = arr
 
+    for col in ("starter_era", "starter_whip", "starter_k9", "starter_bb9", "starter_hr9", "starter_pitches_per_ip"):
+        x[f"{col}_momentum"] = x[f"{col}_r3"] - x[f"{col}_r10"]
+
     return x.sort_values(["game_date", "game_pk", "is_home"]).reset_index(drop=True)
 
 
 def pregame_feature_columns(long: pd.DataFrame) -> list[str]:
     raw = {
-        "game_pk", "game_date", "season", "team_id", "team", "opponent_id", "is_home",
-        "runs_for", "runs_against", "win", "starter_id", "starter_name",
+        "game_pk", "game_date", "season", "team_id", "team", "opponent_id", "venue_id", "is_home",
+        "runs_for", "runs_against", "run_diff", "game_total", "win", "starter_id", "starter_name",
         "bat_ab", "bat_h", "bat_tb", "bat_bb", "bat_hbp", "bat_sf", "bat_hr", "bat_so",
         "starter_ip_raw", "starter_er_raw", "starter_h_raw", "starter_bb_raw", "starter_k_raw", "starter_hr_raw",
-        "bullpen_ip_raw", "bullpen_er_raw", "bullpen_h_raw", "bullpen_bb_raw", "bullpen_k_raw", "bullpen_hr_raw", "bullpen_pitches_raw",
+        "starter_pitches_raw", "starter_batters_raw",
+        "bullpen_ip_raw", "bullpen_er_raw", "bullpen_h_raw", "bullpen_bb_raw", "bullpen_k_raw", "bullpen_hr_raw",
+        "bullpen_pitches_raw", "bullpen_batters_raw",
     }
-    # observed game metrics are also raw; only derived pregame features are retained.
     raw |= set(TEAM_METRICS) | set(STARTER_METRICS)
     return [c for c in long.columns if c not in raw]
 
@@ -167,8 +217,6 @@ def build_features(enriched_path=ENRICHED_GAMES, team_out=TEAM_GAMES, out_path=F
     a = a.rename(columns={c: f"away_{c}" for c in feat_cols})
     ds = games.merge(h, on="game_pk", how="inner").merge(a, on="game_pk", how="inner")
     ds["month"] = pd.to_datetime(ds["game_date"], utc=True).dt.month
-
-    # Differences improve the W/L classifier while raw home/away values remain for run models.
     for c in feat_cols:
         hc, ac = f"home_{c}", f"away_{c}"
         if pd.api.types.is_numeric_dtype(ds[hc]) and pd.api.types.is_numeric_dtype(ds[ac]):
