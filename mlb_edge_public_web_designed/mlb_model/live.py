@@ -8,6 +8,7 @@ import pandas as pd
 
 from .api import MLBStatsAPI
 from .config import TEAM_GAMES, MODEL_FILE, LIVE_PREDICTIONS, DATA_DIR
+from .context import get_pitcher_meta, live_game_context
 from .odds import OddsAPI, find_event, summarize_event
 from .probability import market_probabilities
 from .recommend import expected_value, load_rules, choose_recommendation, qualifies, candidate_score
@@ -37,7 +38,7 @@ def _meta_matrix(pl, pt, pr):
 
 
 def _prob_model(bundle, row: dict):
-    """Statistical pre-market prediction, compatible with legacy and V6 bundles."""
+    """Statistical pre-market prediction, compatible with legacy, V6 and V7 bundles."""
     wf, rf = bundle["win_features"], bundle["run_features"]
     Xw = pd.DataFrame([{c: row.get(c, np.nan) for c in wf}])
     Xr = pd.DataFrame([{c: row.get(c, np.nan) for c in rf}])
@@ -54,7 +55,6 @@ def _prob_model(bundle, row: dict):
     if total_model is not None:
         direct_total = float(np.clip(total_model.predict(Xr)[0], 0.6, 25.0))
         summed = max(0.6, lh + la)
-        # Must match the training/backtest correction exactly.
         corrected_total = 0.58 * summed + 0.42 * direct_total
         scale = corrected_total / summed
         lh = float(np.clip(lh * scale, 0.2, 15.0))
@@ -118,7 +118,6 @@ def _empirical_total_probs(expected_total: float, line: float, residuals) -> tup
     nonpush = over_count + under_count
     if nonpush <= 0:
         return None, None
-    # Mild beta-style shrinkage prevents extreme probabilities from residual tails.
     over = (over_count + 12.0) / (nonpush + 24.0)
     under = (under_count + 12.0) / (nonpush + 24.0)
     s = over + under
@@ -126,7 +125,7 @@ def _empirical_total_probs(expected_total: float, line: float, residuals) -> tup
 
 
 def _apply_context_consensus(probs: dict, odds: dict, similarity: dict, starters_known: bool, bundle=None):
-    """Blend statistics, sportsbook consensus and historical analogues."""
+    """Blend statistical prediction, sportsbook consensus and historical analogues."""
     base_home = float(probs["home_model"])
     market_home = odds.get("home_market_novig")
     sim_home = similarity.get("home_prob") if similarity.get("available") else None
@@ -298,6 +297,19 @@ def predict_date(target_date: str, save=True):
     api = MLBStatsAPI()
     schedule_games = _kst_schedule(api, target_date)
 
+    pitcher_ids = []
+    for g in schedule_games:
+        for side in ("home", "away"):
+            pp = ((g.get("teams") or {}).get(side) or {}).get("probablePitcher") or {}
+            if pp.get("id"):
+                pitcher_ids.append(pp.get("id"))
+    pitcher_meta = get_pitcher_meta(api, pitcher_ids)
+    hand_map = {}
+    if len(pitcher_meta):
+        for r in pitcher_meta.itertuples(index=False):
+            if not pd.isna(r.pitcher_id):
+                hand_map[int(r.pitcher_id)] = str(r.pitch_hand or "").upper()
+
     try:
         odds_events, quota = OddsAPI().current_mlb(markets="h2h,spreads,totals", odds_format="decimal")
     except Exception as e:
@@ -313,7 +325,24 @@ def predict_date(target_date: str, save=True):
         hp = hside.get("probablePitcher") or {}
         ap = aside.get("probablePitcher") or {}
         game_dt = pd.Timestamp(g.get("gameDate"))
-        row = live_feature_row(team_games, home["id"], away["id"], hp.get("id"), ap.get("id"), game_dt)
+        home_hand = hand_map.get(int(hp["id"])) if hp.get("id") else None
+        away_hand = hand_map.get(int(ap["id"])) if ap.get("id") else None
+
+        row = live_feature_row(
+            team_games,
+            home["id"], away["id"],
+            hp.get("id"), ap.get("id"),
+            game_dt,
+            home_starter_hand=home_hand,
+            away_starter_hand=away_hand,
+        )
+        try:
+            pregame_ctx = live_game_context(api, g, game_dt)
+            row.update(pregame_ctx)
+        except Exception as e:
+            pregame_ctx = {}
+            print(f"[pregame context warning] gamePk={g.get('gamePk')}: {e}")
+
         probs = _prob_model(bundle, row)
 
         event = find_event(odds_events, home["name"], away["name"])
@@ -356,6 +385,8 @@ def predict_date(target_date: str, save=True):
             "status": (g.get("status") or {}).get("detailedState"),
             "away": away["name"], "home": home["name"],
             "away_probable": ap.get("fullName"), "home_probable": hp.get("fullName"),
+            "away_probable_hand": away_hand, "home_probable_hand": home_hand,
+            **pregame_ctx,
             **probs, **odds,
             "market_underdog": underdog, "upset_prob": upset_prob, "upset_edge": upset_edge,
             "recommendation": rec.get("pick", "NO BET") if rec.get("label") == "BET" else "NO BET",
