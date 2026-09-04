@@ -45,3 +45,12 @@ class MLBStatsAPI:
 
     def boxscore(self, game_pk: int):
         return self.get(f"game/{int(game_pk)}/boxscore")
+
+    def game_feed(self, game_pk: int):
+        return self.get(f"game/{int(game_pk)}/feed/live")
+
+    def person(self, person_id: int):
+        return self.get(f"people/{int(person_id)}")
+
+    def venue(self, venue_id: int):
+        return self.get(f"venues/{int(venue_id)}", {"hydrate": "location,fieldInfo,timezone"})
