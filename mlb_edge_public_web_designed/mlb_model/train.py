@@ -13,28 +13,41 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from .config import FEATURES, MODEL_FILE, MODEL_DIR
+from .config import FEATURES, MODEL_FILE, MODEL_DIR, DATA_DIR
 from .probability import market_probabilities
 
-LEVEL_FEATURE_BASES = [
+CORE_BASES = [
     "win_r10", "win_r20", "run_diff_r10", "run_diff_r20",
     "bat_ops_r10", "bat_ops_r20", "bat_hr_rate_r10",
-    "bullpen_era_r10", "bullpen_whip_r10", "bullpen_kbb9_r10", "bullpen_fip_proxy_r10",
+    "bullpen_era_r10", "bullpen_whip_r10",
     "bullpen_pitches_usage_1", "bullpen_pitches_usage_2", "bullpen_pitches_usage_3",
     "days_rest", "games_last7", "games_last4", "elo_pre",
     "venue_win_r20", "venue_run_diff_r20", "venue_bat_ops_r20",
     "win_trend_5v20", "run_diff_trend_5v20", "bat_ops_trend_5v20",
-    "bullpen_era_trend_5v20", "bullpen_whip_trend_5v20", "bullpen_fip_proxy_trend_5v20",
-    "starter_era_r5", "starter_whip_r5", "starter_k9_r5", "starter_bb9_r5", "starter_hr9_r5",
-    "starter_kbb9_r5", "starter_fip_proxy_r5", "starter_ip_r5", "starter_pitches_r5",
-    "starter_rest_days", "starter_pitches_last1", "starter_pitches_last2", "starter_short_rest",
+    "bullpen_era_trend_5v20", "bullpen_whip_trend_5v20",
+    "starter_era_r5", "starter_whip_r5", "starter_k9_r5",
+    "starter_bb9_r5", "starter_hr9_r5", "starter_ip_r5",
     "starter_vs_opp_starts", "starter_era_vs_opp", "starter_whip_vs_opp",
-    "starter_k9_vs_opp", "starter_bb9_vs_opp", "starter_hr9_vs_opp", "starter_fip_proxy_vs_opp",
-    "opp_starter_is_left",
-    "vs_hand_win_r20", "vs_hand_run_diff_r20", "vs_hand_bat_ops_r20",
-    "vs_hand_bat_hr_rate_r20", "vs_hand_runs_for_r20",
-    "vs_hand_win_history", "vs_hand_bat_ops_history",
+    "starter_k9_vs_opp", "starter_bb9_vs_opp", "starter_hr9_vs_opp",
 ]
+
+FEATURE_GROUPS = {
+    "starter_quality": [
+        "starter_kbb9_r5", "starter_fip_proxy_r5", "starter_pitches_r5",
+        "starter_fip_proxy_vs_opp",
+    ],
+    "starter_load": [
+        "starter_rest_days", "starter_pitches_last1", "starter_pitches_last2", "starter_short_rest",
+    ],
+    "bullpen_quality": [
+        "bullpen_kbb9_r10", "bullpen_fip_proxy_r10", "bullpen_fip_proxy_trend_5v20",
+    ],
+    "handedness": [
+        "opp_starter_is_left", "vs_hand_win_r20", "vs_hand_run_diff_r20",
+        "vs_hand_bat_ops_r20", "vs_hand_bat_hr_rate_r20", "vs_hand_runs_for_r20",
+        "vs_hand_win_history", "vs_hand_bat_ops_history",
+    ],
+}
 
 GAME_CONTEXT_FEATURES = [
     "park_factor", "park_run_factor", "is_day_game",
@@ -42,31 +55,59 @@ GAME_CONTEXT_FEATURES = [
     "weather_wind_kmh", "weather_wind_dir",
 ]
 
+ABLATION_CANDIDATES = {
+    "core": [],
+    "core+starter_quality": ["starter_quality"],
+    "core+starter_load": ["starter_load"],
+    "core+bullpen_quality": ["bullpen_quality"],
+    "core+handedness": ["handedness"],
+    "core+context": ["context"],
+    "core+starter_quality+load": ["starter_quality", "starter_load"],
+    "core+starter_quality+bullpen": ["starter_quality", "bullpen_quality"],
+    "core+handedness+context": ["handedness", "context"],
+    "core+pitching": ["starter_quality", "starter_load", "bullpen_quality"],
+    "core+all_context": ["starter_quality", "starter_load", "bullpen_quality", "handedness", "context"],
+}
 
-def feature_sets(df: pd.DataFrame):
-    win_features = [c for c in df.columns if c.startswith("diff_")]
-    for base in LEVEL_FEATURE_BASES:
-        for side in ("home", "away"):
-            c = f"{side}_{base}"
+
+def _side_and_diff_features(df: pd.DataFrame, bases: list[str]) -> list[str]:
+    cols = []
+    for base in bases:
+        for c in (f"diff_{base}", f"home_{base}", f"away_{base}"):
             if c in df.columns:
-                win_features.append(c)
-    for c in ("month", "elo_home_prob", *GAME_CONTEXT_FEATURES):
-        if c in df.columns:
-            win_features.append(c)
-    win_features = list(dict.fromkeys(win_features))
+                cols.append(c)
+    return cols
 
+
+def win_features_for_groups(df: pd.DataFrame, groups: list[str]) -> list[str]:
+    bases = list(CORE_BASES)
+    use_context = False
+    for group in groups:
+        if group == "context":
+            use_context = True
+        else:
+            bases.extend(FEATURE_GROUPS.get(group, []))
+    cols = _side_and_diff_features(df, list(dict.fromkeys(bases)))
+    for c in ("month", "elo_home_prob"):
+        if c in df.columns:
+            cols.append(c)
+    if use_context:
+        cols.extend([c for c in GAME_CONTEXT_FEATURES if c in df.columns])
+    return list(dict.fromkeys(cols))
+
+
+def run_features_full(df: pd.DataFrame) -> list[str]:
     bases = [c[len("diff_"):] for c in df.columns if c.startswith("diff_")]
-    run_features = []
+    cols = []
     for b in bases:
         for side in ("home", "away"):
             c = f"{side}_{b}"
             if c in df.columns:
-                run_features.append(c)
+                cols.append(c)
     for c in ("month", "elo_home_prob", *GAME_CONTEXT_FEATURES):
         if c in df.columns:
-            run_features.append(c)
-    run_features = list(dict.fromkeys(run_features))
-    return win_features, run_features
+            cols.append(c)
+    return list(dict.fromkeys(cols))
 
 
 def make_models():
@@ -170,8 +211,77 @@ def _learn_ensemble_weights(train_df, win_features, run_features):
     return best[1], resid
 
 
+def _blend(pl, pt, pr, weights):
+    return np.clip(
+        float(weights.get("linear", 0.44)) * pl
+        + float(weights.get("tree", 0.36)) * pt
+        + float(weights.get("run", 0.20)) * pr,
+        0.005, 0.995,
+    )
+
+
+def _selector_score(y: np.ndarray, p: np.ndarray) -> tuple[float, dict]:
+    conf = np.maximum(p, 1.0 - p)
+    correct = ((p >= 0.5).astype(int) == y.astype(int))
+    m60 = conf >= 0.60
+    m55 = conf >= 0.55
+    n60 = int(m60.sum())
+    n55 = int(m55.sum())
+    a60 = float(correct[m60].mean()) if n60 else 0.5
+    a55 = float(correct[m55].mean()) if n55 else 0.5
+    auc = float(roc_auc_score(y, p))
+    ll = float(log_loss(y, p))
+    acc = float(correct.mean())
+    reliability60 = min(1.0, n60 / 120.0)
+    shrunk60 = 0.5 + (a60 - 0.5) * reliability60
+    reliability55 = min(1.0, n55 / 300.0)
+    shrunk55 = 0.5 + (a55 - 0.5) * reliability55
+    score = 4.0 * shrunk60 + 1.5 * shrunk55 + 0.8 * auc + 0.4 * acc - 0.35 * ll
+    return score, {
+        "score": float(score), "games": int(len(y)), "accuracy": acc,
+        "roc_auc": auc, "log_loss": ll,
+        "confidence_55_games": n55, "confidence_55_accuracy": a55,
+        "confidence_60_games": n60, "confidence_60_accuracy": a60,
+    }
+
+
+def select_moneyline_features(train_df: pd.DataFrame, run_features: list[str]):
+    train_df = train_df.sort_values("game_date").reset_index(drop=True)
+    cut = int(len(train_df) * 0.72)
+    selector_train = train_df.iloc[:cut].copy()
+    selector_val = train_df.iloc[cut:].copy()
+    reports = []
+
+    for name, groups in ABLATION_CANDIDATES.items():
+        wf = win_features_for_groups(train_df, groups)
+        weights, _ = _learn_ensemble_weights(selector_train, wf, run_features)
+        models = _fit_base(selector_train, wf, run_features)
+        pl, pt, pr, _, _ = _base_predictions(models, selector_val, wf, run_features)
+        p = _blend(pl, pt, pr, weights)
+        y = selector_val["home_win"].astype(int).to_numpy()
+        score, metrics = _selector_score(y, p)
+        reports.append({
+            "candidate": name,
+            "groups": "+".join(groups) if groups else "core",
+            "feature_count": len(wf),
+            "weights": json.dumps(weights, ensure_ascii=False),
+            **metrics,
+        })
+        print(f"[ablation] {name}: score={score:.4f}, 60%+={metrics['confidence_60_games']} games @ {metrics['confidence_60_accuracy']:.3f}")
+
+    report = pd.DataFrame(reports).sort_values(["score", "confidence_60_accuracy", "roc_auc"], ascending=False)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    report.to_csv(DATA_DIR / "ablation_report.csv", index=False)
+    best_name = str(report.iloc[0]["candidate"])
+    best_groups = ABLATION_CANDIDATES[best_name]
+    best_features = win_features_for_groups(train_df, best_groups)
+    print(f"[ablation winner] {best_name} ({len(best_features)} features)")
+    return best_name, best_groups, best_features, report
+
+
 def fit_bundle(train_df: pd.DataFrame):
-    win_features, run_features = feature_sets(train_df)
+    run_features = run_features_full(train_df)
+    selected_name, selected_groups, win_features, _ = select_moneyline_features(train_df, run_features)
     stat_weights, total_residuals = _learn_ensemble_weights(train_df, win_features, run_features)
     linear_model, tree_model, home_run_model, away_run_model, total_run_model = _fit_base(train_df, win_features, run_features)
     return {
@@ -185,7 +295,9 @@ def fit_bundle(train_df: pd.DataFrame):
         "run_features": run_features,
         "stat_weights": stat_weights,
         "total_residuals": total_residuals.astype(np.float32),
-        "model_version": "sports-lab-v7-pregame-context",
+        "selected_feature_candidate": selected_name,
+        "selected_feature_groups": selected_groups,
+        "model_version": "sports-lab-v8-auto-ablation",
     }
 
 
@@ -195,9 +307,7 @@ def _statistical_moneyline(bundle, Xw: pd.DataFrame, run_home: np.ndarray) -> np
     if tree_model is None:
         return np.clip(0.72 * linear + 0.28 * run_home, 0.005, 0.995)
     tree = tree_model.predict_proba(Xw)[:, 1]
-    w = bundle.get("stat_weights", {"linear": 0.44, "tree": 0.36, "run": 0.20})
-    p = float(w.get("linear", 0.44)) * linear + float(w.get("tree", 0.36)) * tree + float(w.get("run", 0.20)) * run_home
-    return np.clip(p, 0.005, 0.995)
+    return _blend(linear, tree, run_home, bundle.get("stat_weights", {}))
 
 
 def predict_bundle(bundle, df: pd.DataFrame) -> pd.DataFrame:
@@ -251,6 +361,9 @@ def train(features_path=FEATURES, model_path=MODEL_FILE):
     y = test_df["home_win"].astype(int).to_numpy()
     metrics = {
         "model_version": bundle["model_version"],
+        "selected_feature_candidate": bundle.get("selected_feature_candidate"),
+        "selected_feature_groups": bundle.get("selected_feature_groups"),
+        "selected_win_feature_count": int(len(bundle["win_features"])),
         "train_games": int(len(train_df)), "test_games": int(len(test_df)),
         "test_from": str(test_df.game_date.min()), "test_to": str(test_df.game_date.max()),
         "ensemble_weights": bundle["stat_weights"],
@@ -262,7 +375,6 @@ def train(features_path=FEATURES, model_path=MODEL_FILE):
         "away_runs_mae": float(mean_absolute_error(test_df.away_score, pred.expected_away_runs)),
         "total_runs_mae": float(mean_absolute_error(test_df.home_score + test_df.away_score, pred.expected_total)),
         "total_residual_samples": int(len(bundle.get("total_residuals", []))),
-        "context_feature_count": int(sum(c in df.columns for c in GAME_CONTEXT_FEATURES)),
         **_confidence_metrics(y, p),
     }
     bundle["metrics"] = metrics
