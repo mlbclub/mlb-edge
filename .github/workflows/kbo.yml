@@ -32,6 +32,9 @@ jobs:
       - name: Syntax check KBO V2 modules
         run: python -m py_compile sports_lab/registry.py sports_lab/baseball/kbo.py sports_lab/baseball/kbo_v2.py run_kbo_v2_pipeline.py mlb_model/odds.py
 
+      - name: Unit test KBO V2 helpers
+        run: python -m unittest tests.test_kbo_v2
+
       - name: Collect and cache official KBO boxscore detail
         run: |
           python - <<'PY'
