@@ -17,8 +17,27 @@ from .state import live_feature_row, display_snapshot
 KST = ZoneInfo("Asia/Seoul")
 
 
+def _meta_matrix(pl, pt, pr):
+    pl = np.clip(np.asarray(pl, dtype=float), 0.01, 0.99)
+    pt = np.clip(np.asarray(pt, dtype=float), 0.01, 0.99)
+    pr = np.clip(np.asarray(pr, dtype=float), 0.01, 0.99)
+    mean = (pl + pt + pr) / 3.0
+    spread = np.maximum.reduce([pl, pt, pr]) - np.minimum.reduce([pl, pt, pr])
+    return np.column_stack([
+        pl, pt, pr,
+        np.log(pl / (1.0 - pl)),
+        np.log(pt / (1.0 - pt)),
+        np.log(pr / (1.0 - pr)),
+        mean,
+        spread,
+        np.abs(pl - pt),
+        np.abs(pl - pr),
+        np.abs(pt - pr),
+    ])
+
+
 def _prob_model(bundle, row: dict):
-    """Statistical pre-market prediction, compatible with both V3 and V4 bundles."""
+    """Statistical pre-market prediction, compatible with legacy and V6 bundles."""
     wf, rf = bundle["win_features"], bundle["run_features"]
     Xw = pd.DataFrame([{c: row.get(c, np.nan) for c in wf}])
     Xr = pd.DataFrame([{c: row.get(c, np.nan) for c in rf}])
@@ -35,7 +54,8 @@ def _prob_model(bundle, row: dict):
     if total_model is not None:
         direct_total = float(np.clip(total_model.predict(Xr)[0], 0.6, 25.0))
         summed = max(0.6, lh + la)
-        corrected_total = 0.62 * summed + 0.38 * direct_total
+        # Must match the training/backtest correction exactly.
+        corrected_total = 0.58 * summed + 0.42 * direct_total
         scale = corrected_total / summed
         lh = float(np.clip(lh * scale, 0.2, 15.0))
         la = float(np.clip(la * scale, 0.2, 15.0))
@@ -43,7 +63,10 @@ def _prob_model(bundle, row: dict):
     base = market_probabilities(lh, la)
     p_run = float(base["home_win_run"])
 
-    if tree_model is not None:
+    meta = bundle.get("moneyline_meta_model")
+    if meta is not None and tree_model is not None:
+        ph = float(meta.predict_proba(_meta_matrix([p_linear], [p_tree], [p_run]))[:, 1][0])
+    elif tree_model is not None:
         w = bundle.get("stat_weights", {"linear": 0.44, "tree": 0.36, "run": 0.20})
         ph = (
             float(w.get("linear", 0.44)) * p_linear
@@ -51,8 +74,6 @@ def _prob_model(bundle, row: dict):
             + float(w.get("run", 0.20)) * p_run
         )
     else:
-        # Backwards compatibility with the currently deployed V3 joblib until
-        # the next training workflow writes a V4 bundle.
         legacy_w = float(bundle.get("classifier_weight", 0.62))
         ph = legacy_w * p_linear + (1.0 - legacy_w) * p_run
 
@@ -76,9 +97,6 @@ def _consensus_probability(components: list[tuple[float | None, float]], shrink_
     p = sum(v * w for v, w in vals) / total_w
     disagreement = max(v for v, _ in vals) - min(v for v, _ in vals)
 
-    # When independent views disagree sharply, confidence is more likely to be
-    # overstated. Keep the direction but contract it toward 50% instead of
-    # pretending the uncertainty does not exist.
     if shrink_on_disagreement:
         if disagreement >= 0.30:
             p = 0.5 + (p - 0.5) * 0.68
@@ -89,22 +107,32 @@ def _consensus_probability(components: list[tuple[float | None, float]], shrink_
     return float(np.clip(p, 0.01, 0.99)), float(disagreement)
 
 
-def _apply_context_consensus(probs: dict, odds: dict, similarity: dict, starters_known: bool):
-    """Blend statistics, sportsbook consensus and historical analogues.
+def _empirical_total_probs(expected_total: float, line: float, residuals) -> tuple[float | None, float | None]:
+    r = np.asarray(residuals if residuals is not None else [], dtype=float)
+    r = r[np.isfinite(r)]
+    if len(r) < 250:
+        return None, None
+    simulated = float(expected_total) + r
+    over_count = float(np.sum(simulated > float(line)))
+    under_count = float(np.sum(simulated < float(line)))
+    nonpush = over_count + under_count
+    if nonpush <= 0:
+        return None, None
+    # Mild beta-style shrinkage prevents extreme probabilities from residual tails.
+    over = (over_count + 12.0) / (nonpush + 24.0)
+    under = (under_count + 12.0) / (nonpush + 24.0)
+    s = over + under
+    return float(over / s), float(under / s)
 
-    This layer is prediction-oriented, not EV-oriented. Market probability is
-    treated as an additional information source because closing/near-closing MLB
-    prices aggregate lineup, injury and information that a boxscore-only model
-    can miss. Historical similarity has limited, sample-size-dependent weight.
-    """
+
+def _apply_context_consensus(probs: dict, odds: dict, similarity: dict, starters_known: bool, bundle=None):
+    """Blend statistics, sportsbook consensus and historical analogues."""
     base_home = float(probs["home_model"])
     market_home = odds.get("home_market_novig")
     sim_home = similarity.get("home_prob") if similarity.get("available") else None
     sim_eff = float(similarity.get("effective_n") or 0.0)
     sim_reliability = min(1.0, sim_eff / 45.0)
 
-    # With an unknown probable starter, trust the statistical snapshot a little
-    # less and the live market a little more.
     base_w = 0.60 if starters_known else 0.52
     market_w = 0.27 if market_home is not None else 0.0
     sim_w = 0.13 * sim_reliability if sim_home is not None else 0.0
@@ -123,15 +151,29 @@ def _apply_context_consensus(probs: dict, odds: dict, similarity: dict, starters
         probs["away_model"] = 1.0 - home_final
         probs["moneyline_disagreement"] = ml_disagreement
 
-    # Totals get an independent consensus. The underlying run simulation remains
-    # the main view; market and historical analogues correct systematic context
-    # that the run model may not see.
     line = odds.get("total_line")
     if line is not None:
         tm = market_probabilities(probs["expected_home_runs"], probs["expected_away_runs"], float(line))
         denom = max(1e-9, tm["over_prob"] + tm["under_prob"])
-        run_over = tm["over_prob"] / denom
-        run_under = tm["under_prob"] / denom
+        poisson_over = tm["over_prob"] / denom
+        poisson_under = tm["under_prob"] / denom
+
+        empirical_over = empirical_under = None
+        if bundle is not None:
+            empirical_over, empirical_under = _empirical_total_probs(
+                probs["expected_home_runs"] + probs["expected_away_runs"],
+                float(line),
+                bundle.get("total_residuals"),
+            )
+
+        if empirical_over is not None and empirical_under is not None:
+            run_over = 0.35 * poisson_over + 0.65 * empirical_over
+            run_under = 0.35 * poisson_under + 0.65 * empirical_under
+            probs["total_empirical_over"] = float(empirical_over)
+            probs["total_empirical_under"] = float(empirical_under)
+        else:
+            run_over, run_under = poisson_over, poisson_under
+
         market_over = odds.get("over_market_novig")
         market_under = odds.get("under_market_novig")
         sim_over = similarity.get("over_prob") if similarity.get("available") else None
@@ -149,8 +191,6 @@ def _apply_context_consensus(probs: dict, odds: dict, similarity: dict, starters
             (sim_under, total_sim_w),
         ])
 
-        # Force the non-push O/U probabilities to be complements after the two
-        # independent consensus calculations.
         if over_final is not None and under_final is not None:
             s = max(1e-9, over_final + under_final)
             probs["over_model"] = float(over_final / s)
@@ -180,7 +220,6 @@ def _candidate(side, market, model_prob, market_prob, odds, label, push=0.0, rul
 
 def build_market_candidates(home, away, probs: dict, odds: dict):
     cs = []
-    # Moneyline
     for side, team in (("home", home), ("away", away)):
         mp = probs[f"{side}_model"]
         marketp = odds.get(f"{side}_market_novig")
@@ -190,7 +229,6 @@ def build_market_candidates(home, away, probs: dict, odds: dict):
         if c:
             cs.append(c)
 
-    # Totals
     line = odds.get("total_line")
     if line is not None:
         tm = market_probabilities(probs["expected_home_runs"], probs["expected_away_runs"], float(line))
@@ -216,7 +254,6 @@ def build_market_candidates(home, away, probs: dict, odds: dict):
         probs["over_model"] = over_cond
         probs["under_model"] = under_cond
 
-    # Exact -1.5 markets when quoted. Run-distribution model remains the source.
     for side, team in (("home", home), ("away", away)):
         c = _candidate(
             side, "minus_1_5", probs[f"{side}_minus_1_5"],
@@ -294,6 +331,7 @@ def predict_date(target_date: str, save=True):
             odds,
             similarity,
             starters_known=bool(hp.get("id") and ap.get("id")),
+            bundle=bundle,
         )
 
         candidates = build_market_candidates(home["name"], away["name"], probs, odds)
