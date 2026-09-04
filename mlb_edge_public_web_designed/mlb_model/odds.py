@@ -46,6 +46,14 @@ def no_vig_two_way(a_decimal: float, b_decimal: float):
     return ai / z, bi / z, z - 1.0
 
 
+def no_vig_many(decimal_prices: list[float]):
+    implied = [1.0 / float(x) for x in decimal_prices]
+    z = sum(implied)
+    if z <= 0:
+        return [None for _ in implied], None
+    return [x / z for x in implied], z - 1.0
+
+
 class OddsAPI:
     def __init__(self, api_key: str | None = None, timeout=30):
         self.api_key = api_key or os.getenv("ODDS_API_KEY")
@@ -55,10 +63,10 @@ class OddsAPI:
             )
         self.timeout = timeout
         self.session = requests.Session()
-        self.session.headers.update({"User-Agent": "mlb-probability-model/3.0"})
+        self.session.headers.update({"User-Agent": "sports-lab-probability-model/1.0"})
 
-    def current_mlb(self, regions="us", markets="h2h,spreads,totals", odds_format="decimal"):
-        url = f"{ODDS_BASE}/sports/baseball_mlb/odds"
+    def current_sport(self, sport_key: str, regions="us", markets="h2h,spreads,totals", odds_format="decimal"):
+        url = f"{ODDS_BASE}/sports/{sport_key}/odds"
         r = self.session.get(url, params={
             "apiKey": self.api_key,
             "regions": regions,
@@ -69,8 +77,8 @@ class OddsAPI:
         r.raise_for_status()
         return r.json(), self._quota(r)
 
-    def historical_mlb(self, snapshot_iso: str, regions="us", markets="h2h,spreads,totals", odds_format="decimal"):
-        url = f"{ODDS_BASE}/historical/sports/baseball_mlb/odds"
+    def historical_sport(self, sport_key: str, snapshot_iso: str, regions="us", markets="h2h,spreads,totals", odds_format="decimal"):
+        url = f"{ODDS_BASE}/historical/sports/{sport_key}/odds"
         r = self.session.get(url, params={
             "apiKey": self.api_key,
             "regions": regions,
@@ -83,6 +91,15 @@ class OddsAPI:
         payload = r.json()
         events = payload.get("data", payload if isinstance(payload, list) else [])
         return events, payload, self._quota(r)
+
+    def current_mlb(self, regions="us", markets="h2h,spreads,totals", odds_format="decimal"):
+        return self.current_sport("baseball_mlb", regions=regions, markets=markets, odds_format=odds_format)
+
+    def historical_mlb(self, snapshot_iso: str, regions="us", markets="h2h,spreads,totals", odds_format="decimal"):
+        return self.historical_sport(
+            "baseball_mlb", snapshot_iso,
+            regions=regions, markets=markets, odds_format=odds_format,
+        )
 
     @staticmethod
     def _quota(r):
@@ -110,6 +127,49 @@ def _best_price(rows):
         return None, None
     best = max(rows, key=lambda r: r[0])
     return float(best[0]), best[1]
+
+
+def summarize_event_three_way(event: dict | None, odds_format="decimal") -> dict:
+    """Summarize 1X2-style h2h markets without changing MLB two-way behavior.
+
+    Used by KBO/NPB when a draw price is quoted and by soccer. Totals/spreads are
+    still obtained from ``summarize_event`` and merged into this result.
+    """
+    if not event:
+        return {}
+    base = summarize_event(event, odds_format=odds_format)
+    home = event.get("home_team")
+    away = event.get("away_team")
+    hk, ak = _norm_team(home), _norm_team(away)
+    rows = []
+    hbest, dbest, abest = [], [], []
+    for book in event.get("bookmakers", []):
+        m = _market(book, "h2h")
+        if not m:
+            continue
+        prices = {_norm_team(o.get("name")): decimal_from_price(o.get("price"), odds_format) for o in m.get("outcomes", [])}
+        draw_key = next((k for k in prices if k in {"draw", "tie"}), None)
+        if hk not in prices or ak not in prices or draw_key is None:
+            continue
+        hd, dd, ad = prices[hk], prices[draw_key], prices[ak]
+        if min(hd, dd, ad) <= 1:
+            continue
+        probs, vig = no_vig_many([hd, dd, ad])
+        title = book.get("title") or book.get("key") or "unknown"
+        rows.append((probs[0], probs[1], probs[2], vig))
+        hbest.append((hd, title)); dbest.append((dd, title)); abest.append((ad, title))
+    if rows:
+        base.update({
+            "home_market_novig": statistics.median(r[0] for r in rows),
+            "draw_market_novig": statistics.median(r[1] for r in rows),
+            "away_market_novig": statistics.median(r[2] for r in rows),
+            "market_vig": statistics.median(r[3] for r in rows),
+            "moneyline_books": len(rows),
+        })
+        base["home_ml_odds"], base["home_ml_book"] = _best_price(hbest)
+        base["draw_ml_odds"], base["draw_ml_book"] = _best_price(dbest)
+        base["away_ml_odds"], base["away_ml_book"] = _best_price(abest)
+    return base
 
 
 def summarize_event(event: dict | None, odds_format="decimal") -> dict:
@@ -170,7 +230,6 @@ def summarize_event(event: dict | None, odds_format="decimal") -> dict:
             title = book.get("title") or book.get("key") or "unknown"
             total_by_line[float(point)].append((op, up, vig, od, ud, title))
     if total_by_line:
-        # Most books quoted; tie -> median-ish line nearest overall median.
         counts = {k: len(v) for k, v in total_by_line.items()}
         max_count = max(counts.values())
         candidates = [k for k, v in counts.items() if v == max_count]
