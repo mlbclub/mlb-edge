@@ -1,11 +1,11 @@
 from __future__ import annotations
 import json
-import math
 from pathlib import Path
 import pandas as pd
 
 from .api import MLBStatsAPI
 from .config import RAW_GAMES, ENRICHED_GAMES, BOX_DIR, DATA_DIR
+from .context import get_pitcher_meta
 
 
 def ip_to_float(value) -> float:
@@ -144,6 +144,27 @@ def enrich_games(raw_path=RAW_GAMES, out_path=ENRICHED_GAMES, cache_dir=BOX_DIR)
             print(f"[enrich] {i:,}/{len(final):,}")
 
     df = pd.DataFrame(rows).sort_values("game_date")
+
+    # Starter handedness is static metadata. Cache it once and attach it to every
+    # historical game so the feature layer can learn team performance vs RHP/LHP.
+    ids = pd.concat([
+        pd.to_numeric(df.get("home_starter_id", pd.Series(dtype=float)), errors="coerce"),
+        pd.to_numeric(df.get("away_starter_id", pd.Series(dtype=float)), errors="coerce"),
+    ]).dropna().tolist()
+    meta = get_pitcher_meta(api, ids)
+    if len(meta):
+        hand_map = {
+            int(r.pitcher_id): r.pitch_hand
+            for r in meta.itertuples(index=False)
+            if not pd.isna(r.pitcher_id)
+        }
+        df["home_starter_hand"] = pd.to_numeric(df["home_starter_id"], errors="coerce").map(
+            lambda x: hand_map.get(int(x)) if not pd.isna(x) else None
+        )
+        df["away_starter_hand"] = pd.to_numeric(df["away_starter_id"], errors="coerce").map(
+            lambda x: hand_map.get(int(x)) if not pd.isna(x) else None
+        )
+
     df.to_csv(out_path, index=False)
     print(f"[saved] {out_path} ({len(df):,} games)")
     return df
