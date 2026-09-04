@@ -9,7 +9,7 @@ permissions:
 jobs:
   build-kbo:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     defaults:
       run:
@@ -29,22 +29,42 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Syntax check KBO modules
-        run: python -m py_compile sports_lab/registry.py sports_lab/baseball/kbo.py run_kbo_pipeline.py mlb_model/odds.py
+      - name: Syntax check KBO V2 modules
+        run: python -m py_compile sports_lab/registry.py sports_lab/baseball/kbo.py sports_lab/baseball/kbo_v2.py run_kbo_v2_pipeline.py mlb_model/odds.py
 
-      - name: Collect KBO data and train model
+      - name: Collect and cache official KBO boxscore detail
+        run: |
+          python - <<'PY'
+          from sports_lab.baseball.kbo_v2 import collect_schedule_v2, collect_details_v2
+          games = collect_schedule_v2()
+          collect_details_v2(games)
+          PY
+
+      - name: Checkpoint KBO detail cache
+        run: |
+          git config user.name "sports-lab-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/kbo/games_v2.csv data/kbo/game_details_v2.csv
+          if git diff --cached --quiet; then
+            echo "No new KBO detail cache."
+          else
+            git commit -m "Update KBO V2 detail cache"
+            git push
+          fi
+
+      - name: Train KBO V2 and create today predictions
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-        run: python run_kbo_pipeline.py
+        run: python run_kbo_v2_pipeline.py
 
-      - name: Save KBO model data
+      - name: Save KBO V2 model data
         run: |
           git config user.name "sports-lab-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data/kbo models/kbo
           if git diff --cached --quiet; then
-            echo "No new KBO data."
+            echo "No new KBO V2 data."
           else
-            git commit -m "Update KBO model data"
+            git commit -m "Update KBO V2 model data"
             git push
           fi
