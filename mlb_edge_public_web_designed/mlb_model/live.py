@@ -64,7 +64,9 @@ def _prob_model(bundle, row: dict):
     p_run = float(base["home_win_run"])
 
     meta = bundle.get("moneyline_meta_model")
-    if meta is not None and tree_model is not None:
+    if bundle.get('moneyline_mode') == 'compact_linear':
+        ph = p_linear
+    elif meta is not None and tree_model is not None:
         ph = float(meta.predict_proba(_meta_matrix([p_linear], [p_tree], [p_run]))[:, 1][0])
     elif tree_model is not None:
         w = bundle.get("stat_weights", {"linear": 0.44, "tree": 0.36, "run": 0.20})
@@ -144,6 +146,9 @@ def _apply_context_consensus(probs: dict, odds: dict, similarity: dict, starters
         (sim_home, sim_w),
     ])
     if home_final is not None:
+        if bundle is not None and bundle.get('moneyline_mode') == 'compact_linear':
+            probs['home_context_consensus'] = home_final
+            home_final = base_home
         probs["home_stat_model"] = base_home
         probs["away_stat_model"] = 1.0 - base_home
         probs["home_model"] = home_final

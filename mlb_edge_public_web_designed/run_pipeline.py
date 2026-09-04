@@ -12,4 +12,4 @@ if __name__ == "__main__":
     report = DATA_DIR / "robust_ablation_report.csv"
     if not report.is_file():
         raise RuntimeError("Training did not produce robust_ablation_report.csv")
-    print(f"[saved robust selection diagnostics] {report}")
+    print(f"[saved designated compact baseline diagnostics] {report}")

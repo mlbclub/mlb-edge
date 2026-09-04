@@ -137,7 +137,7 @@ class RobustSelectionTests(unittest.TestCase):
         with patch.object(training, "select_moneyline_features", return_value=("core", [], wf, report)), \
              patch.object(training, "_learn_ensemble_weights", return_value=({"linear": .44, "tree": .36, "run": .2}, np.array([]))), \
              patch.object(training, "_fit_base", side_effect=fit):
-            bundle = training.fit_bundle(df)
+            bundle = training.fit_v9_bundle(df)
         self.assertEqual(bundle["selection_diagnostics"]["selected"], "core")
         self.assertEqual(bundle["selection_diagnostics"]["report"][0]["candidate"], "core")
         self.assertEqual(bundle["run_features"], rf)

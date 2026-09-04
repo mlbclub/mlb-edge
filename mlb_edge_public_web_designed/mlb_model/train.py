@@ -298,7 +298,7 @@ def select_moneyline_features(train_df: pd.DataFrame, run_features=None):
     return selected, ABLATION_CANDIDATES[selected], win_features_for_groups(train_df, ABLATION_CANDIDATES[selected]), report
 
 
-def fit_bundle(train_df: pd.DataFrame):
+def fit_v9_bundle(train_df: pd.DataFrame):
     train_df = development_frame(train_df)
     if len(train_df) < POLICY["min_train_games"]:
         raise ValueError("At least 800 development games from 2024-2025 required")
@@ -330,8 +330,75 @@ def fit_bundle(train_df: pd.DataFrame):
     }
 
 
+def fit_bundle(train_df: pd.DataFrame):
+    from .compact import FEATURES, NAME, C, make_model
+    train_df = development_frame(train_df)
+    if len(train_df) < POLICY['min_train_games']:
+        raise ValueError('At least 800 development games from 2024-2025 required')
+    rows, ys, ps = [], [], []
+    for fold, (tr_idx, va_idx) in enumerate(chronological_folds(train_df), 1):
+        tr, va = train_df.iloc[tr_idx], train_df.iloc[va_idx]
+        if len(tr) < POLICY['min_train_games'] or len(va) < POLICY['min_fold_games']:
+            raise ValueError('All three development folds required for compact baseline')
+        model = make_model().fit(tr[FEATURES], tr.home_win)
+        p = model.predict_proba(va[FEATURES])[:, 1]
+        ys.append(va.home_win.to_numpy()); ps.append(p)
+        rows.append(dict(candidate=NAME, row_type='fold', fold=fold,
+            train_to=str(tr.game_date.max()), validation_from=str(va.game_date.min()),
+            validation_to=str(va.game_date.max()), **selection_metrics(ys[-1], p)))
+    summary = summarize(rows, selection_metrics(np.concatenate(ys), np.concatenate(ps)))
+    rows.append(dict(candidate=NAME, row_type='summary', fold='pooled', **summary))
+    report = pd.DataFrame(rows)
+    report['selected'] = True
+    report['selection_method'] = 'user_designated_baseline'
+    report['promotion_passed'] = False
+    report['decision_reasons'] = 'user_designated;historical_gate_not_passed'
+    report['win_features'] = json.dumps(FEATURES)
+    report['policy'] = json.dumps(POLICY, sort_keys=True)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    report.to_csv(DATA_DIR/'robust_ablation_report.csv', index=False)
+    report[report.row_type.eq('summary')].to_csv(DATA_DIR/'ablation_report.csv', index=False)
+    linear = make_model().fit(train_df[FEATURES], train_df.home_win)
+    rf = run_features_for_groups(train_df, [])
+
+    def fit_runs(frame):
+        models = make_models(date_splits(frame, 3))[2:]
+        for model, target in zip(models, (frame.home_score, frame.away_score, frame.home_score+frame.away_score)):
+            model.fit(frame[rf], target.astype(float))
+        return models
+
+    # Preserve the V9 totals estimators and chronological residual calibration.
+    residuals = []
+    for tr_idx, va_idx in date_splits(train_df, 4):
+        tr, va = train_df.iloc[tr_idx], train_df.iloc[va_idx]
+        if len(tr) < 500 or tr.home_win.nunique() != 2:
+            continue
+        h, a = _correct_runs(*fit_runs(tr), va[rf])
+        residuals.extend((va.home_score+va.away_score-h-a).to_numpy())
+    runs = fit_runs(train_df)
+    residuals = np.asarray(residuals, dtype=float)
+    residuals = np.clip(residuals[np.isfinite(residuals)][-3000:], -12, 12).astype(np.float32)
+    return dict(moneyline_model=linear, moneyline_linear_model=linear,
+        moneyline_tree_model=None, moneyline_mode='compact_linear', classifier_weight=1.0,
+        home_run_model=runs[0], away_run_model=runs[1], total_run_model=runs[2],
+        win_features=list(FEATURES), run_features=rf,
+        stat_weights=dict(linear=1.0, tree=0.0, run=0.0), total_residuals=residuals,
+        selected_feature_candidate=NAME, selected_feature_groups=[],
+        model_version='sports-lab-v10-compact-core',
+        selection_diagnostics=dict(selection_method='user_designated_baseline',
+            champion=NAME, previous_champion='core', selected=NAME, C=C,
+            automatic_promotion_passed=False,
+            historical_gate_reasons=['insufficient_samples', 'fold_60_regression'],
+            policy=POLICY.copy(), development_from=str(train_df.game_date.min()),
+            development_to=str(train_df.game_date.max()),
+            report=json.loads(report.to_json(orient='records')),
+            validation_status='reused_development_data;prospective_validation_pending'))
+
+
 def _statistical_moneyline(bundle, Xw: pd.DataFrame, run_home: np.ndarray) -> np.ndarray:
     linear = bundle.get("moneyline_linear_model", bundle["moneyline_model"]).predict_proba(Xw)[:, 1]
+    if bundle.get('moneyline_mode') == 'compact_linear':
+        return np.clip(linear, .005, .995)
     tree_model = bundle.get("moneyline_tree_model")
     if tree_model is None:
         return np.clip(0.72 * linear + 0.28 * run_home, 0.005, 0.995)

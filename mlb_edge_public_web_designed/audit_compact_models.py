@@ -4,26 +4,17 @@ import hashlib
 from pathlib import Path
 import numpy as np
 import pandas as pd
-from sklearn.pipeline import make_pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
 from mlb_model.config import FEATURES
+from mlb_model.compact import make_model, FEATURES as COMPACT_FEATURES
 from mlb_model.robust_selection import development_frame, chronological_folds, metrics, summarize, promotion_reasons, POLICY
 
 
 def feature_sets():
-    strength = ['elo_home_prob'] + ['diff_'+b for b in
-        ['win_r20', 'run_diff_r20', 'bat_ops_r20', 'bullpen_era_r20', 'bullpen_whip_r20']]
+    strength = list(COMPACT_FEATURES)
     pitching = ['diff_starter_'+b+'_r5' for b in ['era', 'whip', 'k9', 'bb9', 'hr9', 'ip']]
     schedule = ['diff_days_rest', 'diff_games_last7', 'diff_bullpen_pitches_usage_3']
     return {'strength': strength, 'strength_starter': strength+pitching,
             'compact': strength+pitching+schedule}
-
-
-def make_model(c):
-    return make_pipeline(SimpleImputer(strategy='median'), StandardScaler(),
-        LogisticRegression(C=c, max_iter=2000, random_state=42))
 
 
 def run(features_path=FEATURES, output_dir=Path('data/compact_model_audit'),

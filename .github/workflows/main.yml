@@ -48,7 +48,7 @@ jobs:
       - name: Test robust selection and live compatibility
         run: python -m unittest discover -s tests -v
 
-      - name: Collect MLB data and train robust champion challenger model
+      - name: Collect MLB data and train designated compact core model
         env:
           OMP_NUM_THREADS: '2'
           OPENBLAS_NUM_THREADS: '2'
