@@ -6,6 +6,7 @@ import pandas as pd
 from .api import MLBStatsAPI
 from .config import RAW_GAMES, ENRICHED_GAMES, BOX_DIR, DATA_DIR
 from .context import get_pitcher_meta
+from .game_details import relief_rows, RELIEF_FILE
 
 
 def ip_to_float(value) -> float:
@@ -128,10 +129,12 @@ def enrich_games(raw_path=RAW_GAMES, out_path=ENRICHED_GAMES, cache_dir=BOX_DIR)
     final = games[games["home_win"].notna()].copy().sort_values("game_date")
     api = MLBStatsAPI()
     rows = []
+    relievers = []
 
     for i, row in enumerate(final.itertuples(index=False), 1):
         try:
             box = _load_or_fetch_box(api, int(row.game_pk), cache_dir)
+            relievers.extend(relief_rows(box, int(row.game_pk), row.game_date))
             home = _team_from_box(box, "home")
             away = _team_from_box(box, "away")
             rec = row._asdict()
@@ -166,6 +169,8 @@ def enrich_games(raw_path=RAW_GAMES, out_path=ENRICHED_GAMES, cache_dir=BOX_DIR)
         )
 
     df.to_csv(out_path, index=False)
+    if relievers:
+        pd.DataFrame(relievers).to_csv(RELIEF_FILE, index=False)
     print(f"[saved] {out_path} ({len(df):,} games)")
     return df
 

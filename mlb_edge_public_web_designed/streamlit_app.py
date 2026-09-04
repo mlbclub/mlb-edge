@@ -22,6 +22,7 @@ from mlb_model.auth import SupabaseAuth
 from mlb_model.config import MODEL_FILE, TEAM_GAMES, PICK_RULES_FILE
 from mlb_model.live import predict_date
 from mlb_model.runtime import prediction_revision
+from mlb_model.card_view import pitcher_label, team_details_html
 from mlb_model.recommend import (
     TOP_PICKS,
     betting_rank_score,
@@ -128,6 +129,8 @@ div[role="radiogroup"]>label:has(input:checked) p{color:#fff!important}
 .team-name{font-size:1.08rem}.pitcher{font-size:.7rem}.detail-title{font-size:1.02rem!important}.bet-title{font-size:1.24rem}
 @media(max-width:900px){div[role="radiogroup"]{overflow-x:auto!important;flex-wrap:nowrap!important;scrollbar-width:none}div[role="radiogroup"]::-webkit-scrollbar{display:none}div[role="radiogroup"]>label{flex:0 0 auto!important}.team-name{font-size:.94rem}}
 
+
+.team-overview{min-width:0;align-self:start}.starter-name{font-size:1rem;font-weight:800;color:#d9e7f5;margin-top:7px;line-height:1.5}.pitcher-en{display:block;font-size:.76rem;color:#a4b4c7;font-weight:500}.recent-form{margin:13px 0 10px;color:#9eafc3;font-size:.78rem}.recent-form span{margin-left:8px;letter-spacing:3px}.team-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.team-facts>div{padding:10px 12px;background:#09121e;border:1px solid #203147;border-radius:10px;display:flex;flex-direction:column;gap:5px}.team-facts span{font-size:.72rem;color:#9babbd}.team-facts b{font-size:1.05rem;color:#e9f3ff}.team-facts .fact-wide{grid-column:1/-1}.team-facts .relief strong{font-size:.8rem;line-height:1.7;color:#cfdeed}.team-facts small{font-size:.65rem;color:#8e9eb3;line-height:1.5}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -284,9 +287,10 @@ def game_card_html(g, selected_map):
     return f'''<div class="game-card simple">
 <div class="game-top"><div class="game-time">{game_time(g)}</div><div class="market-badge">KST · 현재 배당</div></div>
 <div class="simple-match">
-<div class="team-line">{logo_img(g['away'])}<div><div class="club-name">{html.escape(team_ko(g['away']))}</div><div class="club-sub">{html.escape(g.get('away_probable') or '선발 미정')}</div></div><div class="win-box"><div class="win-score{' hot' if aw>=hw else ''}">{score100(aw)}</div><div class="win-odds">배당 {price(g.get('away_ml_odds'))}</div></div></div>
-<div class="simple-vs">VS</div>
-<div class="team-line home"><div class="win-box"><div class="win-score{' hot' if hw>aw else ''}">{score100(hw)}</div><div class="win-odds">배당 {price(g.get('home_ml_odds'))}</div></div><div><div class="club-name">{html.escape(team_ko(g['home']))}</div><div class="club-sub">{html.escape(g.get('home_probable') or '선발 미정')}</div></div>{logo_img(g['home'])}</div>
+<section class="team-overview"><div class="team-line">{logo_img(g['away'])}<div><div class="club-name">{html.escape(team_ko(g['away']))}</div><div class="starter-name">{pitcher_label(g.get('away_probable'))}</div></div><div class="win-box"><div class="win-score{' hot' if aw>=hw else ''}">{score100(aw)}</div><div class="win-odds">배당 {price(g.get('away_ml_odds'))}</div></div></div>
+{team_details_html(g.get('away_details'))}</section><div class="simple-vs">VS</div>
+<section class="team-overview"><div class="team-line home"><div class="win-box"><div class="win-score{' hot' if hw>aw else ''}">{score100(hw)}</div><div class="win-odds">배당 {price(g.get('home_ml_odds'))}</div></div><div><div class="club-name">{html.escape(team_ko(g['home']))}</div><div class="starter-name">{pitcher_label(g.get('home_probable'))}</div></div>{logo_img(g['home'])}</div>
+{team_details_html(g.get('home_details'))}</section>
 </div>
 <div class="simple-divider"></div>
 <div class="simple-bottom"><div class="guide-box"><div class="guide-label">SPORTS LAB GUIDE</div><div class="guide-pick">{html.escape(pick_name)}</div><div class="guide-meta">{html.escape(guide_meta)}</div></div><div class="mini-box"><span>언더 · 오버</span><strong>{html.escape(total_hint)}</strong></div><div class="mini-box"><span>핸디캡</span><strong>상세 분석 탭</strong></div></div>

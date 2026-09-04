@@ -16,6 +16,7 @@ from .recommend import expected_value, load_rules, choose_recommendation, qualif
 from .similarity import historical_similarity
 from .state import live_feature_row, display_snapshot
 from .runtime import prediction_revision
+from .game_details import team_card_details
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -401,6 +402,8 @@ def predict_date(target_date: str, save=True):
             upset_edge = upset_prob - um
 
         records.append({
+            "home_details": team_card_details(team_games, home['id'], hp.get('id'), game_dt, True),
+            "away_details": team_card_details(team_games, away['id'], ap.get('id'), game_dt, False),
             "game_pk": g.get("gamePk"),
             "game_date": str(game_dt),
             "official_date": g.get("officialDate"),
@@ -429,7 +432,7 @@ def predict_date(target_date: str, save=True):
     if save:
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         flat = pd.DataFrame([
-            {k: v for k, v in r.items() if k not in ("candidates", "qualified_candidates", "home_snapshot", "away_snapshot", "similarity")}
+            {k: v for k, v in r.items() if k not in ("candidates", "qualified_candidates", "home_snapshot", "away_snapshot", "similarity", "home_details", "away_details")}
             for r in records
         ])
         flat.to_csv(LIVE_PREDICTIONS, index=False)

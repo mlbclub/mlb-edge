@@ -72,6 +72,7 @@ jobs:
           git add models/market_model_v3.joblib
           git add data/robust_ablation_report.csv
           git add data/today_market_predictions.csv
+          git add data/reliever_appearances.csv
 
           for f in \
             data/current_odds_history.csv \
