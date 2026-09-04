@@ -64,7 +64,8 @@ jobs:
             data/pitcher_meta.csv \
             data/venue_meta.csv \
             data/park_factors_context.csv \
-            data/game_pregame_context.csv; do
+            data/game_pregame_context.csv \
+            data/ablation_report.csv; do
             if [ -f "$f" ]; then
               git add "$f"
             fi
