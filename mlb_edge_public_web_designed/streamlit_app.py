@@ -23,7 +23,7 @@ from mlb_model.config import MODEL_FILE, TEAM_GAMES, PICK_RULES_FILE
 from mlb_model.live import predict_date
 from mlb_model.runtime import prediction_revision
 from mlb_model.recommend import (
-    BETTING_FLOORS,
+    TOP_PICKS,
     betting_rank_score,
     candidate_hit_prob,
     select_betting_picks,
@@ -249,7 +249,7 @@ def pick_ko(text: str | None):
     s = str(text or "")
     for en, ko in sorted(TEAM_KO.items(), key=lambda x: len(x[0]), reverse=True):
         s = s.replace(en, ko)
-    return s.replace("NO BET", "배팅 기준 미달")
+    return s.replace("NO BET", "배당 정보 대기")
 
 
 def market_ko(m):
@@ -273,14 +273,14 @@ def game_card_html(g, selected_map):
     line = g.get("total_line")
     selected = selected_map.get(g.get("game_pk"))
     selected_prob = candidate_hit_prob(selected) if selected else None
-    pick_name = pick_ko(selected.get("pick")) if selected else "오늘 배팅 기준 미달"
+    pick_name = pick_ko(selected.get("pick")) if selected else "오늘 상위 추천 외 경기"
     pick_odds = price(selected.get("odds")) if selected else "-"
     total_hint = "-"
     if valid_number(line):
         side = "언더" if float(g.get("under_prob") or 0) >= float(g.get("over_prob") or 0) else "오버"
         pp = g.get("under_prob") if side == "언더" else g.get("over_prob")
         total_hint = f"{side} {float(line):g} · {score100(pp)}"
-    guide_meta = ("적중점수 " + score100(selected_prob) + " · 배당 " + pick_odds) if selected else "추천 기준을 통과한 픽이 없습니다."
+    guide_meta = ("적중점수 " + score100(selected_prob) + " · 배당 " + pick_odds) if selected else "전체 예측은 제공되며 상위 5경기를 추천합니다."
     return f'''<div class="game-card simple">
 <div class="game-top"><div class="game-time">{game_time(g)}</div><div class="market-badge">KST · 현재 배당</div></div>
 <div class="simple-match">
@@ -425,7 +425,7 @@ with c2:
     st.write("")
     if st.button("경기 조회", use_container_width=True, type="primary"):
         st.session_state.board_date = requested_date
-        st.cache_data.clear()
+
 with c3:
     st.caption("한국시간(KST) 00:00~23:59에 실제 시작하는 경기만 조회합니다. 미국 현지 날짜와 달라도 실제 경기 시작시각 기준으로 자동 보정됩니다.")
 TARGET_DATE = st.session_state.board_date
@@ -443,10 +443,10 @@ except Exception as e:
 games = sorted(games, key=lambda g: game_dt_kst(g) or datetime.max.replace(tzinfo=KST))
 all_qualified = []
 for g in games:
-    for c in g.get("qualified_candidates") or []:
+    for c in g.get("candidates") or []:
         all_qualified.append((g, c))
-# Hit-rate oriented public picks: one per game, max 10.
-betting_picks = select_betting_picks(all_qualified, max_picks=10)
+# Rank all priced predictions, one per game, top five.
+betting_picks = select_betting_picks(all_qualified, max_picks=TOP_PICKS)
 selected_map = {g.get("game_pk"): c for g, c in betting_picks}
 
 if page == "오늘 경기":
@@ -457,18 +457,17 @@ if page == "오늘 경기":
         ml_count = sum(1 for _, c in betting_picks if c.get("market") == "moneyline")
         total_count = sum(1 for _, c in betting_picks if c.get("market") == "total")
         avg_prob = (sum(candidate_hit_prob(c) for _, c in betting_picks) / len(betting_picks)) if betting_picks else 0
-        st.markdown(f'<div class="quick-grid"><div class="quick"><span>오늘 전체 경기</span><strong>{len(games)}경기</strong><small>KST 기준</small></div><div class="quick"><span>배팅 경기</span><strong class="green">{len(betting_picks)}개</strong><small>최대 10개</small></div><div class="quick"><span>승·패 비중</span><strong>{ml_count}개</strong><small>O/U {total_count}개</small></div><div class="quick"><span>평균 적중점수</span><strong>{avg_prob*100:.0f}점</strong><small>선정 픽 기준</small></div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="quick-grid"><div class="quick"><span>오늘 전체 경기</span><strong>{len(games)}경기</strong><small>KST 기준</small></div><div class="quick"><span>배팅 경기</span><strong class="green">{len(betting_picks)}개</strong><small>상위 5개</small></div><div class="quick"><span>승·패 비중</span><strong>{ml_count}개</strong><small>O/U {total_count}개</small></div><div class="quick"><span>평균 적중점수</span><strong>{avg_prob*100:.0f}점</strong><small>선정 픽 기준</small></div></div>', unsafe_allow_html=True)
         for g in games:
             st.markdown(game_card_html(g, selected_map), unsafe_allow_html=True)
 
 elif page == "배팅 경기":
-    page_header("BETTING GUIDE", "오늘의 배팅 경기", "승·패를 우선으로 선정하고, 언더·오버는 신호가 매우 강한 경우에만 포함합니다. 기준을 통과한 경기만 최대 10개까지 보여줍니다.")
-    floors = BETTING_FLOORS
+    page_header("BETTING GUIDE", "오늘의 배팅 경기", "승·패, 언더·오버, 핸디캡의 예측 적중확률을 비교해 경기당 하나씩 상위 5개를 추천합니다. 고정 점수 제한 없이 순위로 선정합니다.")
     if betting_picks:
         g0, c0 = betting_picks[0]
         st.markdown(f'<div class="hero-pick"><div class="label">TODAY BEST PICK · {pick_grade(candidate_hit_prob(c0))}</div><div class="pick">{html.escape(pick_ko(c0.get("pick")))}</div><div class="meta">{html.escape(team_ko(g0["away"]))} vs {html.escape(team_ko(g0["home"]))} · 적중확률 {score100(candidate_hit_prob(c0))} · 현재 배당 {price(c0.get("odds"))}</div></div>', unsafe_allow_html=True)
     if not betting_picks:
-        st.info("오늘은 강화 배팅 기준을 통과한 경기가 없습니다. 억지로 픽 수를 채우지 않습니다.")
+        st.info("현재 배당이 제공된 추천 후보가 없습니다. 배당이 들어오면 적중확률 순으로 선정합니다.")
     else:
         for rank, (g, c) in enumerate(betting_picks, start=1):
             st.markdown(bet_card_html(g, c, rank), unsafe_allow_html=True)

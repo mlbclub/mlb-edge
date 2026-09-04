@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 from .config import PICK_RULES_FILE
+TOP_PICKS = 5
 
 DEFAULT_RULES = {
     "moneyline": {"min_prob": 0.56, "min_edge": 0.035, "min_ev": 0.025},
@@ -66,15 +68,23 @@ def candidate_score(c: dict):
 
 
 def betting_rank_score(c: dict) -> float:
-    """Hit-rate first score for the public Betting Games board.
+    """Unmodified model hit probability; no minimum score gate."""
+    return candidate_hit_prob(c)
 
-    Probability dominates. Edge and EV break ties and stop the ranking from simply
-    becoming a list of very short-priced favourites.
-    """
-    p = candidate_hit_prob(c)
-    edge = max(0.0, min(float(c.get("edge") or 0.0), 0.15)) / 0.15
-    ev = max(0.0, min(float(c.get("ev") or 0.0), 0.30)) / 0.30
-    return 0.68 * p + 0.19 * edge + 0.13 * ev
+
+def available_candidate(c):
+    try:
+        return (c.get('market') in BETTING_FLOORS
+                and math.isfinite(candidate_hit_prob(c))
+                and 0 < candidate_hit_prob(c) <= 1
+                and math.isfinite(float(c.get('odds')))
+                and float(c['odds']) > 1)
+    except (TypeError, ValueError):
+        return False
+
+
+def hit_rank(c):
+    return (candidate_hit_prob(c), float(c.get('ev') or 0))
 
 
 def strict_betting_candidate(c: dict) -> bool:
@@ -90,29 +100,25 @@ def strict_betting_candidate(c: dict) -> bool:
     )
 
 
-def select_betting_picks(game_candidate_pairs: list[tuple[dict, dict]], max_picks: int = 10):
-    """Pick at most one strongest candidate per game, then return top N.
-
-    Input candidates should already have passed the historical/default optimization
-    rule. This function adds the stricter public hit-rate gate.
-    """
+def select_betting_picks(game_candidate_pairs: list[tuple[dict, dict]], max_picks: int = TOP_PICKS):
+    """Rank all available markets by hit probability, one per game, top N."""
     best_by_game: dict[object, tuple[dict, dict]] = {}
     for game, c in game_candidate_pairs:
-        if not strict_betting_candidate(c):
+        if not available_candidate(c):
             continue
         key = game.get("game_pk") or (game.get("game_date"), game.get("away"), game.get("home"))
         current = best_by_game.get(key)
-        if current is None or betting_rank_score(c) > betting_rank_score(current[1]):
+        if current is None or hit_rank(c) > hit_rank(current[1]):
             best_by_game[key] = (game, c)
     picks = list(best_by_game.values())
-    picks.sort(key=lambda gc: betting_rank_score(gc[1]), reverse=True)
+    picks.sort(key=lambda gc: hit_rank(gc[1]), reverse=True)
     return picks[: max(0, int(max_picks))]
 
 
 def choose_recommendation(candidates: list[dict], rules: dict):
-    valid = [c for c in candidates if qualifies(c, rules)]
+    valid = [c for c in candidates if available_candidate(c)]
     if not valid:
-        return {"label": "NO BET", "market": None, "reason": "최적화 기준 미충족"}
-    best = max(valid, key=candidate_score).copy()
+        return {"label": "NO BET", "market": None, "reason": "배당 정보 대기"}
+    best = max(valid, key=hit_rank).copy()
     best["label"] = "BET"
     return best

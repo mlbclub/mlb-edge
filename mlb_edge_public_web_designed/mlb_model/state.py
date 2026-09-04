@@ -180,9 +180,9 @@ def live_feature_row(
     return row
 
 
-def display_snapshot(team_games: pd.DataFrame, team_id: int, starter_id, game_dt):
-    ts = team_state(team_games, team_id, game_dt)
-    ss = starter_state(team_games, starter_id, game_dt)
+def display_snapshot(team_games: pd.DataFrame, team_id: int, starter_id, game_dt, precomputed=None):
+    ts = precomputed if precomputed is not None else team_state(team_games, team_id, game_dt)
+    ss = precomputed if precomputed is not None else starter_state(team_games, starter_id, game_dt)
     return {
         "record_recent10": ts.get("win_r10"),
         "record_history": ts.get("win_history"),

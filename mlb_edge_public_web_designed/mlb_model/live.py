@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
+from functools import lru_cache
 
 import joblib
 import numpy as np
@@ -14,8 +15,22 @@ from .probability import market_probabilities
 from .recommend import expected_value, load_rules, choose_recommendation, qualifies, candidate_score
 from .similarity import historical_similarity
 from .state import live_feature_row, display_snapshot
+from .runtime import prediction_revision
 
 KST = ZoneInfo("Asia/Seoul")
+
+
+@lru_cache(maxsize=2)
+def _prediction_assets(revision):
+    frame = pd.read_csv(TEAM_GAMES, parse_dates=['game_date'])
+    frame['game_date'] = pd.to_datetime(frame['game_date'], utc=True)
+    return frame, joblib.load(MODEL_FILE)
+
+
+def _needs_game_context(bundle):
+    used = set(bundle['win_features']) | set(bundle['run_features'])
+    return bool(used.intersection({'park_factor', 'park_run_factor', 'is_day_game'})
+                or any(c.startswith('weather_') for c in used))
 
 
 def _meta_matrix(pl, pt, pr):
@@ -299,9 +314,7 @@ def _kst_schedule(api: MLBStatsAPI, target_date: str):
 
 def predict_date(target_date: str, save=True):
     """Predict every MLB game on a Korean calendar date (Asia/Seoul)."""
-    team_games = pd.read_csv(TEAM_GAMES, parse_dates=["game_date"])
-    team_games["game_date"] = pd.to_datetime(team_games["game_date"], utc=True)
-    bundle = joblib.load(MODEL_FILE)
+    team_games, bundle = _prediction_assets(prediction_revision())
     api = MLBStatsAPI()
     schedule_games = _kst_schedule(api, target_date)
 
@@ -345,7 +358,8 @@ def predict_date(target_date: str, save=True):
             away_starter_hand=away_hand,
         )
         try:
-            pregame_ctx = live_game_context(api, g, game_dt)
+            # V10 core moneyline and run models do not consume weather/park inputs.
+            pregame_ctx = live_game_context(api, g, game_dt) if _needs_game_context(bundle) else {}
             row.update(pregame_ctx)
         except Exception as e:
             pregame_ctx = {}
@@ -372,6 +386,7 @@ def predict_date(target_date: str, save=True):
         )
 
         candidates = build_market_candidates(home["name"], away["name"], probs, odds)
+        # Preserve historical value-gate diagnostics; the board ranks all candidates.
         qualified = [c.copy() for c in candidates if qualifies(c, rules)]
         qualified.sort(key=candidate_score, reverse=True)
         rec = choose_recommendation(candidates, rules)
@@ -405,8 +420,10 @@ def predict_date(target_date: str, save=True):
             "similarity": similarity,
             "candidates": candidates,
             "qualified_candidates": qualified,
-            "home_snapshot": display_snapshot(team_games, home["id"], hp.get("id"), game_dt),
-            "away_snapshot": display_snapshot(team_games, away["id"], ap.get("id"), game_dt),
+            "home_snapshot": display_snapshot(team_games, home["id"], hp.get("id"), game_dt,
+                {k[5:]:v for k,v in row.items() if k.startswith('home_')}),
+            "away_snapshot": display_snapshot(team_games, away["id"], ap.get("id"), game_dt,
+                {k[5:]:v for k,v in row.items() if k.startswith('away_')}),
         })
 
     if save:
