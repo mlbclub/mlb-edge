@@ -5,7 +5,7 @@ import math
 from pathlib import Path
 
 from .config import PICK_RULES_FILE
-TOP_PICKS = 5
+TOP_PICKS = 10
 
 DEFAULT_RULES = {
     "moneyline": {"min_prob": 0.56, "min_edge": 0.035, "min_ev": 0.025},

@@ -2,6 +2,7 @@
 from functools import lru_cache
 import pandas as pd
 from .config import DATA_DIR
+from .bullpen_roles import verified_roles
 
 RELIEF_FILE = DATA_DIR / 'reliever_appearances.csv'
 
@@ -74,7 +75,11 @@ def team_card_details(team_games, team_id, starter_id, game_dt, is_home, relief=
     pitchers = r[r.pitcher_id.ne(0)]
     scores = pitchers.groupby('pitcher_id')[['saves','holds']].sum().sum(axis=1)
     top = scores[scores.gt(0)].sort_values(ascending=False).head(3)
-    for pid in top.index:
+    verified = verified_roles(team_id, dt)
+    chosen = ([dict(pitcher_id=int(p['pitcher_id']), name=p['name'], role=p['role']) for p in verified]
+              if verified is not None else [dict(pitcher_id=pid) for pid in top.index])
+    for chosen_pitcher in chosen:
+        pid = chosen_pitcher['pitcher_id']
         appearances = pitchers[pitchers.pitcher_id.eq(pid)]
         seen = set(appearances.game_pk)
         streak = 0
@@ -82,6 +87,10 @@ def team_card_details(team_games, team_id, starter_id, game_dt, is_home, relief=
             if pk not in seen:
                 break
             streak += 1
-        result['key_relievers'].append(dict(name=appearances.iloc[-1]['name'], streak=streak))
-    result['relief_status'] = '최근 30경기 SV+HLD 상위 3명' if len(top) else '최근 30경기 세이브·홀드 기록 없음'
+        rec = dict(name=chosen_pitcher.get('name') or appearances.iloc[-1]['name'], streak=streak)
+        if 'role' in chosen_pitcher: rec['role']=chosen_pitcher['role']
+        result['key_relievers'].append(rec)
+    result['relief_status'] = (('보직표 + MLB 현역 명단 대조 · ' + verified[0]['chart_date'])
+                              if verified else '보직표에서 현역 확인된 투수 없음') if verified is not None else (
+        '보직 미확인 · 최근 30경기 SV+HLD 통계 추정' if len(top) else '최근 30경기 세이브·홀드 기록 없음')
     return result

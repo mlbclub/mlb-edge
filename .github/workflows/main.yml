@@ -54,6 +54,10 @@ jobs:
           OPENBLAS_NUM_THREADS: '2'
         run: python run_pipeline.py
 
+      - name: Cross-check bullpen roles against active MLB rosters
+        continue-on-error: true
+        run: python -m mlb_model.bullpen_roles
+
       - name: Generate current KST predictions and recommendations
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
@@ -75,6 +79,7 @@ jobs:
           git add data/reliever_appearances.csv
 
           for f in \
+            data/bullpen_roles.csv \
             data/current_odds_history.csv \
             data/pitcher_meta.csv \
             data/venue_meta.csv \

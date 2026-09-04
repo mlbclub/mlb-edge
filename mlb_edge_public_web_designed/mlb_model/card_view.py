@@ -61,7 +61,7 @@ def team_details_html(d):
     wins = d.get('venue_wins', 0); losses = d.get('venue_losses', 0)
     h2h = (f"{d.get('h2h_wins',0)}승 {d.get('h2h_losses',0)}패"
            if d.get('h2h_games',0) else '맞대결 기록 없음')
-    relief = ' · '.join(f"{html.escape(str(p['name']))} <b>{p['streak']}경기</b>" for p in d.get('key_relievers', []))
+    relief = ' · '.join(f"{html.escape(p.get('role',''))} {html.escape(str(p['name']))} <b>{p['streak']}경기</b>" for p in d.get('key_relievers', []))
     if not relief:
         relief = html.escape(d.get('relief_status', '기록 수집 중'))
     return f'''<div class="recent-form" title="왼쪽이 과거, 오른쪽이 최신 · 초록 승 / 빨강 패">최근 5경기 <span>{form}</span></div>

@@ -14,8 +14,8 @@ class RankedPickTests(unittest.TestCase):
             pairs.append(({'game_pk':i+1}, c))
             pairs.append(({'game_pk':i+1}, dict(c, model_prob=p-.01)))
         picks = select_betting_picks(pairs)
-        self.assertEqual([g['game_pk'] for g,c in picks], [8,7,6,5,4])
-        self.assertEqual([c['model_prob'] for g,c in picks], [.51+i*.005 for i in (7,6,5,4,3)])
+        self.assertEqual([g['game_pk'] for g,c in picks], [8,7,6,5,4,3,2,1])
+        self.assertEqual([c['model_prob'] for g,c in picks], [.51+i*.005 for i in (7,6,5,4,3,2,1,0)])
         self.assertEqual(choose_recommendation([pairs[0][1]], {})['label'], 'BET')
         self.assertEqual(len(select_betting_picks(pairs[:2])), 1)
 

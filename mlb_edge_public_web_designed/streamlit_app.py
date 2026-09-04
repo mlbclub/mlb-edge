@@ -283,7 +283,7 @@ def game_card_html(g, selected_map):
         side = "언더" if float(g.get("under_prob") or 0) >= float(g.get("over_prob") or 0) else "오버"
         pp = g.get("under_prob") if side == "언더" else g.get("over_prob")
         total_hint = f"{side} {float(line):g} · {score100(pp)}"
-    guide_meta = ("적중점수 " + score100(selected_prob) + " · 배당 " + pick_odds) if selected else "전체 예측은 제공되며 상위 5경기를 추천합니다."
+    guide_meta = ("적중점수 " + score100(selected_prob) + " · 배당 " + pick_odds) if selected else "전체 예측을 제공하며 선택한 개수만큼 상위 경기를 추천합니다."
     return f'''<div class="game-card simple">
 <div class="game-top"><div class="game-time">{game_time(g)}</div><div class="market-badge">KST · 현재 배당</div></div>
 <div class="simple-match">
@@ -449,8 +449,10 @@ all_qualified = []
 for g in games:
     for c in g.get("candidates") or []:
         all_qualified.append((g, c))
-# Rank all priced predictions, one per game, top five.
-betting_picks = select_betting_picks(all_qualified, max_picks=TOP_PICKS)
+# Rank all priced predictions, one per game, top ten.
+recommend_count = st.selectbox("추천 경기 수", [5, 10, 15, "전체"], index=1)
+top_limit = len(games) if recommend_count == "전체" else int(recommend_count)
+betting_picks = select_betting_picks(all_qualified, max_picks=top_limit)
 selected_map = {g.get("game_pk"): c for g, c in betting_picks}
 
 if page == "오늘 경기":
@@ -461,12 +463,12 @@ if page == "오늘 경기":
         ml_count = sum(1 for _, c in betting_picks if c.get("market") == "moneyline")
         total_count = sum(1 for _, c in betting_picks if c.get("market") == "total")
         avg_prob = (sum(candidate_hit_prob(c) for _, c in betting_picks) / len(betting_picks)) if betting_picks else 0
-        st.markdown(f'<div class="quick-grid"><div class="quick"><span>오늘 전체 경기</span><strong>{len(games)}경기</strong><small>KST 기준</small></div><div class="quick"><span>배팅 경기</span><strong class="green">{len(betting_picks)}개</strong><small>상위 5개</small></div><div class="quick"><span>승·패 비중</span><strong>{ml_count}개</strong><small>O/U {total_count}개</small></div><div class="quick"><span>평균 적중점수</span><strong>{avg_prob*100:.0f}점</strong><small>선정 픽 기준</small></div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="quick-grid"><div class="quick"><span>오늘 전체 경기</span><strong>{len(games)}경기</strong><small>KST 기준</small></div><div class="quick"><span>배팅 경기</span><strong class="green">{len(betting_picks)}개</strong><small>적중확률 순</small></div><div class="quick"><span>승·패 비중</span><strong>{ml_count}개</strong><small>O/U {total_count}개</small></div><div class="quick"><span>평균 적중점수</span><strong>{avg_prob*100:.0f}점</strong><small>선정 픽 기준</small></div></div>', unsafe_allow_html=True)
         for g in games:
             st.markdown(game_card_html(g, selected_map), unsafe_allow_html=True)
 
 elif page == "배팅 경기":
-    page_header("BETTING GUIDE", "오늘의 배팅 경기", "승·패, 언더·오버, 핸디캡의 예측 적중확률을 비교해 경기당 하나씩 상위 5개를 추천합니다. 고정 점수 제한 없이 순위로 선정합니다.")
+    page_header("BETTING GUIDE", "오늘의 배팅 경기", "승·패, 언더·오버, 핸디캡의 예측 적중확률을 비교해 경기당 하나씩 선택한 개수만큼 상위 경기를 추천합니다. 고정 점수 제한 없이 순위로 선정합니다.")
     if betting_picks:
         g0, c0 = betting_picks[0]
         st.markdown(f'<div class="hero-pick"><div class="label">TODAY BEST PICK · {pick_grade(candidate_hit_prob(c0))}</div><div class="pick">{html.escape(pick_ko(c0.get("pick")))}</div><div class="meta">{html.escape(team_ko(g0["away"]))} vs {html.escape(team_ko(g0["home"]))} · 적중확률 {score100(candidate_hit_prob(c0))} · 현재 배당 {price(c0.get("odds"))}</div></div>', unsafe_allow_html=True)
