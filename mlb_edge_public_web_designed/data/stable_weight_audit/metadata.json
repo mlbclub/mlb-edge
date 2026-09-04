@@ -1,0 +1,33 @@
+{
+  "prior": {
+    "linear": 0.44,
+    "tree": 0.36,
+    "run": 0.2
+  },
+  "shrinkage": 0.5,
+  "cap": 0.15,
+  "policy": {
+    "min_fold_games": 300,
+    "min_train_games": 800,
+    "min_60_per_fold": 30,
+    "min_55_per_fold": 100,
+    "min_60_total": 150,
+    "min_folds": 3,
+    "score_margin": 0.025,
+    "lcb_margin": 0.01,
+    "fold_win_fraction": 0.75,
+    "max_fold_accuracy_drop": 0.02,
+    "max_log_loss_increase": 0.005,
+    "max_auc_drop": 0.005,
+    "max_accuracy_drop": 0.005
+  },
+  "development_games": 4482,
+  "development_to": "2025-09-28 19:20:00+00:00",
+  "input_sha256": "be61e1b28b2c28c3e94b525198f1c1771847def261d6fc58396350520c17b16b",
+  "sklearn": "1.9.0",
+  "pandas": "3.0.1",
+  "numpy": "2.3.5",
+  "holdout_evaluated": false,
+  "production_model_modified": false,
+  "note": "Repeated development experiments are exploratory; no 2026 tuning or automatic promotion."
+}

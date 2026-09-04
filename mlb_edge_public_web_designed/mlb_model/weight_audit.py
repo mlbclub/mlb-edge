@@ -46,15 +46,21 @@ def blended(frame, weights):
     return train._blend(frame.linear.to_numpy(), frame.tree.to_numpy(), frame.run.to_numpy(), weights)
 
 
-def choose_weights(oof, objective="log_loss"):
+def choose_weights(oof, objective="log_loss", candidates=None, fallback_weights=None):
     if objective not in ("log_loss", "hit_rate"):
         raise ValueError("Unknown objective")
     if oof.empty:
-        return DEFAULT_WEIGHTS.copy(), {"reason": "no_inner_oof", "eligible_grid": 0}, []
-    grid = list(weight_grid())
-    baseline = min(grid, key=lambda w: log_loss(oof.y, np.clip(blended(oof, w), .01, .99), labels=[0, 1]))
+        return dict(fallback_weights or DEFAULT_WEIGHTS), {"reason": "no_inner_oof", "eligible_grid": 0}, []
+    grid = list(weight_grid() if candidates is None else candidates)
+    if not grid:
+        raise ValueError("Empty weight candidate set")
+    for weights in grid:
+        if set(weights) != set(DEFAULT_WEIGHTS) or not all(np.isfinite(v) and v >= 0 for v in weights.values()) or not np.isclose(sum(weights.values()), 1):
+            raise ValueError("Weights must be finite nonnegative probabilities summing to one")
+    loss = lambda w: log_loss(oof.y, np.clip(blended(oof, w), .01, .99), labels=[0, 1])
+    baseline = min(weight_grid(), key=loss)
     if objective == "log_loss":
-        return baseline, {"reason": "minimum_inner_log_loss"}, []
+        return min(grid, key=loss), {"reason": "minimum_inner_log_loss"}, []
 
     # Three latest available inner blocks, declared before seeing audit results.
     ids = sorted(oof.inner_fold.unique())[-POLICY["min_folds"]:]
@@ -71,7 +77,7 @@ def choose_weights(oof, objective="log_loss"):
         if result["eligible"] and guardrails:
             eligible.append((result["robust_score"], weights))
     if not eligible:
-        return baseline, {"reason": "insufficient_inner_evidence", "eligible_grid": 0,
+        return dict(fallback_weights or baseline), {"reason": "insufficient_inner_evidence", "eligible_grid": 0,
                           "inner_blocks": len(ids)}, records
     best = max(eligible, key=lambda item: item[0])[1]
     return best, {"reason": "maximum_inner_robust_score", "eligible_grid": len(eligible),
