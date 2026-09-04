@@ -42,13 +42,16 @@ def rate(frame, numerator, denominator, scale=1):
     return float(scale*x[numerator].sum()/den) if den > 0 else None
 
 
-def team_card_details(team_games, team_id, starter_id, game_dt, is_home, relief=None):
+def team_card_details(team_games, team_id, starter_id, game_dt, is_home, relief=None, opponent_id=None):
     dt = pd.Timestamp(game_dt)
     dt = dt.tz_localize('UTC') if dt.tzinfo is None else dt.tz_convert('UTC')
     past = team_games[team_games.game_date < dt]
     team = past[past.team_id.eq(team_id)].sort_values('game_date')
     last = team.tail(5)
     venue = team[team.is_home.eq(int(is_home))].tail(10)
+    h2h = (team[team.opponent_id.eq(opponent_id) & team.win.isin([0, 1])]
+           .sort_values(['game_date', 'game_pk']).drop_duplicates('game_pk').tail(10)
+           if opponent_id is not None and 'opponent_id' in team else team.iloc[:0])
     starts = past[past.starter_id.eq(starter_id)].sort_values('game_date') if starter_id else past.iloc[:0]
     season = starts[starts.season.eq(dt.year)]
     result = dict(last5=['W' if int(w) else 'L' for w in last.win],
@@ -59,6 +62,7 @@ def team_card_details(team_games, team_id, starter_id, game_dt, is_home, relief=
         starter_starts5=len(starts.tail(5)), recent_games=len(last),
         venue_games=len(venue), venue_wins=int(venue.win.sum()),
         venue_losses=int(len(venue)-venue.win.sum()), venue='홈' if is_home else '원정',
+        h2h_games=len(h2h), h2h_wins=int(h2h.win.sum()), h2h_losses=int(len(h2h)-h2h.win.sum()),
         key_relievers=[], relief_status='기록 수집 중')
     relief = relief_history() if relief is None else relief
     recent = team.tail(30)

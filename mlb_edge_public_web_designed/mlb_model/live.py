@@ -402,8 +402,8 @@ def predict_date(target_date: str, save=True):
             upset_edge = upset_prob - um
 
         records.append({
-            "home_details": team_card_details(team_games, home['id'], hp.get('id'), game_dt, True),
-            "away_details": team_card_details(team_games, away['id'], ap.get('id'), game_dt, False),
+            "home_details": team_card_details(team_games, home['id'], hp.get('id'), game_dt, True, opponent_id=away['id']),
+            "away_details": team_card_details(team_games, away['id'], ap.get('id'), game_dt, False, opponent_id=home['id']),
             "game_pk": g.get("gamePk"),
             "game_date": str(game_dt),
             "official_date": g.get("officialDate"),

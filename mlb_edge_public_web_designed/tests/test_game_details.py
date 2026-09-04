@@ -23,6 +23,24 @@ class GameDetailsTests(unittest.TestCase):
         self.assertEqual((d['venue_wins'],d['venue_losses']),(0,5))
         self.assertEqual(d['key_relievers'],[])
 
+    def test_h2h_limits_unique_prior_games_and_team_perspective(self):
+        f=self.frame()
+        f['opponent_id']=2
+        reverse=f.copy()
+        reverse['team_id'],reverse['opponent_id']=2,1
+        reverse['win']=1-reverse.win
+        both=pd.concat([f,reverse,f.iloc[[5]]],ignore_index=True)
+        one=team_card_details(both,1,None,'2025-06-12',True,pd.DataFrame(),opponent_id=2)
+        two=team_card_details(both,2,None,'2025-06-12',False,pd.DataFrame(),opponent_id=1)
+        self.assertEqual(one['h2h_games'],10)
+        self.assertEqual(one['h2h_wins'],two['h2h_losses'])
+        self.assertEqual(one['h2h_losses'],two['h2h_wins'])
+        short=team_card_details(both,1,None,'2025-06-03',True,pd.DataFrame(),opponent_id=2)
+        self.assertEqual(short['h2h_games'],2)
+        missing=team_card_details(both,1,None,'2025-06-12',True,pd.DataFrame(),opponent_id=99)
+        self.assertEqual(missing['h2h_games'],0)
+        self.assertIn('맞대결 기록 없음',team_details_html(missing))
+
     def test_key_relievers_are_individuals_and_streak_stops_at_missed_game(self):
         f=self.frame().iloc[:5]
         rows=[]

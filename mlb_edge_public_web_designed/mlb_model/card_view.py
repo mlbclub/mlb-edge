@@ -59,6 +59,8 @@ def team_details_html(d):
         return f'{value:.{digits}f}' if value is not None else '—'
     form = ''.join('🟢' if w == 'W' else '🔴' for w in d.get('last5', [])) or '기록 없음'
     wins = d.get('venue_wins', 0); losses = d.get('venue_losses', 0)
+    h2h = (f"{d.get('h2h_wins',0)}승 {d.get('h2h_losses',0)}패"
+           if d.get('h2h_games',0) else '맞대결 기록 없음')
     relief = ' · '.join(f"{html.escape(str(p['name']))} <b>{p['streak']}경기</b>" for p in d.get('key_relievers', []))
     if not relief:
         relief = html.escape(d.get('relief_status', '기록 수집 중'))
@@ -66,4 +68,5 @@ def team_details_html(d):
 <div class="team-facts"><div><span>선발 시즌 ERA</span><b>{number('starter_era_season')}</b></div><div><span>선발 최근 5등판 ERA</span><b>{number('starter_era5')}</b></div>
 <div><span>불펜 최근 5경기 ERA</span><b>{number('bullpen_era5')}</b></div><div><span>팀 최근 5경기 타율</span><b>{number('batting_avg5', 3)}</b></div>
 <div class="fact-wide"><span>{html.escape(d.get('venue','홈/원정'))} 최근 {d.get('venue_games',0)}경기 (최대 10)</span><b>{wins}승 {losses}패</b></div>
+<div class="fact-wide"><span>상대전적 · 최근 {d.get('h2h_games',0)}경기 (최대 10)</span><b>{h2h}</b><small>홈·원정 통합 · 보유 기록 내 경기 시작 전 맞대결</small></div>
 <div class="fact-wide relief"><span>필승조 연속 등판</span><strong>{relief}</strong><small>{html.escape(d.get('relief_status',''))} · 팀 직전 경기부터 연속 등판 수</small></div></div>'''
