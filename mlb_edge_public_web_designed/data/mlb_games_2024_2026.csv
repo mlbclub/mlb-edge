@@ -6967,8 +6967,8 @@ season,game_pk,game_date,official_date,game_type,status,abstract_state,home_team
 2026,824632,2026-09-03 23:15:00+00:00,2026-09-03,R,Final,Final,112,Chicago Cubs,158,Milwaukee Brewers,2.0,1.0,1.0,592332.0,Kevin Gausman,701656.0,Logan Henderson,17,Wrigley Field
 2026,824069,2026-09-03 23:40:00+00:00,2026-09-03,R,Final,Final,118,Kansas City Royals,146,Miami Marlins,7.0,3.0,1.0,608379.0,Michael Wacha,645261.0,Sandy Alcantara,7,Kauffman Stadium
 2026,822853,2026-09-04 00:05:00+00:00,2026-09-03,R,Final,Final,140,Texas Rangers,139,Tampa Bay Rays,6.0,0.0,1.0,615698.0,Cal Quantrill,663556.0,Shane McClanahan,5325,Globe Life Field
-2026,823095,2026-09-04 01:40:00+00:00,2026-09-03,R,In Progress,Live,136,Seattle Mariners,133,Athletics,3.0,2.0,,807739.0,Kade Anderson,678022.0,Jack Perkins,680,T-Mobile Park
-2026,823907,2026-09-04 02:10:00+00:00,2026-09-03,R,In Progress,Live,119,Los Angeles Dodgers,138,St. Louis Cardinals,0.0,1.0,,669373.0,Tarik Skubal,687273.0,Quinn Mathews,22,UNIQLO Field at Dodger Stadium
+2026,823095,2026-09-04 01:40:00+00:00,2026-09-03,R,In Progress,Live,136,Seattle Mariners,133,Athletics,4.0,7.0,,807739.0,Kade Anderson,678022.0,Jack Perkins,680,T-Mobile Park
+2026,823907,2026-09-04 02:10:00+00:00,2026-09-03,R,In Progress,Live,119,Los Angeles Dodgers,138,St. Louis Cardinals,1.0,2.0,,669373.0,Tarik Skubal,687273.0,Quinn Mathews,22,UNIQLO Field at Dodger Stadium
 2026,824471,2026-09-04 22:10:00+00:00,2026-09-04,R,Scheduled,Preview,113,Cincinnati Reds,158,Milwaukee Brewers,,,,695076.0,Rhett Lowder,675660.0,Shane Drohan,2602,Great American Ball Park
 2026,823418,2026-09-04 22:40:00+00:00,2026-09-04,R,Scheduled,Preview,143,Philadelphia Phillies,144,Atlanta Braves,,,,650911.0,Cristopher Sánchez,519242.0,Chris Sale,2681,Citizens Bank Park
 2026,823338,2026-09-04 22:45:00+00:00,2026-09-04,R,Scheduled,Preview,134,Pittsburgh Pirates,108,Los Angeles Angels,,,,683003.0,Jared Jones,696270.0,Ryan Johnson,31,PNC Park
@@ -6977,7 +6977,7 @@ season,game_pk,game_date,official_date,game_type,status,abstract_state,home_team
 2026,823824,2026-09-04 23:10:00+00:00,2026-09-04,R,Scheduled,Preview,146,Miami Marlins,112,Chicago Cubs,,,,676083.0,Janson Junk,684007.0,Shota Imanaga,4169,loanDepot park
 2026,824387,2026-09-04 23:15:00+00:00,2026-09-04,R,Scheduled,Preview,114,Cleveland Guardians,116,Detroit Tigers,,,,656492.0,Foster Griffin,808825.0,Andrew Sears,5,Progressive Field
 2026,824554,2026-09-04 23:40:00+00:00,2026-09-04,R,Scheduled,Preview,145,Chicago White Sox,142,Minnesota Twins,,,,607200.0,Erick Fedde,805673.0,Zebby Matthews,4,Rate Field
-2026,822852,2026-09-05 00:05:00+00:00,2026-09-04,R,Scheduled,Preview,140,Texas Rangers,139,Tampa Bay Rays,,,,677958.0,Kumar Rocker,607259.0,Nick Martinez,5325,Globe Life Field
+2026,822852,2026-09-05 00:05:00+00:00,2026-09-04,R,Scheduled,Preview,140,Texas Rangers,139,Tampa Bay Rays,,,,592866.0,Trevor Williams,607259.0,Nick Martinez,5325,Globe Life Field
 2026,824146,2026-09-05 00:10:00+00:00,2026-09-04,R,Scheduled,Preview,117,Houston Astros,109,Arizona Diamondbacks,,,,664299.0,Cristian Javier,518876.0,Merrill Kelly,2392,Daikin Park
 2026,824067,2026-09-05 00:10:00+00:00,2026-09-04,R,Scheduled,Preview,118,Kansas City Royals,141,Toronto Blue Jays,,,,663738.0,Daniel Lynch IV,592791.0,Jameson Taillon,7,Kauffman Stadium
 2026,824311,2026-09-05 00:40:00+00:00,2026-09-04,R,Scheduled,Preview,115,Colorado Rockies,138,St. Louis Cardinals,,,,663372.0,Ryan Feltner,669467.0,Andre Pallante,19,Coors Field
