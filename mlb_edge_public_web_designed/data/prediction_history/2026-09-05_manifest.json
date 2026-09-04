@@ -1,0 +1,17 @@
+{
+  "kst_date": "2026-09-05",
+  "snapshot_status": "FROZEN",
+  "source_commit": "8f08b2e678a00b6500404663118c6dbd78fab280",
+  "source_prediction_path": "mlb_edge_public_web_designed/data/today_market_predictions.csv",
+  "source_prediction_blob_sha": "4fe0b3b780d89ca4f0923d51062374ecd81b6f1b",
+  "model_version": "sports-lab-v10-compact-core",
+  "all_predictions_path": "mlb_edge_public_web_designed/data/prediction_history/2026-09-05_all_predictions.csv",
+  "top10_path": "mlb_edge_public_web_designed/data/prediction_history/2026-09-05_top10.csv",
+  "all_game_count": 16,
+  "top10_count": 10,
+  "moneyline_rule": "For every game, record the team with the higher V10 home_model/away_model probability.",
+  "total_rule": "For every game with a total line, record the higher over_model/under_model side. total_actual_hit_prob equals the selected conditional side probability multiplied by (1 - push_prob).",
+  "top10_rule": "Exactly matches current SPORTS LAB recommendation policy: choose the available market with the highest unmodified candidate_hit_prob for each game, break ties by EV, then rank the best one-per-game candidates by hit probability and keep the top 10. No probability/edge/EV minimum gate.",
+  "settlement_rule": "Moneyline: predicted winner versus final winner. Total: compare final combined runs with frozen total_line; equality to an integer line is PUSH. Postponed/suspended/non-final games remain PENDING. Hit rate excludes PUSH and PENDING from the denominator and reports them separately.",
+  "settlement_status": "PENDING"
+}
