@@ -1,0 +1,42 @@
+venue_id,venue,latitude,longitude,timezone,roof_type,turf_type
+1,Angel Stadium,33.80019044,-117.8823996,America/Los_Angeles,Open,Grass
+2,Oriole Park at Camden Yards,39.283787,-76.621689,America/New_York,Open,Grass
+3,Fenway Park,42.346456,-71.097441,America/New_York,Open,Grass
+4,Rate Field,41.83,-87.634167,America/Chicago,Open,Grass
+5,Progressive Field,41.495861,-81.685255,America/New_York,Open,Grass
+7,Kauffman Stadium,39.051567,-94.480483,America/Chicago,Open,Grass
+10,Oakland Coliseum,37.751511,-122.200698,America/Los_Angeles,Open,Grass
+12,Tropicana Field,27.767778,-82.6525,America/New_York,Dome,Artificial Turf
+14,Rogers Centre,43.64155,-79.38915,America/Toronto,Retractable,Artificial Turf
+15,Chase Field,33.445302,-112.066687,America/Phoenix,Retractable,Artificial Turf
+17,Wrigley Field,41.948171,-87.655503,America/Chicago,Open,Grass
+19,Coors Field,39.756042,-104.994136,America/Denver,Open,Grass
+22,UNIQLO Field at Dodger Stadium,34.07368,-118.24053,America/Los_Angeles,Open,Grass
+31,PNC Park,40.446904,-80.005753,America/New_York,Open,Grass
+32,American Family Field,43.02838,-87.97099,America/Chicago,Retractable,Grass
+680,T-Mobile Park,47.591333,-122.33251,America/Los_Angeles,Retractable,Grass
+2392,Daikin Park,29.756967,-95.355509,America/Chicago,Retractable,Grass
+2394,Comerica Park,42.3391151,-83.048695,America/Detroit,Open,Grass
+2395,Oracle Park,37.778383,-122.389448,America/Los_Angeles,Open,Grass
+2397,Tokyo Dome,35.7056,139.7519,Asia/Tokyo,Dome,Artificial Turf
+2523,George M. Steinbrenner Field,27.97997,-82.50702,America/New_York,Open,Grass
+2529,Sutter Health Park,38.57994,-121.51246,America/Los_Angeles,Open,Grass
+2602,Great American Ball Park,39.097389,-84.506611,America/New_York,Open,Grass
+2680,Petco Park,32.707861,-117.157278,America/Los_Angeles,Open,Grass
+2681,Citizens Bank Park,39.90539086,-75.16716957,America/New_York,Open,Grass
+2735,Journey Bank Ballpark,41.2419845,-77.0475104,America/New_York,Open,Grass
+2889,Busch Stadium,38.62256667,-90.19286667,America/Chicago,Open,Grass
+3289,Citi Field,40.75753012,-73.84559155,America/New_York,Open,Grass
+3309,Nationals Park,38.872861,-77.007501,America/New_York,Open,Grass
+3312,Target Field,44.981829,-93.277891,America/Chicago,Open,Grass
+3313,Yankee Stadium,40.82919482,-73.9264977,America/New_York,Open,Grass
+3949,Rickwood Field,33.5023303,-86.8563555,America/Chicago,Open,Grass
+4169,loanDepot park,25.77796236,-80.21951795,America/New_York,Retractable,Artificial Turf
+4705,Truist Park,33.890672,-84.467641,America/New_York,Open,Grass
+5150,Gocheok Sky Dome,37.4982,126.867,Asia/Seoul,Dome,Artificial Turf
+5325,Globe Life Field,32.747299,-97.081818,America/Chicago,Retractable,Artificial Turf
+5340,Estadio Alfredo Harp Helu,,,America/Mexico_City,Open,Artificial Turf
+5355,Las Vegas Ballpark,36.152607,-115.329888,America/Los_Angeles,Open,Grass
+5381,London Stadium,51.50853,-0.12574,Europe/London,Open,Artificial Turf
+5445,Field of Dreams,42.498241,-91.056486,America/Chicago,Open,Grass
+6130,Bristol Motor Speedway,31.5156,-82.5269,America/New_York,Open,Artificial Turf
