@@ -1,0 +1,64 @@
+name: Check historical odds access
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test one MLB historical moneyline snapshot
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          key = os.environ.get("ODDS_API_KEY")
+          if not key:
+              raise SystemExit("ODDS_API_KEY secret is missing")
+
+          params = urllib.parse.urlencode({
+              "apiKey": key,
+              "regions": "us",
+              "markets": "h2h",
+              "oddsFormat": "decimal",
+              "dateFormat": "iso",
+              "date": "2026-08-01T00:00:00Z",
+          })
+          url = "https://api.the-odds-api.com/v4/historical/sports/baseball_mlb/odds?" + params
+          req = urllib.request.Request(url, headers={"User-Agent": "sports-lab-historical-check/1.0"})
+
+          try:
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  body = r.read().decode("utf-8")
+                  payload = json.loads(body)
+                  events = payload.get("data", []) if isinstance(payload, dict) else []
+                  print("HISTORICAL_ACCESS=OK")
+                  print("HTTP_STATUS=", r.status)
+                  print("EVENTS_RETURNED=", len(events))
+                  print("CREDITS_LAST=", r.headers.get("x-requests-last"))
+                  print("CREDITS_USED=", r.headers.get("x-requests-used"))
+                  print("CREDITS_REMAINING=", r.headers.get("x-requests-remaining"))
+          except urllib.error.HTTPError as e:
+              body = e.read().decode("utf-8", errors="replace")
+              print("HISTORICAL_ACCESS=FAILED")
+              print("HTTP_STATUS=", e.code)
+              print("CREDITS_LAST=", e.headers.get("x-requests-last"))
+              print("CREDITS_USED=", e.headers.get("x-requests-used"))
+              print("CREDITS_REMAINING=", e.headers.get("x-requests-remaining"))
+              try:
+                  err = json.loads(body)
+                  print("ERROR_CODE=", err.get("error_code"))
+                  print("MESSAGE=", err.get("message"))
+              except Exception:
+                  print("RESPONSE=", body[:500])
+              raise SystemExit(1)
+          PY
