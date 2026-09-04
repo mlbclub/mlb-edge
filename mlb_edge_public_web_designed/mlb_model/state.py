@@ -33,17 +33,25 @@ def _schedule_live(x: pd.DataFrame, dt: pd.Timestamp) -> dict:
     }
 
 
-def team_state(team_games: pd.DataFrame, team_id: int, target_dt, target_is_home: int | None = None) -> dict:
+def team_state(
+    team_games: pd.DataFrame,
+    team_id: int,
+    target_dt,
+    target_is_home: int | None = None,
+    opp_starter_hand: str | None = None,
+) -> dict:
     dt = pd.Timestamp(target_dt)
     if dt.tzinfo is None:
         dt = dt.tz_localize("UTC")
     else:
         dt = dt.tz_convert("UTC")
     x = team_games[(team_games.team_id.eq(int(team_id))) & (team_games.game_date < dt)].copy().sort_values("game_date")
+    hand = str(opp_starter_hand or "").upper()
     out = {
         "history_games": int(len(x)),
         "season_games": int((x.season.eq(dt.year)).sum()),
         "elo_pre": _current_elo(x),
+        "opp_starter_is_left": float(hand == "L"),
     }
     out.update(_schedule_live(x, dt))
 
@@ -58,7 +66,7 @@ def team_state(team_games: pd.DataFrame, team_id: int, target_dt, target_is_home
         valid = vals.dropna()
         out[f"{col}_ewm60"] = float(valid.ewm(span=60, adjust=True).mean().iloc[-1]) if len(valid) else np.nan
 
-    for col in ("win", "run_diff", "bat_ops", "bullpen_era", "bullpen_whip"):
+    for col in ("win", "run_diff", "bat_ops", "bullpen_era", "bullpen_whip", "bullpen_fip_proxy"):
         r5, r20 = out.get(f"{col}_r5"), out.get(f"{col}_r20")
         out[f"{col}_trend_5v20"] = (
             float(r5) - float(r20)
@@ -81,6 +89,13 @@ def team_state(team_games: pd.DataFrame, team_id: int, target_dt, target_is_home
         for col in ("win", "run_diff", "bat_ops", "runs_for", "runs_against"):
             out[f"venue_{col}_r20"] = np.nan
             out[f"venue_{col}_history"] = np.nan
+
+    # Same-handed historical split as today's opposing starter.
+    hx = x[x.get("opp_starter_hand", pd.Series(index=x.index, dtype=object)).fillna("").astype(str).str.upper().eq(hand)] if hand in {"R", "L"} else x.iloc[0:0]
+    for col in ("win", "run_diff", "bat_ops", "bat_hr_rate", "runs_for"):
+        out[f"vs_hand_{col}_r20"] = _mean_tail(hx[col], 20) if len(hx) else np.nan
+        vv = pd.to_numeric(hx[col], errors="coerce").dropna() if len(hx) else pd.Series(dtype=float)
+        out[f"vs_hand_{col}_history"] = float(vv.mean()) if len(vv) >= 5 else np.nan
     return out
 
 
@@ -92,7 +107,13 @@ def starter_state(team_games: pd.DataFrame, starter_id: int | float | None, targ
                 out[f"{col}_r{w}"] = np.nan
             out[f"{col}_history"] = np.nan
             out[f"{col}_vs_opp"] = np.nan
-        out["starter_vs_opp_starts"] = 0.0
+        out.update({
+            "starter_vs_opp_starts": 0.0,
+            "starter_rest_days": np.nan,
+            "starter_pitches_last1": np.nan,
+            "starter_pitches_last2": np.nan,
+            "starter_short_rest": 0.0,
+        })
         return out
 
     dt = pd.Timestamp(target_dt)
@@ -107,6 +128,20 @@ def starter_state(team_games: pd.DataFrame, starter_id: int | float | None, targ
         vals = pd.to_numeric(x[col], errors="coerce").dropna()
         out[f"{col}_history"] = float(vals.mean()) if len(vals) else np.nan
 
+    if len(x):
+        last_dt = pd.Timestamp(x.game_date.iloc[-1])
+        rest = (dt - last_dt).total_seconds() / 86400.0
+        out["starter_rest_days"] = float(np.clip(rest, 0.0, 15.0))
+        pitches = pd.to_numeric(x.get("starter_pitches_raw", pd.Series(dtype=float)), errors="coerce").dropna()
+        out["starter_pitches_last1"] = float(pitches.tail(1).sum()) if len(pitches) else np.nan
+        out["starter_pitches_last2"] = float(pitches.tail(2).sum()) if len(pitches) else np.nan
+        out["starter_short_rest"] = float(rest < 4.5)
+    else:
+        out["starter_rest_days"] = np.nan
+        out["starter_pitches_last1"] = np.nan
+        out["starter_pitches_last2"] = np.nan
+        out["starter_short_rest"] = 0.0
+
     ox = x[x["opponent_id"].eq(int(opponent_id))] if opponent_id is not None and "opponent_id" in x.columns else x.iloc[0:0]
     out["starter_vs_opp_starts"] = float(len(ox))
     for col in STARTER_METRICS:
@@ -115,10 +150,19 @@ def starter_state(team_games: pd.DataFrame, starter_id: int | float | None, targ
     return out
 
 
-def live_feature_row(team_games: pd.DataFrame, home_id: int, away_id: int, home_starter_id, away_starter_id, game_dt) -> dict:
-    hs = team_state(team_games, home_id, game_dt, target_is_home=1)
+def live_feature_row(
+    team_games: pd.DataFrame,
+    home_id: int,
+    away_id: int,
+    home_starter_id,
+    away_starter_id,
+    game_dt,
+    home_starter_hand: str | None = None,
+    away_starter_hand: str | None = None,
+) -> dict:
+    hs = team_state(team_games, home_id, game_dt, target_is_home=1, opp_starter_hand=away_starter_hand)
     hs.update(starter_state(team_games, home_starter_id, game_dt, opponent_id=away_id))
-    aw = team_state(team_games, away_id, game_dt, target_is_home=0)
+    aw = team_state(team_games, away_id, game_dt, target_is_home=0, opp_starter_hand=home_starter_hand)
     aw.update(starter_state(team_games, away_starter_id, game_dt, opponent_id=home_id))
     row = {}
     for k, v in hs.items():
@@ -147,13 +191,16 @@ def display_snapshot(team_games: pd.DataFrame, team_id: int, starter_id, game_dt
         "bat_ops_recent10": ts.get("bat_ops_r10"),
         "bat_ops_history": ts.get("bat_ops_history"),
         "bullpen_era_recent10": ts.get("bullpen_era_r10"),
-        "bullpen_era_history": ts.get("bullpen_era_history"),
         "bullpen_whip_recent10": ts.get("bullpen_whip_r10"),
+        "bullpen_fip_recent10": ts.get("bullpen_fip_proxy_r10"),
         "bullpen_usage_pitches3": ts.get("bullpen_pitches_usage_3"),
         "days_rest": ts.get("days_rest"),
         "elo": ts.get("elo_pre"),
         "starter_era_recent5": ss.get("starter_era_r5"),
+        "starter_fip_recent5": ss.get("starter_fip_proxy_r5"),
         "starter_era_history": ss.get("starter_era_history"),
         "starter_whip_recent5": ss.get("starter_whip_r5"),
         "starter_k9_recent5": ss.get("starter_k9_r5"),
+        "starter_rest_days": ss.get("starter_rest_days"),
+        "starter_pitches_last1": ss.get("starter_pitches_last1"),
     }
