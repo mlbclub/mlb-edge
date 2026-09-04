@@ -11,7 +11,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 360
 
     defaults:
       run:
@@ -45,7 +45,13 @@ jobs:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python snapshot_current_odds.py
 
-      - name: Collect MLB data and train model
+      - name: Test robust selection and live compatibility
+        run: python -m unittest discover -s tests -v
+
+      - name: Collect MLB data and train robust champion challenger model
+        env:
+          OMP_NUM_THREADS: '2'
+          OPENBLAS_NUM_THREADS: '2'
         run: python run_pipeline.py
 
       - name: Save updated model to GitHub
@@ -58,6 +64,7 @@ jobs:
           git add data/team_game_stats.csv
           git add data/features_v3.csv
           git add models/market_model_v3.joblib
+          git add data/robust_ablation_report.csv
 
           for f in \
             data/current_odds_history.csv \

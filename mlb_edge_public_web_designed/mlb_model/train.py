@@ -15,6 +15,8 @@ from sklearn.preprocessing import StandardScaler
 
 from .config import FEATURES, MODEL_FILE, MODEL_DIR, DATA_DIR
 from .probability import market_probabilities
+from .robust_selection import (V5_BASES, POLICY, development_frame, chronological_folds,
+                               metrics as selection_metrics, summarize, promotion_reasons)
 
 CORE_BASES = [
     "win_r10", "win_r20", "run_diff_r10", "run_diff_r20",
@@ -80,14 +82,20 @@ def _side_and_diff_features(df: pd.DataFrame, bases: list[str]) -> list[str]:
 
 
 def win_features_for_groups(df: pd.DataFrame, groups: list[str]) -> list[str]:
-    bases = list(CORE_BASES)
+    required = [f"diff_{b}" for b in V5_BASES]
+    required += [f"{s}_{b}" for b in CORE_BASES for s in ("home", "away")]
+    required += ["month", "elo_home_prob"]
+    missing = sorted(set(required) - set(df.columns))
+    if missing:
+        raise ValueError(f"Incomplete V5 champion schema: {missing}")
+    bases = []
     use_context = False
     for group in groups:
         if group == "context":
             use_context = True
         else:
-            bases.extend(FEATURE_GROUPS.get(group, []))
-    cols = _side_and_diff_features(df, list(dict.fromkeys(bases)))
+            bases.extend(FEATURE_GROUPS[group])
+    cols = required + _side_and_diff_features(df, list(dict.fromkeys(bases)))
     for c in ("month", "elo_home_prob"):
         if c in df.columns:
             cols.append(c)
@@ -96,27 +104,40 @@ def win_features_for_groups(df: pd.DataFrame, groups: list[str]) -> list[str]:
     return list(dict.fromkeys(cols))
 
 
-def run_features_full(df: pd.DataFrame) -> list[str]:
-    bases = [c[len("diff_"):] for c in df.columns if c.startswith("diff_")]
-    cols = []
-    for b in bases:
-        for side in ("home", "away"):
-            c = f"{side}_{b}"
-            if c in df.columns:
-                cols.append(c)
-    for c in ("month", "elo_home_prob", *GAME_CONTEXT_FEATURES):
-        if c in df.columns:
-            cols.append(c)
+def run_features_for_groups(df, groups):
+    # The run-probability component is part of moneyline too. Do not let full
+    # V7 context enter the champion through this indirect path.
+    bases = list(V5_BASES)
+    for group in groups:
+        if group != "context":
+            bases.extend(FEATURE_GROUPS[group])
+    cols = [f"{s}_{b}" for b in dict.fromkeys(bases) for s in ("home", "away")]
+    cols += ["month", "elo_home_prob"]
+    if "context" in groups:
+        cols += GAME_CONTEXT_FEATURES
+    missing = sorted(set(cols) - set(df.columns))
+    if missing:
+        raise ValueError(f"Incomplete run feature schema: {missing}")
     return list(dict.fromkeys(cols))
 
 
-def make_models():
+def date_splits(df, n_splits):
+    """Keep an entire UTC calendar day on one side of every nested split."""
+    days = pd.to_datetime(df.game_date, utc=True).dt.normalize()
+    unique = np.sort(days.unique())
+    return [(np.flatnonzero(days.isin(unique[tr])), np.flatnonzero(days.isin(unique[va])))
+            for tr, va in TimeSeriesSplit(n_splits=n_splits).split(unique)]
+
+
+def make_models(calibration_cv=None):
+    if calibration_cv is None:
+        calibration_cv = TimeSeriesSplit(n_splits=3)
     linear_base = Pipeline([
         ("impute", SimpleImputer(strategy="median")),
         ("scale", StandardScaler()),
         ("clf", LogisticRegression(C=0.14, max_iter=5000)),
     ])
-    linear_model = CalibratedClassifierCV(linear_base, method="sigmoid", cv=TimeSeriesSplit(n_splits=3))
+    linear_model = CalibratedClassifierCV(linear_base, method="sigmoid", cv=calibration_cv)
 
     tree_base = Pipeline([
         ("impute", SimpleImputer(strategy="median")),
@@ -126,7 +147,7 @@ def make_models():
             min_samples_leaf=38, random_state=42,
         )),
     ])
-    tree_model = CalibratedClassifierCV(tree_base, method="sigmoid", cv=TimeSeriesSplit(n_splits=3))
+    tree_model = CalibratedClassifierCV(tree_base, method="sigmoid", cv=calibration_cv)
 
     def run_model(seed):
         return Pipeline([
@@ -141,7 +162,7 @@ def make_models():
 
 
 def _fit_base(train_df: pd.DataFrame, win_features: list[str], run_features: list[str]):
-    linear_model, tree_model, home_run_model, away_run_model, total_run_model = make_models()
+    linear_model, tree_model, home_run_model, away_run_model, total_run_model = make_models(date_splits(train_df, 3))
     Xw, Xr = train_df[win_features], train_df[run_features]
     y = train_df["home_win"].astype(int)
     linear_model.fit(Xw, y)
@@ -173,9 +194,8 @@ def _base_predictions(models, df, win_features, run_features):
 
 
 def _learn_ensemble_weights(train_df, win_features, run_features):
-    splitter = TimeSeriesSplit(n_splits=4)
     y_all, pl_all, pt_all, pr_all, total_residuals = [], [], [], [], []
-    for tr_idx, va_idx in splitter.split(train_df):
+    for tr_idx, va_idx in date_splits(train_df, 4):
         tr, va = train_df.iloc[tr_idx], train_df.iloc[va_idx]
         if tr["home_win"].nunique() < 2 or len(tr) < 500:
             continue
@@ -220,68 +240,70 @@ def _blend(pl, pt, pr, weights):
     )
 
 
-def _selector_score(y: np.ndarray, p: np.ndarray) -> tuple[float, dict]:
-    conf = np.maximum(p, 1.0 - p)
-    correct = ((p >= 0.5).astype(int) == y.astype(int))
-    m60 = conf >= 0.60
-    m55 = conf >= 0.55
-    n60 = int(m60.sum())
-    n55 = int(m55.sum())
-    a60 = float(correct[m60].mean()) if n60 else 0.5
-    a55 = float(correct[m55].mean()) if n55 else 0.5
-    auc = float(roc_auc_score(y, p))
-    ll = float(log_loss(y, p))
-    acc = float(correct.mean())
-    reliability60 = min(1.0, n60 / 120.0)
-    shrunk60 = 0.5 + (a60 - 0.5) * reliability60
-    reliability55 = min(1.0, n55 / 300.0)
-    shrunk55 = 0.5 + (a55 - 0.5) * reliability55
-    score = 4.0 * shrunk60 + 1.5 * shrunk55 + 0.8 * auc + 0.4 * acc - 0.35 * ll
-    return score, {
-        "score": float(score), "games": int(len(y)), "accuracy": acc,
-        "roc_auc": auc, "log_loss": ll,
-        "confidence_55_games": n55, "confidence_55_accuracy": a55,
-        "confidence_60_games": n60, "confidence_60_accuracy": a60,
-    }
-
-
-def select_moneyline_features(train_df: pd.DataFrame, run_features: list[str]):
-    train_df = train_df.sort_values("game_date").reset_index(drop=True)
-    cut = int(len(train_df) * 0.72)
-    selector_train = train_df.iloc[:cut].copy()
-    selector_val = train_df.iloc[cut:].copy()
-    reports = []
-
+def select_moneyline_features(train_df: pd.DataFrame, run_features=None):
+    # Retain the legacy optional argument; feature lists are now candidate-specific.
+    train_df = development_frame(train_df)
+    splits = list(chronological_folds(train_df))
+    valid_splits = [(tr, va) for tr, va in splits
+                    if len(tr) >= POLICY["min_train_games"] and len(va) >= POLICY["min_fold_games"]]
+    rows, summaries, fold_metrics = [], {}, {}
     for name, groups in ABLATION_CANDIDATES.items():
         wf = win_features_for_groups(train_df, groups)
-        weights, _ = _learn_ensemble_weights(selector_train, wf, run_features)
-        models = _fit_base(selector_train, wf, run_features)
-        pl, pt, pr, _, _ = _base_predictions(models, selector_val, wf, run_features)
-        p = _blend(pl, pt, pr, weights)
-        y = selector_val["home_win"].astype(int).to_numpy()
-        score, metrics = _selector_score(y, p)
-        reports.append({
-            "candidate": name,
-            "groups": "+".join(groups) if groups else "core",
-            "feature_count": len(wf),
-            "weights": json.dumps(weights, ensure_ascii=False),
-            **metrics,
-        })
-        print(f"[ablation] {name}: score={score:.4f}, 60%+={metrics['confidence_60_games']} games @ {metrics['confidence_60_accuracy']:.3f}")
+        rf = run_features_for_groups(train_df, groups)
+        results, ys, ps = [], [], []
+        for fold, (tr_idx, va_idx) in enumerate(valid_splits, 1):
+            tr, va = train_df.iloc[tr_idx], train_df.iloc[va_idx]
+            # All weight learning and calibration are nested within outer training.
+            weights, _ = _learn_ensemble_weights(tr, wf, rf)
+            models = _fit_base(tr, wf, rf)
+            pl, pt, pr, _, _ = _base_predictions(models, va, wf, rf)
+            p = _blend(pl, pt, pr, weights)
+            y = va.home_win.to_numpy(int)
+            m = selection_metrics(y, p)
+            results.append(m); ys.append(y); ps.append(p)
+            rows.append(dict(candidate=name, row_type="fold", fold=fold,
+                groups=json.dumps(groups), feature_count=len(wf), run_feature_count=len(rf),
+                win_features=json.dumps(wf), run_features=json.dumps(rf),
+                weights=json.dumps(weights), train_games=len(tr),
+                train_from=str(tr.game_date.min()), train_to=str(tr.game_date.max()),
+                validation_from=str(va.game_date.min()), validation_to=str(va.game_date.max()), **m))
+            print(f"[robust ablation] {name} fold {fold}: 60%+ n={m['confidence_60_games']} LCB={m['confidence_60_lcb']:.4f}", flush=True)
+        pooled = selection_metrics(np.concatenate(ys), np.concatenate(ps)) if ys else dict(
+            games=0, accuracy=0.0, roc_auc=0.5, log_loss=0.0, score=0.0,
+            confidence_55_games=0, confidence_55_wins=0, confidence_55_accuracy=0.0, confidence_55_lcb=0.0,
+            confidence_60_games=0, confidence_60_wins=0, confidence_60_accuracy=0.0, confidence_60_lcb=0.0)
+        summaries[name] = summarize(results, pooled)
+        fold_metrics[name] = results
 
-    report = pd.DataFrame(reports).sort_values(["score", "confidence_60_accuracy", "roc_auc"], ascending=False)
+    selected, promoted = "core", []
+    for name, summary in summaries.items():
+        reasons = (["champion_default"] if name == "core" else
+                   promotion_reasons(summary, summaries["core"], fold_metrics[name], fold_metrics["core"]))
+        if name != "core" and not reasons:
+            promoted.append(name)
+        summary["promotion_passed"] = name != "core" and not reasons
+        summary["decision_reasons"] = ";".join(reasons) if reasons else "robust_margin_passed"
+        summary["score_delta_vs_core"] = summary["robust_score"] - summaries["core"]["robust_score"]
+    if promoted:
+        selected = max(promoted, key=lambda n: summaries[n]["robust_score"])
+    for name, summary in summaries.items():
+        rows.append(dict(candidate=name, row_type="summary", fold="pooled", **summary))
+    report = pd.DataFrame(rows)
+    report["selected"] = report.candidate.eq(selected)
+    report["policy"] = json.dumps(POLICY, sort_keys=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    report.to_csv(DATA_DIR / "ablation_report.csv", index=False)
-    best_name = str(report.iloc[0]["candidate"])
-    best_groups = ABLATION_CANDIDATES[best_name]
-    best_features = win_features_for_groups(train_df, best_groups)
-    print(f"[ablation winner] {best_name} ({len(best_features)} features)")
-    return best_name, best_groups, best_features, report
+    report.to_csv(DATA_DIR / "robust_ablation_report.csv", index=False)
+    report[report.row_type.eq("summary")].to_csv(DATA_DIR / "ablation_report.csv", index=False)
+    print(f"[robust selection] {selected}", flush=True)
+    return selected, ABLATION_CANDIDATES[selected], win_features_for_groups(train_df, ABLATION_CANDIDATES[selected]), report
 
 
 def fit_bundle(train_df: pd.DataFrame):
-    run_features = run_features_full(train_df)
-    selected_name, selected_groups, win_features, _ = select_moneyline_features(train_df, run_features)
+    train_df = development_frame(train_df)
+    if len(train_df) < POLICY["min_train_games"]:
+        raise ValueError("At least 800 development games from 2024-2025 required")
+    selected_name, selected_groups, win_features, report = select_moneyline_features(train_df)
+    run_features = run_features_for_groups(train_df, selected_groups)
     stat_weights, total_residuals = _learn_ensemble_weights(train_df, win_features, run_features)
     linear_model, tree_model, home_run_model, away_run_model, total_run_model = _fit_base(train_df, win_features, run_features)
     return {
@@ -297,7 +319,14 @@ def fit_bundle(train_df: pd.DataFrame):
         "total_residuals": total_residuals.astype(np.float32),
         "selected_feature_candidate": selected_name,
         "selected_feature_groups": selected_groups,
-        "model_version": "sports-lab-v8-auto-ablation",
+        "selection_diagnostics": {
+            "policy": POLICY.copy(), "champion": "core", "selected": selected_name,
+            "development_from": str(train_df.game_date.min()),
+            "development_to": str(train_df.game_date.max()),
+            "report": json.loads(report.to_json(orient="records")),
+            "core_source": "features:2ccb87b;train:a153e82",
+        },
+        "model_version": "sports-lab-v9-robust-champion",
     }
 
 
@@ -349,13 +378,17 @@ def train(features_path=FEATURES, model_path=MODEL_FILE):
     df = pd.read_csv(features_path, parse_dates=["game_date"]).sort_values("game_date")
     mask = (df["home_history_games"] >= 20) & (df["away_history_games"] >= 20)
     df = df[mask].copy()
-    train_df = df[df.season <= 2025].copy()
-    test_df = df[df.season == 2026].copy()
-    if len(test_df) < 100:
-        cut = int(len(df) * 0.82)
-        train_df, test_df = df.iloc[:cut], df.iloc[cut:]
+    train_df = development_frame(df)
+    test_df = df[(df.season == 2026) & (pd.to_datetime(df.game_date, utc=True).dt.year == 2026)].copy()
 
     bundle = fit_bundle(train_df)
+    if test_df.empty:
+        metrics = {"model_version": bundle["model_version"], "train_games": len(train_df),
+                   "test_games": 0, "evaluation_status": "no_2026_holdout"}
+        bundle["metrics"] = metrics
+        MODEL_DIR.mkdir(parents=True, exist_ok=True)
+        joblib.dump(bundle, model_path)
+        return metrics
     pred = predict_bundle(bundle, test_df)
     p = pred["home_model"].to_numpy()
     y = test_df["home_win"].astype(int).to_numpy()
@@ -368,9 +401,9 @@ def train(features_path=FEATURES, model_path=MODEL_FILE):
         "test_from": str(test_df.game_date.min()), "test_to": str(test_df.game_date.max()),
         "ensemble_weights": bundle["stat_weights"],
         "moneyline_accuracy": float(accuracy_score(y, p >= 0.5)),
-        "moneyline_log_loss": float(log_loss(y, p)),
+        "moneyline_log_loss": float(log_loss(y, p, labels=[0, 1])),
         "moneyline_brier": float(brier_score_loss(y, p)),
-        "moneyline_roc_auc": float(roc_auc_score(y, p)),
+        "moneyline_roc_auc": float(roc_auc_score(y, p)) if len(np.unique(y)) == 2 else None,
         "home_runs_mae": float(mean_absolute_error(test_df.home_score, pred.expected_home_runs)),
         "away_runs_mae": float(mean_absolute_error(test_df.away_score, pred.expected_away_runs)),
         "total_runs_mae": float(mean_absolute_error(test_df.home_score + test_df.away_score, pred.expected_total)),
