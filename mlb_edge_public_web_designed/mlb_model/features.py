@@ -8,6 +8,8 @@ warnings.simplefilter("ignore", PerformanceWarning)
 from .config import ENRICHED_GAMES, TEAM_GAMES, FEATURES, WINDOWS, STARTER_WINDOWS, DATA_DIR
 
 EPS = 1e-9
+ELO_HOME_ADV = 24.0
+ELO_K = 20.0
 
 TEAM_METRICS = [
     "win", "runs_for", "runs_against", "run_diff",
@@ -18,7 +20,37 @@ STARTER_METRICS = ["starter_era", "starter_whip", "starter_k9", "starter_bb9", "
 
 
 def _safe_div(a, b):
-    return np.where(np.asarray(b, dtype=float) > 0, np.asarray(a, dtype=float) / np.asarray(b, dtype=float), np.nan)
+    aa = np.asarray(a, dtype=float)
+    bb = np.asarray(b, dtype=float)
+    out = np.full(np.broadcast(aa, bb).shape, np.nan, dtype=float)
+    np.divide(aa, bb, out=out, where=bb > 0)
+    return out
+
+
+def _elo_expect(home_rating: float, away_rating: float) -> float:
+    return 1.0 / (1.0 + 10.0 ** (-((home_rating + ELO_HOME_ADV) - away_rating) / 400.0))
+
+
+def game_elo_frame(df: pd.DataFrame) -> pd.DataFrame:
+    ratings: dict[int, float] = {}
+    rows = []
+    for g in df.sort_values(["game_date", "game_pk"]).itertuples(index=False):
+        hid, aid = int(g.home_team_id), int(g.away_team_id)
+        rh, ra = ratings.get(hid, 1500.0), ratings.get(aid, 1500.0)
+        p_home = _elo_expect(rh, ra)
+        y = float(g.home_win)
+        margin = abs(float(g.home_score) - float(g.away_score))
+        margin_mult = min(1.75, 1.0 + 0.12 * max(0.0, margin - 1.0))
+        delta = ELO_K * margin_mult * (y - p_home)
+        post_h, post_a = rh + delta, ra - delta
+        rows.append({
+            "game_pk": int(g.game_pk),
+            "home_elo_pre": rh, "away_elo_pre": ra,
+            "home_elo_post": post_h, "away_elo_post": post_a,
+            "elo_home_prob": p_home,
+        })
+        ratings[hid], ratings[aid] = post_h, post_a
+    return pd.DataFrame(rows)
 
 
 def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
@@ -85,8 +117,13 @@ def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
 
 
 def make_team_long(enriched: pd.DataFrame) -> pd.DataFrame:
-    home = _side_long(enriched, "home")
-    away = _side_long(enriched, "away")
+    elo = game_elo_frame(enriched)
+    home = _side_long(enriched, "home").merge(
+        elo[["game_pk", "home_elo_pre", "home_elo_post"]], on="game_pk", how="left"
+    ).rename(columns={"home_elo_pre": "elo_pre", "home_elo_post": "elo_post"})
+    away = _side_long(enriched, "away").merge(
+        elo[["game_pk", "away_elo_pre", "away_elo_post"]], on="game_pk", how="left"
+    ).rename(columns={"away_elo_pre": "elo_pre", "away_elo_post": "elo_post"})
     return pd.concat([home, away], ignore_index=True).sort_values(["game_date", "game_pk", "is_home"]).reset_index(drop=True)
 
 
@@ -98,8 +135,34 @@ def _prior_ewm(grouped, col, span=60):
     return grouped[col].transform(lambda s: s.shift(1).ewm(span=span, adjust=True, min_periods=5).mean())
 
 
+def _schedule_context(group: pd.DataFrame) -> pd.DataFrame:
+    g = group.sort_values(["game_date", "game_pk"]).copy()
+    dates = pd.to_datetime(g["game_date"], utc=True)
+    prev = dates.shift(1)
+    g["days_rest"] = (dates - prev).dt.total_seconds() / 86400.0
+    g["days_rest"] = g["days_rest"].clip(lower=0.0, upper=10.0)
+    g["back_to_back"] = (g["days_rest"] <= 1.25).astype(float)
+    arr = dates.astype("int64").to_numpy() / 86_400_000_000_000.0
+    last7 = np.zeros(len(g), dtype=float)
+    last4 = np.zeros(len(g), dtype=float)
+    for i in range(len(g)):
+        if i == 0:
+            continue
+        diffs = arr[i] - arr[:i]
+        last7[i] = float(np.sum((diffs > 0) & (diffs <= 7.0)))
+        last4[i] = float(np.sum((diffs > 0) & (diffs <= 4.0)))
+    g["games_last7"] = last7
+    g["games_last4"] = last4
+    return g
+
+
 def add_pregame_features(long: pd.DataFrame) -> pd.DataFrame:
     x = long.sort_values(["team_id", "game_date", "game_pk"]).copy()
+    parts = []
+    for _, grp in x.groupby("team_id", sort=False):
+        parts.append(_schedule_context(grp))
+    x = pd.concat(parts, ignore_index=True)
+
     tg = x.groupby("team_id", group_keys=False, sort=False)
     sg = x.groupby(["season", "team_id"], group_keys=False, sort=False)
 
@@ -114,12 +177,21 @@ def add_pregame_features(long: pd.DataFrame) -> pd.DataFrame:
         x[f"{col}_season"] = _prior_expanding(sg, col)
         x[f"{col}_ewm60"] = _prior_ewm(tg, col, 60)
 
-    # Bullpen workload: recent use can matter even when performance ratios look good.
+    vg = x.groupby(["team_id", "is_home"], group_keys=False, sort=False)
+    for col in ("win", "run_diff", "bat_ops", "runs_for", "runs_against"):
+        x[f"venue_{col}_r20"] = vg[col].transform(lambda s: s.shift(1).rolling(20, min_periods=5).mean())
+        x[f"venue_{col}_history"] = vg[col].transform(lambda s: s.shift(1).expanding(min_periods=5).mean())
+
+    for col in ("win", "run_diff", "bat_ops", "bullpen_era", "bullpen_whip"):
+        r5, r20 = f"{col}_r5", f"{col}_r20"
+        if r5 in x.columns and r20 in x.columns:
+            x[f"{col}_trend_5v20"] = x[r5] - x[r20]
+
     x["bullpen_pitches_usage_1"] = tg["bullpen_pitches_raw"].transform(lambda s: s.shift(1).rolling(1, min_periods=1).sum())
+    x["bullpen_pitches_usage_2"] = tg["bullpen_pitches_raw"].transform(lambda s: s.shift(1).rolling(2, min_periods=1).sum())
     x["bullpen_pitches_usage_3"] = tg["bullpen_pitches_raw"].transform(lambda s: s.shift(1).rolling(3, min_periods=1).sum())
     x["bullpen_ip_usage_3"] = tg["bullpen_ip_raw"].transform(lambda s: s.shift(1).rolling(3, min_periods=1).sum())
 
-    # Starter history follows the pitcher across teams. The current game's line is never included.
     x = x.sort_values(["starter_id", "game_date", "game_pk"])
     valid = x["starter_id"].notna()
     for col in STARTER_METRICS:
@@ -137,6 +209,18 @@ def add_pregame_features(long: pd.DataFrame) -> pd.DataFrame:
         arr.loc[valid] = vals
         x[f"{col}_history"] = arr
 
+    x["starter_vs_opp_starts"] = 0.0
+    for col in STARTER_METRICS:
+        x[f"{col}_vs_opp"] = np.nan
+    valid = x["starter_id"].notna()
+    if valid.any():
+        sub = x.loc[valid].sort_values(["starter_id", "opponent_id", "game_date", "game_pk"])
+        pg = sub.groupby(["starter_id", "opponent_id"], group_keys=False, sort=False)
+        x.loc[sub.index, "starter_vs_opp_starts"] = pg.cumcount().astype(float)
+        for col in STARTER_METRICS:
+            vals = pg[col].transform(lambda s: s.shift(1).expanding(min_periods=1).mean())
+            x.loc[sub.index, f"{col}_vs_opp"] = vals
+
     return x.sort_values(["game_date", "game_pk", "is_home"]).reset_index(drop=True)
 
 
@@ -146,9 +230,8 @@ def pregame_feature_columns(long: pd.DataFrame) -> list[str]:
         "runs_for", "runs_against", "win", "starter_id", "starter_name",
         "bat_ab", "bat_h", "bat_tb", "bat_bb", "bat_hbp", "bat_sf", "bat_hr", "bat_so",
         "starter_ip_raw", "starter_er_raw", "starter_h_raw", "starter_bb_raw", "starter_k_raw", "starter_hr_raw",
-        "bullpen_ip_raw", "bullpen_er_raw", "bullpen_h_raw", "bullpen_bb_raw", "bullpen_k_raw", "bullpen_hr_raw", "bullpen_pitches_raw",
+        "bullpen_ip_raw", "bullpen_er_raw", "bullpen_h_raw", "bullpen_bb_raw", "bullpen_k_raw", "bullpen_hr_raw", "bullpen_pitches_raw", "elo_post",
     }
-    # observed game metrics are also raw; only derived pregame features are retained.
     raw |= set(TEAM_METRICS) | set(STARTER_METRICS)
     return [c for c in long.columns if c not in raw]
 
@@ -168,11 +251,14 @@ def build_features(enriched_path=ENRICHED_GAMES, team_out=TEAM_GAMES, out_path=F
     ds = games.merge(h, on="game_pk", how="inner").merge(a, on="game_pk", how="inner")
     ds["month"] = pd.to_datetime(ds["game_date"], utc=True).dt.month
 
-    # Differences improve the W/L classifier while raw home/away values remain for run models.
     for c in feat_cols:
         hc, ac = f"home_{c}", f"away_{c}"
-        if pd.api.types.is_numeric_dtype(ds[hc]) and pd.api.types.is_numeric_dtype(ds[ac]):
+        if hc in ds and ac in ds and pd.api.types.is_numeric_dtype(ds[hc]) and pd.api.types.is_numeric_dtype(ds[ac]):
             ds[f"diff_{c}"] = ds[hc] - ds[ac]
+
+    if "home_elo_pre" in ds and "away_elo_pre" in ds:
+        ds["elo_home_prob"] = 1.0 / (1.0 + 10.0 ** (-((ds["home_elo_pre"] + ELO_HOME_ADV - ds["away_elo_pre"]) / 400.0)))
+
     ds = ds.sort_values("game_date")
     ds.to_csv(out_path, index=False)
     print(f"[saved] {team_out} ({len(long):,} team-games)")
