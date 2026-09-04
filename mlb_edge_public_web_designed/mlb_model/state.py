@@ -5,9 +5,9 @@ from .features import TEAM_METRICS, STARTER_METRICS
 from .config import WINDOWS, STARTER_WINDOWS
 
 
-def _mean_tail(s: pd.Series, n: int):
-    v = pd.to_numeric(s, errors="coerce").dropna().tail(n)
-    return float(v.mean()) if len(v) else np.nan
+def _mean_tail(s: pd.Series, n: int, min_periods: int = 1):
+    v = pd.to_numeric(s, errors="coerce").tail(n)
+    return float(v.mean()) if v.notna().sum() >= min_periods else np.nan
 
 
 def _current_elo(x: pd.DataFrame) -> float:
@@ -58,7 +58,7 @@ def team_state(
     sx = x[x.season.eq(dt.year)]
     for col in TEAM_METRICS:
         for w in WINDOWS:
-            out[f"{col}_r{w}"] = _mean_tail(x[col], w)
+            out[f"{col}_r{w}"] = _mean_tail(x[col], w, 3 if w <= 5 else max(5, w // 2))
         vals = pd.to_numeric(x[col], errors="coerce")
         out[f"{col}_history"] = float(vals.mean()) if vals.notna().sum() else np.nan
         svals = pd.to_numeric(sx[col], errors="coerce")
@@ -82,7 +82,7 @@ def team_state(
     if target_is_home is not None and "is_home" in x.columns:
         vx = x[x["is_home"].eq(int(target_is_home))]
         for col in ("win", "run_diff", "bat_ops", "runs_for", "runs_against"):
-            out[f"venue_{col}_r20"] = _mean_tail(vx[col], 20)
+            out[f"venue_{col}_r20"] = _mean_tail(vx[col], 20, 5)
             vv = pd.to_numeric(vx[col], errors="coerce").dropna()
             out[f"venue_{col}_history"] = float(vv.mean()) if len(vv) >= 5 else np.nan
     else:
@@ -93,7 +93,7 @@ def team_state(
     # Same-handed historical split as today's opposing starter.
     hx = x[x.get("opp_starter_hand", pd.Series(index=x.index, dtype=object)).fillna("").astype(str).str.upper().eq(hand)] if hand in {"R", "L"} else x.iloc[0:0]
     for col in ("win", "run_diff", "bat_ops", "bat_hr_rate", "runs_for"):
-        out[f"vs_hand_{col}_r20"] = _mean_tail(hx[col], 20) if len(hx) else np.nan
+        out[f"vs_hand_{col}_r20"] = _mean_tail(hx[col], 20, 5) if len(hx) else np.nan
         vv = pd.to_numeric(hx[col], errors="coerce").dropna() if len(hx) else pd.Series(dtype=float)
         out[f"vs_hand_{col}_history"] = float(vv.mean()) if len(vv) >= 5 else np.nan
     return out
@@ -124,7 +124,7 @@ def starter_state(team_games: pd.DataFrame, starter_id: int | float | None, targ
     x = team_games[(team_games.starter_id.eq(float(starter_id))) & (team_games.game_date < dt)].copy().sort_values("game_date")
     for col in STARTER_METRICS:
         for w in STARTER_WINDOWS:
-            out[f"{col}_r{w}"] = _mean_tail(x[col], w)
+            out[f"{col}_r{w}"] = _mean_tail(x[col], w, min(2, w))
         vals = pd.to_numeric(x[col], errors="coerce").dropna()
         out[f"{col}_history"] = float(vals.mean()) if len(vals) else np.nan
 

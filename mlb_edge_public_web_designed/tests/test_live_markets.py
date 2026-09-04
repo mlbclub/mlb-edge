@@ -1,6 +1,9 @@
 import tempfile
 import unittest
 from pathlib import Path
+import numpy as np
+import pandas as pd
+from mlb_model.state import _mean_tail
 from mlb_model.live import build_market_candidates
 from mlb_model.probability import market_probabilities
 from mlb_model.recommend import DEFAULT_RULES, qualifies, choose_recommendation, select_betting_picks
@@ -8,6 +11,12 @@ from mlb_model.runtime import prediction_revision
 
 
 class LiveMarketsTests(unittest.TestCase):
+    def test_live_window_matches_training_with_missing_bullpen_games(self):
+        s = pd.Series([99.] * 5 + [2.] * 19 + [np.nan])
+        self.assertAlmostEqual(_mean_tail(s, 20, 10), s.rolling(20, min_periods=10).mean().iloc[-1])
+        self.assertEqual(_mean_tail(s, 20, 10), 2.)
+        self.assertTrue(np.isnan(_mean_tail(pd.Series([1., np.nan]), 20, 10)))
+
     def test_display_recommendation_and_push_use_same_probabilities(self):
         for line in (8., 8.5):
             p = dict(market_probabilities(5., 4.), home_model=.7, away_model=.3,
