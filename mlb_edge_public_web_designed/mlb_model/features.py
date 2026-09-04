@@ -6,6 +6,7 @@ from pandas.errors import PerformanceWarning
 warnings.simplefilter("ignore", PerformanceWarning)
 
 from .config import ENRICHED_GAMES, TEAM_GAMES, FEATURES, WINDOWS, STARTER_WINDOWS, DATA_DIR
+from .context import build_game_context
 
 EPS = 1e-9
 ELO_HOME_ADV = 24.0
@@ -15,8 +16,12 @@ TEAM_METRICS = [
     "win", "runs_for", "runs_against", "run_diff",
     "bat_avg", "bat_obp", "bat_slg", "bat_ops", "bat_hr_rate", "bat_k_rate",
     "bullpen_era", "bullpen_whip", "bullpen_k9", "bullpen_bb9", "bullpen_hr9",
+    "bullpen_kbb9", "bullpen_fip_proxy",
 ]
-STARTER_METRICS = ["starter_era", "starter_whip", "starter_k9", "starter_bb9", "starter_hr9", "starter_ip"]
+STARTER_METRICS = [
+    "starter_era", "starter_whip", "starter_k9", "starter_bb9", "starter_hr9",
+    "starter_kbb9", "starter_fip_proxy", "starter_ip", "starter_pitches",
+]
 
 
 def _safe_div(a, b):
@@ -56,6 +61,7 @@ def game_elo_frame(df: pd.DataFrame) -> pd.DataFrame:
 def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
     opp = "away" if side == "home" else "home"
     win = df["home_win"].astype(float) if side == "home" else 1.0 - df["home_win"].astype(float)
+    opp_hand = df.get(f"{opp}_starter_hand", pd.Series(index=df.index, dtype=object)).fillna("").astype(str).str.upper()
     x = pd.DataFrame({
         "game_pk": df["game_pk"],
         "game_date": pd.to_datetime(df["game_date"], utc=True),
@@ -77,12 +83,15 @@ def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
         "bat_so": df[f"{side}_bat_so"].astype(float),
         "starter_id": pd.to_numeric(df[f"{side}_starter_id"], errors="coerce"),
         "starter_name": df.get(f"{side}_starter_name_box", pd.Series(index=df.index, dtype=object)),
+        "opp_starter_hand": opp_hand.where(opp_hand.isin(["R", "L"]), None),
+        "opp_starter_is_left": opp_hand.eq("L").astype(float),
         "starter_ip_raw": df[f"{side}_starter_ip"].astype(float),
         "starter_er_raw": df[f"{side}_starter_er"].astype(float),
         "starter_h_raw": df[f"{side}_starter_h"].astype(float),
         "starter_bb_raw": df[f"{side}_starter_bb"].astype(float),
         "starter_k_raw": df[f"{side}_starter_k"].astype(float),
         "starter_hr_raw": df[f"{side}_starter_hr"].astype(float),
+        "starter_pitches_raw": df[f"{side}_starter_pitches"].astype(float),
         "bullpen_ip_raw": df[f"{side}_bullpen_ip"].astype(float),
         "bullpen_er_raw": df[f"{side}_bullpen_er"].astype(float),
         "bullpen_h_raw": df[f"{side}_bullpen_h"].astype(float),
@@ -105,6 +114,10 @@ def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
     x["bullpen_k9"] = _safe_div(9 * x["bullpen_k_raw"], bip)
     x["bullpen_bb9"] = _safe_div(9 * x["bullpen_bb_raw"], bip)
     x["bullpen_hr9"] = _safe_div(9 * x["bullpen_hr_raw"], bip)
+    x["bullpen_kbb9"] = _safe_div(9 * (x["bullpen_k_raw"] - x["bullpen_bb_raw"]), bip)
+    x["bullpen_fip_proxy"] = _safe_div(
+        13 * x["bullpen_hr_raw"] + 3 * x["bullpen_bb_raw"] - 2 * x["bullpen_k_raw"], bip
+    )
 
     sip = x["starter_ip_raw"]
     x["starter_era"] = _safe_div(9 * x["starter_er_raw"], sip)
@@ -112,7 +125,12 @@ def _side_long(df: pd.DataFrame, side: str) -> pd.DataFrame:
     x["starter_k9"] = _safe_div(9 * x["starter_k_raw"], sip)
     x["starter_bb9"] = _safe_div(9 * x["starter_bb_raw"], sip)
     x["starter_hr9"] = _safe_div(9 * x["starter_hr_raw"], sip)
+    x["starter_kbb9"] = _safe_div(9 * (x["starter_k_raw"] - x["starter_bb_raw"]), sip)
+    x["starter_fip_proxy"] = _safe_div(
+        13 * x["starter_hr_raw"] + 3 * x["starter_bb_raw"] - 2 * x["starter_k_raw"], sip
+    )
     x["starter_ip"] = sip
+    x["starter_pitches"] = x["starter_pitches_raw"]
     return x
 
 
@@ -182,7 +200,22 @@ def add_pregame_features(long: pd.DataFrame) -> pd.DataFrame:
         x[f"venue_{col}_r20"] = vg[col].transform(lambda s: s.shift(1).rolling(20, min_periods=5).mean())
         x[f"venue_{col}_history"] = vg[col].transform(lambda s: s.shift(1).expanding(min_periods=5).mean())
 
-    for col in ("win", "run_diff", "bat_ops", "bullpen_era", "bullpen_whip"):
+    # Team production specifically against the handedness of today's opposing starter.
+    valid_hand = x["opp_starter_hand"].isin(["R", "L"])
+    for col in ("win", "run_diff", "bat_ops", "bat_hr_rate", "runs_for"):
+        x[f"vs_hand_{col}_r20"] = np.nan
+        x[f"vs_hand_{col}_history"] = np.nan
+        if valid_hand.any():
+            sub = x.loc[valid_hand]
+            hg = sub.groupby(["team_id", "opp_starter_hand"], group_keys=False, sort=False)
+            x.loc[sub.index, f"vs_hand_{col}_r20"] = hg[col].transform(
+                lambda s: s.shift(1).rolling(20, min_periods=5).mean()
+            )
+            x.loc[sub.index, f"vs_hand_{col}_history"] = hg[col].transform(
+                lambda s: s.shift(1).expanding(min_periods=5).mean()
+            )
+
+    for col in ("win", "run_diff", "bat_ops", "bullpen_era", "bullpen_whip", "bullpen_fip_proxy"):
         r5, r20 = f"{col}_r5", f"{col}_r20"
         if r5 in x.columns and r20 in x.columns:
             x[f"{col}_trend_5v20"] = x[r5] - x[r20]
@@ -209,6 +242,21 @@ def add_pregame_features(long: pd.DataFrame) -> pd.DataFrame:
         arr.loc[valid] = vals
         x[f"{col}_history"] = arr
 
+    x["starter_rest_days"] = np.nan
+    x["starter_pitches_last1"] = np.nan
+    x["starter_pitches_last2"] = np.nan
+    if valid.any():
+        sub = x.loc[valid].copy().sort_values(["starter_id", "game_date", "game_pk"])
+        pg = sub.groupby("starter_id", group_keys=False, sort=False)
+        prev_dt = pg["game_date"].shift(1)
+        rest = (pd.to_datetime(sub["game_date"], utc=True) - pd.to_datetime(prev_dt, utc=True)).dt.total_seconds() / 86400.0
+        x.loc[sub.index, "starter_rest_days"] = rest.clip(lower=0.0, upper=15.0)
+        x.loc[sub.index, "starter_pitches_last1"] = pg["starter_pitches_raw"].shift(1)
+        x.loc[sub.index, "starter_pitches_last2"] = pg["starter_pitches_raw"].transform(
+            lambda s: s.shift(1).rolling(2, min_periods=1).sum()
+        )
+    x["starter_short_rest"] = (pd.to_numeric(x["starter_rest_days"], errors="coerce") < 4.5).astype(float)
+
     x["starter_vs_opp_starts"] = 0.0
     for col in STARTER_METRICS:
         x[f"{col}_vs_opp"] = np.nan
@@ -227,9 +275,9 @@ def add_pregame_features(long: pd.DataFrame) -> pd.DataFrame:
 def pregame_feature_columns(long: pd.DataFrame) -> list[str]:
     raw = {
         "game_pk", "game_date", "season", "team_id", "team", "opponent_id", "is_home",
-        "runs_for", "runs_against", "win", "starter_id", "starter_name",
+        "runs_for", "runs_against", "win", "starter_id", "starter_name", "opp_starter_hand",
         "bat_ab", "bat_h", "bat_tb", "bat_bb", "bat_hbp", "bat_sf", "bat_hr", "bat_so",
-        "starter_ip_raw", "starter_er_raw", "starter_h_raw", "starter_bb_raw", "starter_k_raw", "starter_hr_raw",
+        "starter_ip_raw", "starter_er_raw", "starter_h_raw", "starter_bb_raw", "starter_k_raw", "starter_hr_raw", "starter_pitches_raw",
         "bullpen_ip_raw", "bullpen_er_raw", "bullpen_h_raw", "bullpen_bb_raw", "bullpen_k_raw", "bullpen_hr_raw", "bullpen_pitches_raw", "elo_post",
     }
     raw |= set(TEAM_METRICS) | set(STARTER_METRICS)
@@ -258,6 +306,21 @@ def build_features(enriched_path=ENRICHED_GAMES, team_out=TEAM_GAMES, out_path=F
 
     if "home_elo_pre" in ds and "away_elo_pre" in ds:
         ds["elo_home_prob"] = 1.0 / (1.0 + 10.0 ** (-((ds["home_elo_pre"] + ELO_HOME_ADV - ds["away_elo_pre"]) / 400.0)))
+
+    # Game-level pregame context is the same for both teams. Historical weather is
+    # explicitly the 24-hour-ahead forecast, not after-the-fact observed weather.
+    try:
+        ctx = build_game_context(games)
+        if len(ctx):
+            context_cols = [
+                "game_pk", "park_factor", "park_run_factor", "is_day_game",
+                "weather_temp_c", "weather_humidity", "weather_precip_mm",
+                "weather_wind_kmh", "weather_wind_dir",
+            ]
+            keep = [c for c in context_cols if c in ctx.columns]
+            ds = ds.merge(ctx[keep].drop_duplicates("game_pk"), on="game_pk", how="left")
+    except Exception as e:
+        print(f"[pregame context warning] {e}")
 
     ds = ds.sort_values("game_date")
     ds.to_csv(out_path, index=False)
