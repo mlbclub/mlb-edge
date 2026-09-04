@@ -58,9 +58,17 @@ jobs:
           git add data/team_game_stats.csv
           git add data/features_v3.csv
           git add models/market_model_v3.joblib
-          if [ -f data/current_odds_history.csv ]; then
-            git add data/current_odds_history.csv
-          fi
+
+          for f in \
+            data/current_odds_history.csv \
+            data/pitcher_meta.csv \
+            data/venue_meta.csv \
+            data/park_factors_context.csv \
+            data/game_pregame_context.csv; do
+            if [ -f "$f" ]; then
+              git add "$f"
+            fi
+          done
 
           if git diff --cached --quiet; then
             echo "No new MLB model data."
