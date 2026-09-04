@@ -1,0 +1,67 @@
+{
+  "feature_sets": {
+    "strength": [
+      "elo_home_prob",
+      "diff_win_r20",
+      "diff_run_diff_r20",
+      "diff_bat_ops_r20",
+      "diff_bullpen_era_r20",
+      "diff_bullpen_whip_r20"
+    ],
+    "strength_starter": [
+      "elo_home_prob",
+      "diff_win_r20",
+      "diff_run_diff_r20",
+      "diff_bat_ops_r20",
+      "diff_bullpen_era_r20",
+      "diff_bullpen_whip_r20",
+      "diff_starter_era_r5",
+      "diff_starter_whip_r5",
+      "diff_starter_k9_r5",
+      "diff_starter_bb9_r5",
+      "diff_starter_hr9_r5",
+      "diff_starter_ip_r5"
+    ],
+    "compact": [
+      "elo_home_prob",
+      "diff_win_r20",
+      "diff_run_diff_r20",
+      "diff_bat_ops_r20",
+      "diff_bullpen_era_r20",
+      "diff_bullpen_whip_r20",
+      "diff_starter_era_r5",
+      "diff_starter_whip_r5",
+      "diff_starter_k9_r5",
+      "diff_starter_bb9_r5",
+      "diff_starter_hr9_r5",
+      "diff_starter_ip_r5",
+      "diff_days_rest",
+      "diff_games_last7",
+      "diff_bullpen_pitches_usage_3"
+    ]
+  },
+  "C": [
+    0.01,
+    0.1
+  ],
+  "policy": {
+    "min_fold_games": 300,
+    "min_train_games": 800,
+    "min_60_per_fold": 30,
+    "min_55_per_fold": 100,
+    "min_60_total": 150,
+    "min_folds": 3,
+    "score_margin": 0.025,
+    "lcb_margin": 0.01,
+    "fold_win_fraction": 0.75,
+    "max_fold_accuracy_drop": 0.02,
+    "max_log_loss_increase": 0.005,
+    "max_auc_drop": 0.005,
+    "max_accuracy_drop": 0.005
+  },
+  "development_games": 4482,
+  "holdout_evaluated": false,
+  "production_modified": false,
+  "development_sha256": "c2b696a2d5e6a3ef3b8f51152cb0e800b3fec27e3ae649d6867a47804319f560",
+  "note": "Exploratory repeated development evaluation; no automatic promotion. Standardization and imputation fitted only on prior dates."
+}
