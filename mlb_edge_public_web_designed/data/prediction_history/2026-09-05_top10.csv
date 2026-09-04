@@ -1,0 +1,11 @@
+kst_date,rank,game_pk,away,home,market,pick,model_hit_prob,odds,book,source_commit,settlement_status,away_score,home_score,result
+2026-09-05,1,823905,Washington Nationals,Los Angeles Dodgers,total,UNDER 8.5,0.612110970,1.87,DraftKings,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
+2026-09-05,2,823418,Atlanta Braves,Philadelphia Phillies,total,OVER 6.5,0.597578105,1.88,LowVig.ag,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
+2026-09-05,3,823579,San Francisco Giants,New York Mets,moneyline,New York Mets,0.590476686,1.55,BetOnline.ag,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
+2026-09-05,4,824311,St. Louis Cardinals,Colorado Rockies,total,UNDER 11.5,0.589854309,1.88,BetRivers,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
+2026-09-05,5,823338,Los Angeles Angels,Pittsburgh Pirates,moneyline,Pittsburgh Pirates,0.587260520,1.53,LowVig.ag,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
+2026-09-05,6,824471,Milwaukee Brewers,Cincinnati Reds,total,UNDER 9.5,0.570407064,1.95,MyBookie.ag,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
+2026-09-05,7,824554,Minnesota Twins,Chicago White Sox,moneyline,Chicago White Sox,0.568665564,1.91,BetUS,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
+2026-09-05,8,824424,Detroit Tigers,Cleveland Guardians,moneyline,Cleveland Guardians,0.568133961,1.80,BetUS,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
+2026-09-05,9,824387,Detroit Tigers,Cleveland Guardians,moneyline,Cleveland Guardians,0.568133961,1.80,BetUS,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
+2026-09-05,10,823256,New York Yankees,San Diego Padres,total,OVER 7.5,0.538361029,2.03,LowVig.ag,8f08b2e678a00b6500404663118c6dbd78fab280,PENDING,,,
