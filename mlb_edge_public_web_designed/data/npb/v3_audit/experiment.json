@@ -1,0 +1,136 @@
+{
+  "selection": "2024 H2 and 2025 H1 expanding OOF only",
+  "confirmation": "2025 H2, never used for reselection",
+  "monitoring": "2026 already examined in V2; not a new untouched holdout",
+  "specs": [
+    {
+      "family": "linear",
+      "group": "core",
+      "c": 0.003,
+      "shrink": false
+    },
+    {
+      "family": "linear",
+      "group": "core",
+      "c": 0.01,
+      "shrink": false
+    },
+    {
+      "family": "linear",
+      "group": "core",
+      "c": 0.03,
+      "shrink": false
+    },
+    {
+      "family": "linear",
+      "group": "core",
+      "c": 0.1,
+      "shrink": false
+    },
+    {
+      "family": "hierarchical",
+      "group": "core",
+      "c": 0.01,
+      "shrink": false
+    },
+    {
+      "family": "hierarchical",
+      "group": "core",
+      "c": 0.03,
+      "shrink": false
+    },
+    {
+      "family": "tree",
+      "group": "core",
+      "blend": 0.75,
+      "shrink": false
+    },
+    {
+      "family": "linear",
+      "group": "matchup",
+      "c": 0.003,
+      "shrink": true
+    },
+    {
+      "family": "linear",
+      "group": "matchup",
+      "c": 0.01,
+      "shrink": true
+    },
+    {
+      "family": "linear",
+      "group": "matchup",
+      "c": 0.03,
+      "shrink": true
+    },
+    {
+      "family": "linear",
+      "group": "matchup",
+      "c": 0.1,
+      "shrink": true
+    },
+    {
+      "family": "hierarchical",
+      "group": "matchup",
+      "c": 0.01,
+      "shrink": true
+    },
+    {
+      "family": "hierarchical",
+      "group": "matchup",
+      "c": 0.03,
+      "shrink": true
+    },
+    {
+      "family": "tree",
+      "group": "matchup",
+      "blend": 0.75,
+      "shrink": true
+    },
+    {
+      "family": "linear",
+      "group": "form_matchup",
+      "c": 0.003,
+      "shrink": true
+    },
+    {
+      "family": "linear",
+      "group": "form_matchup",
+      "c": 0.01,
+      "shrink": true
+    },
+    {
+      "family": "linear",
+      "group": "form_matchup",
+      "c": 0.03,
+      "shrink": true
+    },
+    {
+      "family": "linear",
+      "group": "form_matchup",
+      "c": 0.1,
+      "shrink": true
+    },
+    {
+      "family": "hierarchical",
+      "group": "form_matchup",
+      "c": 0.01,
+      "shrink": true
+    },
+    {
+      "family": "hierarchical",
+      "group": "form_matchup",
+      "c": 0.03,
+      "shrink": true
+    },
+    {
+      "family": "tree",
+      "group": "form_matchup",
+      "blend": 0.75,
+      "shrink": true
+    }
+  ],
+  "promotion": ">=1pp accuracy gain in BOTH 2025 H2 and 2026; log loss/Brier increase <=.005; confidence accuracy drop <=2pp, retain max(30, half baseline sample)",
+  "totals": "Frozen V2 model and residuals; no changes",
+  "input_sha256": "88a68097ad2a19307feac7924e66511075bc2d003896da2ed50937cdcefe170d"
+}

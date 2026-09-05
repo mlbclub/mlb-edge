@@ -1,0 +1,15 @@
+{
+  "id": 7,
+  "family": "linear",
+  "group": "matchup",
+  "c": 0.003,
+  "shrink": true,
+  "games": 872,
+  "accuracy": 0.5424311926605505,
+  "log_loss": 0.7853034391514605,
+  "brier": 0.5178480353926521,
+  "conf_55_games": 177,
+  "conf_55_accuracy": 0.5649717514124294,
+  "conf_60_games": 25,
+  "conf_60_accuracy": 0.56
+}
