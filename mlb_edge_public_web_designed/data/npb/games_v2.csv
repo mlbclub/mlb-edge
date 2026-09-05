@@ -1,22 +1,22 @@
 game_id,game_date,season,away,home,away_score,home_score,status,stadium
-20240329-Chunichi_Dragons-Tokyo_Yakult_Swallows,2024-03-29 18:00:00,2024,Chunichi Dragons,Tokyo Yakult Swallows,4.0,7.0,Final,神 宮
-20240329-Fukuoka_SoftBank_Hawks-Orix_Buffaloes,2024-03-29 18:00:00,2024,Fukuoka SoftBank Hawks,Orix Buffaloes,3.0,1.0,Final,京セラD大阪
-20240329-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2024-03-29 18:00:00,2024,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,1.0,0.0,Final,楽天モバイル
-20240329-Hanshin_Tigers-Yomiuri_Giants,2024-03-29 18:15:00,2024,Hanshin Tigers,Yomiuri Giants,0.0,4.0,Final,東京ドーム
-20240329-Hiroshima_Toyo_Carp-Yokohama_DeNA_BayStars,2024-03-29 18:30:00,2024,Hiroshima Toyo Carp,Yokohama DeNA BayStars,3.0,4.0,Final,横 浜
-20240329-Hokkaido_Nippon-Ham_Fighters-Chiba_Lotte_Marines,2024-03-29 18:30:00,2024,Hokkaido Nippon-Ham Fighters,Chiba Lotte Marines,4.0,1.0,Final,ZOZOマリン
-20240330-Fukuoka_SoftBank_Hawks-Orix_Buffaloes,2024-03-30 13:00:00,2024,Fukuoka SoftBank Hawks,Orix Buffaloes,0.0,2.0,Final,京セラD大阪
-20240330-Chunichi_Dragons-Tokyo_Yakult_Swallows,2024-03-30 14:00:00,2024,Chunichi Dragons,Tokyo Yakult Swallows,1.0,1.0,Final,神 宮
-20240330-Hanshin_Tigers-Yomiuri_Giants,2024-03-30 14:00:00,2024,Hanshin Tigers,Yomiuri Giants,0.0,5.0,Final,東京ドーム
-20240330-Hiroshima_Toyo_Carp-Yokohama_DeNA_BayStars,2024-03-30 14:00:00,2024,Hiroshima Toyo Carp,Yokohama DeNA BayStars,1.0,6.0,Final,横 浜
-20240330-Hokkaido_Nippon-Ham_Fighters-Chiba_Lotte_Marines,2024-03-30 14:00:00,2024,Hokkaido Nippon-Ham Fighters,Chiba Lotte Marines,0.0,3.0,Final,ZOZOマリン
-20240330-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2024-03-30 14:00:00,2024,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,8.0,2.0,Final,楽天モバイル
-20240331-Fukuoka_SoftBank_Hawks-Orix_Buffaloes,2024-03-31 13:00:00,2024,Fukuoka SoftBank Hawks,Orix Buffaloes,5.0,2.0,Final,京セラD大阪
-20240331-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2024-03-31 13:00:00,2024,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,3.0,4.0,Final,楽天モバイル
-20240331-Chunichi_Dragons-Tokyo_Yakult_Swallows,2024-03-31 13:30:00,2024,Chunichi Dragons,Tokyo Yakult Swallows,2.0,5.0,Final,神 宮
-20240331-Hanshin_Tigers-Yomiuri_Giants,2024-03-31 14:00:00,2024,Hanshin Tigers,Yomiuri Giants,5.0,0.0,Final,東京ドーム
-20240331-Hiroshima_Toyo_Carp-Yokohama_DeNA_BayStars,2024-03-31 14:00:00,2024,Hiroshima Toyo Carp,Yokohama DeNA BayStars,5.0,1.0,Final,横 浜
-20240331-Hokkaido_Nippon-Ham_Fighters-Chiba_Lotte_Marines,2024-03-31 14:00:00,2024,Hokkaido Nippon-Ham Fighters,Chiba Lotte Marines,3.0,2.0,Final,ZOZOマリン
+20240329-Chunichi_Dragons-Tokyo_Yakult_Swallows,2024-03-29 18:00:00,2024,Chunichi Dragons,Tokyo Yakult Swallows,4,7,Final,神 宮
+20240329-Fukuoka_SoftBank_Hawks-Orix_Buffaloes,2024-03-29 18:00:00,2024,Fukuoka SoftBank Hawks,Orix Buffaloes,3,1,Final,京セラD大阪
+20240329-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2024-03-29 18:00:00,2024,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,1,0,Final,楽天モバイル
+20240329-Hanshin_Tigers-Yomiuri_Giants,2024-03-29 18:15:00,2024,Hanshin Tigers,Yomiuri Giants,0,4,Final,東京ドーム
+20240329-Hiroshima_Toyo_Carp-Yokohama_DeNA_BayStars,2024-03-29 18:30:00,2024,Hiroshima Toyo Carp,Yokohama DeNA BayStars,3,4,Final,横 浜
+20240329-Hokkaido_Nippon-Ham_Fighters-Chiba_Lotte_Marines,2024-03-29 18:30:00,2024,Hokkaido Nippon-Ham Fighters,Chiba Lotte Marines,4,1,Final,ZOZOマリン
+20240330-Fukuoka_SoftBank_Hawks-Orix_Buffaloes,2024-03-30 13:00:00,2024,Fukuoka SoftBank Hawks,Orix Buffaloes,0,2,Final,京セラD大阪
+20240330-Chunichi_Dragons-Tokyo_Yakult_Swallows,2024-03-30 14:00:00,2024,Chunichi Dragons,Tokyo Yakult Swallows,1,1,Final,神 宮
+20240330-Hanshin_Tigers-Yomiuri_Giants,2024-03-30 14:00:00,2024,Hanshin Tigers,Yomiuri Giants,0,5,Final,東京ドーム
+20240330-Hiroshima_Toyo_Carp-Yokohama_DeNA_BayStars,2024-03-30 14:00:00,2024,Hiroshima Toyo Carp,Yokohama DeNA BayStars,1,6,Final,横 浜
+20240330-Hokkaido_Nippon-Ham_Fighters-Chiba_Lotte_Marines,2024-03-30 14:00:00,2024,Hokkaido Nippon-Ham Fighters,Chiba Lotte Marines,0,3,Final,ZOZOマリン
+20240330-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2024-03-30 14:00:00,2024,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,8,2,Final,楽天モバイル
+20240331-Fukuoka_SoftBank_Hawks-Orix_Buffaloes,2024-03-31 13:00:00,2024,Fukuoka SoftBank Hawks,Orix Buffaloes,5,2,Final,京セラD大阪
+20240331-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2024-03-31 13:00:00,2024,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,3,4,Final,楽天モバイル
+20240331-Chunichi_Dragons-Tokyo_Yakult_Swallows,2024-03-31 13:30:00,2024,Chunichi Dragons,Tokyo Yakult Swallows,2,5,Final,神 宮
+20240331-Hanshin_Tigers-Yomiuri_Giants,2024-03-31 14:00:00,2024,Hanshin Tigers,Yomiuri Giants,5,0,Final,東京ドーム
+20240331-Hiroshima_Toyo_Carp-Yokohama_DeNA_BayStars,2024-03-31 14:00:00,2024,Hiroshima Toyo Carp,Yokohama DeNA BayStars,5,1,Final,横 浜
+20240331-Hokkaido_Nippon-Ham_Fighters-Chiba_Lotte_Marines,2024-03-31 14:00:00,2024,Hokkaido Nippon-Ham Fighters,Chiba Lotte Marines,3,2,Final,ZOZOマリン
 20240402-Orix_Buffaloes-Saitama_Seibu_Lions,2024-04-02 18:00:00,2024,Orix Buffaloes,Saitama Seibu Lions,1.0,2.0,Final,ベルーナドーム
 20240402-Tokyo_Yakult_Swallows-Hiroshima_Toyo_Carp,2024-04-02 18:00:00,2024,Tokyo Yakult Swallows,Hiroshima Toyo Carp,1.0,2.0,Final,マツダスタジアム
 20240402-Yokohama_DeNA_BayStars-Hanshin_Tigers,2024-04-02 18:00:00,2024,Yokohama DeNA BayStars,Hanshin Tigers,5.0,3.0,Final,京セラD大阪
@@ -906,24 +906,24 @@ game_id,game_date,season,away,home,away_score,home_score,status,stadium
 20241029-Yokohama_DeNA_BayStars-Fukuoka_SoftBank_Hawks,2024-10-29 18:30:00,2024,Yokohama DeNA BayStars,Fukuoka SoftBank Hawks,4.0,1.0,Final,みずほPayPay
 20241030-Yokohama_DeNA_BayStars-Fukuoka_SoftBank_Hawks,2024-10-30 18:30:00,2024,Yokohama DeNA BayStars,Fukuoka SoftBank Hawks,5.0,0.0,Final,みずほPayPay
 20241031-Yokohama_DeNA_BayStars-Fukuoka_SoftBank_Hawks,2024-10-31 18:00:00,2024,Yokohama DeNA BayStars,Fukuoka SoftBank Hawks,7.0,0.0,Final,みずほPayPay
-20250328-Hanshin_Tigers-Hiroshima_Toyo_Carp,2025-03-28 18:00:00,2025,Hanshin Tigers,Hiroshima Toyo Carp,4.0,0.0,Final,マツダスタジアム
-20250328-Hokkaido_Nippon-Ham_Fighters-Saitama_Seibu_Lions,2025-03-28 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Saitama Seibu Lions,2.0,0.0,Final,ベルーナドーム
-20250328-Tokyo_Yakult_Swallows-Yomiuri_Giants,2025-03-28 18:15:00,2025,Tokyo Yakult Swallows,Yomiuri Giants,5.0,6.0,Final,東京ドーム
-20250328-Chiba_Lotte_Marines-Fukuoka_SoftBank_Hawks,2025-03-28 18:30:00,2025,Chiba Lotte Marines,Fukuoka SoftBank Hawks,8.0,2.0,Final,みずほPayPay
-20250328-Chunichi_Dragons-Yokohama_DeNA_BayStars,2025-03-28 18:30:00,2025,Chunichi Dragons,Yokohama DeNA BayStars,0.0,5.0,Final,横 浜
-20250328-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2025-03-28 18:30:00,2025,Tohoku Rakuten Golden Eagles,Orix Buffaloes,2.0,3.0,Final,京セラD大阪
-20250329-Chiba_Lotte_Marines-Fukuoka_SoftBank_Hawks,2025-03-29 14:00:00,2025,Chiba Lotte Marines,Fukuoka SoftBank Hawks,5.0,4.0,Final,みずほPayPay
-20250329-Chunichi_Dragons-Yokohama_DeNA_BayStars,2025-03-29 14:00:00,2025,Chunichi Dragons,Yokohama DeNA BayStars,1.0,0.0,Final,横 浜
-20250329-Hanshin_Tigers-Hiroshima_Toyo_Carp,2025-03-29 14:00:00,2025,Hanshin Tigers,Hiroshima Toyo Carp,3.0,2.0,Final,マツダスタジアム
-20250329-Hokkaido_Nippon-Ham_Fighters-Saitama_Seibu_Lions,2025-03-29 14:00:00,2025,Hokkaido Nippon-Ham Fighters,Saitama Seibu Lions,3.0,2.0,Final,ベルーナドーム
-20250329-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2025-03-29 14:00:00,2025,Tohoku Rakuten Golden Eagles,Orix Buffaloes,5.0,4.0,Final,京セラD大阪
-20250329-Tokyo_Yakult_Swallows-Yomiuri_Giants,2025-03-29 14:00:00,2025,Tokyo Yakult Swallows,Yomiuri Giants,0.0,12.0,Final,東京ドーム
-20250330-Chiba_Lotte_Marines-Fukuoka_SoftBank_Hawks,2025-03-30 13:00:00,2025,Chiba Lotte Marines,Fukuoka SoftBank Hawks,7.0,4.0,Final,みずほPayPay
-20250330-Hokkaido_Nippon-Ham_Fighters-Saitama_Seibu_Lions,2025-03-30 13:00:00,2025,Hokkaido Nippon-Ham Fighters,Saitama Seibu Lions,7.0,5.0,Final,ベルーナドーム
-20250330-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2025-03-30 13:00:00,2025,Tohoku Rakuten Golden Eagles,Orix Buffaloes,1.0,6.0,Final,京セラD大阪
-20250330-Hanshin_Tigers-Hiroshima_Toyo_Carp,2025-03-30 13:30:00,2025,Hanshin Tigers,Hiroshima Toyo Carp,0.0,2.0,Final,マツダスタジアム
-20250330-Chunichi_Dragons-Yokohama_DeNA_BayStars,2025-03-30 14:00:00,2025,Chunichi Dragons,Yokohama DeNA BayStars,1.0,2.0,Final,横 浜
-20250330-Tokyo_Yakult_Swallows-Yomiuri_Giants,2025-03-30 14:00:00,2025,Tokyo Yakult Swallows,Yomiuri Giants,0.0,3.0,Final,東京ドーム
+20250328-Hanshin_Tigers-Hiroshima_Toyo_Carp,2025-03-28 18:00:00,2025,Hanshin Tigers,Hiroshima Toyo Carp,4,0,Final,マツダスタジアム
+20250328-Hokkaido_Nippon-Ham_Fighters-Saitama_Seibu_Lions,2025-03-28 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Saitama Seibu Lions,2,0,Final,ベルーナドーム
+20250328-Tokyo_Yakult_Swallows-Yomiuri_Giants,2025-03-28 18:15:00,2025,Tokyo Yakult Swallows,Yomiuri Giants,5,6,Final,東京ドーム
+20250328-Chiba_Lotte_Marines-Fukuoka_SoftBank_Hawks,2025-03-28 18:30:00,2025,Chiba Lotte Marines,Fukuoka SoftBank Hawks,8,2,Final,みずほPayPay
+20250328-Chunichi_Dragons-Yokohama_DeNA_BayStars,2025-03-28 18:30:00,2025,Chunichi Dragons,Yokohama DeNA BayStars,0,5,Final,横 浜
+20250328-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2025-03-28 18:30:00,2025,Tohoku Rakuten Golden Eagles,Orix Buffaloes,2,3,Final,京セラD大阪
+20250329-Chiba_Lotte_Marines-Fukuoka_SoftBank_Hawks,2025-03-29 14:00:00,2025,Chiba Lotte Marines,Fukuoka SoftBank Hawks,5,4,Final,みずほPayPay
+20250329-Chunichi_Dragons-Yokohama_DeNA_BayStars,2025-03-29 14:00:00,2025,Chunichi Dragons,Yokohama DeNA BayStars,1,0,Final,横 浜
+20250329-Hanshin_Tigers-Hiroshima_Toyo_Carp,2025-03-29 14:00:00,2025,Hanshin Tigers,Hiroshima Toyo Carp,3,2,Final,マツダスタジアム
+20250329-Hokkaido_Nippon-Ham_Fighters-Saitama_Seibu_Lions,2025-03-29 14:00:00,2025,Hokkaido Nippon-Ham Fighters,Saitama Seibu Lions,3,2,Final,ベルーナドーム
+20250329-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2025-03-29 14:00:00,2025,Tohoku Rakuten Golden Eagles,Orix Buffaloes,5,4,Final,京セラD大阪
+20250329-Tokyo_Yakult_Swallows-Yomiuri_Giants,2025-03-29 14:00:00,2025,Tokyo Yakult Swallows,Yomiuri Giants,0,12,Final,東京ドーム
+20250330-Chiba_Lotte_Marines-Fukuoka_SoftBank_Hawks,2025-03-30 13:00:00,2025,Chiba Lotte Marines,Fukuoka SoftBank Hawks,7,4,Final,みずほPayPay
+20250330-Hokkaido_Nippon-Ham_Fighters-Saitama_Seibu_Lions,2025-03-30 13:00:00,2025,Hokkaido Nippon-Ham Fighters,Saitama Seibu Lions,7,5,Final,ベルーナドーム
+20250330-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2025-03-30 13:00:00,2025,Tohoku Rakuten Golden Eagles,Orix Buffaloes,1,6,Final,京セラD大阪
+20250330-Hanshin_Tigers-Hiroshima_Toyo_Carp,2025-03-30 13:30:00,2025,Hanshin Tigers,Hiroshima Toyo Carp,0,2,Final,マツダスタジアム
+20250330-Chunichi_Dragons-Yokohama_DeNA_BayStars,2025-03-30 14:00:00,2025,Chunichi Dragons,Yokohama DeNA BayStars,1,2,Final,横 浜
+20250330-Tokyo_Yakult_Swallows-Yomiuri_Giants,2025-03-30 14:00:00,2025,Tokyo Yakult Swallows,Yomiuri Giants,0,3,Final,東京ドーム
 20250401-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2025-04-01 16:00:00,2025,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,,,Postponed,楽天モバイル
 20250401-Hiroshima_Toyo_Carp-Tokyo_Yakult_Swallows,2025-04-01 18:00:00,2025,Hiroshima Toyo Carp,Tokyo Yakult Swallows,,,Postponed,神 宮
 20250401-Yokohama_DeNA_BayStars-Hanshin_Tigers,2025-04-01 18:00:00,2025,Yokohama DeNA BayStars,Hanshin Tigers,7.0,1.0,Final,京セラD大阪
@@ -1781,61 +1781,61 @@ game_id,game_date,season,away,home,away_score,home_score,status,stadium
 20250930-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-09-30 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,2.0,1.0,Final,みずほPayPay
 20250930-Tohoku_Rakuten_Golden_Eagles-Chiba_Lotte_Marines,2025-09-30 18:00:00,2025,Tohoku Rakuten Golden Eagles,Chiba Lotte Marines,2.0,1.0,Final,ZOZOマリン
 20250930-Tokyo_Yakult_Swallows-Yokohama_DeNA_BayStars,2025-09-30 18:00:00,2025,Tokyo Yakult Swallows,Yokohama DeNA BayStars,5.0,4.0,Final,横 浜
-20251001-Chunichi_Dragons-Yomiuri_Giants,2025-10-01 18:00:00,2025,Chunichi Dragons,Yomiuri Giants,2.0,5.0,Final,東京ドーム
-20251001-Saitama_Seibu_Lions-Orix_Buffaloes,2025-10-01 18:00:00,2025,Saitama Seibu Lions,Orix Buffaloes,5.0,10.0,Final,京セラD大阪
-20251001-Tokyo_Yakult_Swallows-Yokohama_DeNA_BayStars,2025-10-01 18:00:00,2025,Tokyo Yakult Swallows,Yokohama DeNA BayStars,6.0,9.0,Final,横 浜
-20251002-Saitama_Seibu_Lions-Orix_Buffaloes,2025-10-02 18:00:00,2025,Saitama Seibu Lions,Orix Buffaloes,6.0,5.0,Final,京セラD大阪
-20251002-Tokyo_Yakult_Swallows-Hanshin_Tigers,2025-10-02 18:00:00,2025,Tokyo Yakult Swallows,Hanshin Tigers,2.0,6.0,Final,甲子園
-20251003-Orix_Buffaloes-Fukuoka_SoftBank_Hawks,2025-10-03 18:00:00,2025,Orix Buffaloes,Fukuoka SoftBank Hawks,2.0,10.0,Final,みずほPayPay
-20251003-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2025-10-03 18:00:00,2025,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,6.0,7.0,Final,楽天モバイル
-20251003-Tokyo_Yakult_Swallows-Hiroshima_Toyo_Carp,2025-10-03 18:00:00,2025,Tokyo Yakult Swallows,Hiroshima Toyo Carp,6.0,1.0,Final,マツダスタジアム
-20251004-Tokyo_Yakult_Swallows-Hiroshima_Toyo_Carp,2025-10-04 13:30:00,2025,Tokyo Yakult Swallows,Hiroshima Toyo Carp,3.0,1.0,Final,マツダスタジアム
-20251004-Hokkaido_Nippon-Ham_Fighters-Chiba_Lotte_Marines,2025-10-04 14:00:00,2025,Hokkaido Nippon-Ham Fighters,Chiba Lotte Marines,0.0,3.0,Final,ZOZOマリン
-20251004-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2025-10-04 14:00:00,2025,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,2.0,3.0,Final,楽天モバイル
-20251005-Fukuoka_SoftBank_Hawks-Chiba_Lotte_Marines,2025-10-05 14:00:00,2025,Fukuoka SoftBank Hawks,Chiba Lotte Marines,5.0,2.0,Final,ZOZOマリン
-20251005-Orix_Buffaloes-Tohoku_Rakuten_Golden_Eagles,2025-10-05 14:00:00,2025,Orix Buffaloes,Tohoku Rakuten Golden Eagles,2.0,1.0,Final,楽天モバイル
-20251011-Orix_Buffaloes-Hokkaido_Nippon-Ham_Fighters,2025-10-11 14:00:00,2025,Orix Buffaloes,Hokkaido Nippon-Ham Fighters,0.0,2.0,Final,エスコンＦ
-20251011-Yomiuri_Giants-Yokohama_DeNA_BayStars,2025-10-11 14:00:00,2025,Yomiuri Giants,Yokohama DeNA BayStars,2.0,6.0,Final,横 浜
-20251012-Orix_Buffaloes-Hokkaido_Nippon-Ham_Fighters,2025-10-12 14:00:00,2025,Orix Buffaloes,Hokkaido Nippon-Ham Fighters,4.0,5.0,Final,エスコンＦ
-20251012-Yomiuri_Giants-Yokohama_DeNA_BayStars,2025-10-12 14:00:00,2025,Yomiuri Giants,Yokohama DeNA BayStars,6.0,7.0,Final,横 浜
-20251015-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-15 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,1.0,2.0,Final,みずほPayPay
-20251015-Yokohama_DeNA_BayStars-Hanshin_Tigers,2025-10-15 18:00:00,2025,Yokohama DeNA BayStars,Hanshin Tigers,0.0,2.0,Final,甲子園
-20251016-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-16 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,0.0,3.0,Final,みずほPayPay
-20251016-Yokohama_DeNA_BayStars-Hanshin_Tigers,2025-10-16 18:00:00,2025,Yokohama DeNA BayStars,Hanshin Tigers,3.0,5.0,Final,甲子園
-20251017-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-17 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,6.0,0.0,Final,みずほPayPay
-20251017-Yokohama_DeNA_BayStars-Hanshin_Tigers,2025-10-17 18:00:00,2025,Yokohama DeNA BayStars,Hanshin Tigers,0.0,4.0,Final,甲子園
-20251018-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-18 14:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,9.0,3.0,Final,みずほPayPay
-20251019-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-19 13:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,7.0,1.0,Final,みずほPayPay
-20251020-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-20 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,1.0,2.0,Final,みずほPayPay
-20251025-Hanshin_Tigers-Fukuoka_SoftBank_Hawks,2025-10-25 18:30:00,2025,Hanshin Tigers,Fukuoka SoftBank Hawks,2.0,1.0,Final,みずほPayPay
-20251026-Hanshin_Tigers-Fukuoka_SoftBank_Hawks,2025-10-26 18:30:00,2025,Hanshin Tigers,Fukuoka SoftBank Hawks,1.0,10.0,Final,みずほPayPay
-20251028-Fukuoka_SoftBank_Hawks-Hanshin_Tigers,2025-10-28 18:00:00,2025,Fukuoka SoftBank Hawks,Hanshin Tigers,2.0,1.0,Final,甲子園
-20251029-Fukuoka_SoftBank_Hawks-Hanshin_Tigers,2025-10-29 18:00:00,2025,Fukuoka SoftBank Hawks,Hanshin Tigers,3.0,2.0,Final,甲子園
-20251030-Fukuoka_SoftBank_Hawks-Hanshin_Tigers,2025-10-30 18:00:00,2025,Fukuoka SoftBank Hawks,Hanshin Tigers,3.0,2.0,Final,甲子園
-20260327-Chunichi_Dragons-Hiroshima_Toyo_Carp,2026-03-27 18:00:00,2026,Chunichi Dragons,Hiroshima Toyo Carp,5.0,6.0,Final,マツダスタジアム
-20260327-Hanshin_Tigers-Yomiuri_Giants,2026-03-27 18:15:00,2026,Hanshin Tigers,Yomiuri Giants,1.0,3.0,Final,東京ドーム
-20260327-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2026-03-27 18:30:00,2026,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,5.0,6.0,Final,みずほPayPay
-20260327-Saitama_Seibu_Lions-Chiba_Lotte_Marines,2026-03-27 18:30:00,2026,Saitama Seibu Lions,Chiba Lotte Marines,1.0,3.0,Final,ZOZOマリン
-20260327-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2026-03-27 18:30:00,2026,Tohoku Rakuten Golden Eagles,Orix Buffaloes,10.0,0.0,Final,京セラD大阪
-20260327-Tokyo_Yakult_Swallows-Yokohama_DeNA_BayStars,2026-03-27 18:30:00,2026,Tokyo Yakult Swallows,Yokohama DeNA BayStars,3.0,2.0,Final,横 浜
-20260328-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2026-03-28 13:30:00,2026,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,4.0,6.0,Final,みずほPayPay
-20260328-Chunichi_Dragons-Hiroshima_Toyo_Carp,2026-03-28 14:00:00,2026,Chunichi Dragons,Hiroshima Toyo Carp,1.0,2.0,Final,マツダスタジアム
-20260328-Hanshin_Tigers-Yomiuri_Giants,2026-03-28 14:00:00,2026,Hanshin Tigers,Yomiuri Giants,2.0,0.0,Final,東京ドーム
-20260328-Saitama_Seibu_Lions-Chiba_Lotte_Marines,2026-03-28 14:00:00,2026,Saitama Seibu Lions,Chiba Lotte Marines,0.0,11.0,Final,ZOZOマリン
-20260328-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2026-03-28 14:00:00,2026,Tohoku Rakuten Golden Eagles,Orix Buffaloes,0.0,6.0,Final,京セラD大阪
-20260328-Tokyo_Yakult_Swallows-Yokohama_DeNA_BayStars,2026-03-28 14:00:00,2026,Tokyo Yakult Swallows,Yokohama DeNA BayStars,5.0,2.0,Final,横 浜
-20260329-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2026-03-29 13:00:00,2026,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,4.0,8.0,Final,みずほPayPay
-20260329-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2026-03-29 13:00:00,2026,Tohoku Rakuten Golden Eagles,Orix Buffaloes,4.0,5.0,Final,京セラD大阪
-20260329-Chunichi_Dragons-Hiroshima_Toyo_Carp,2026-03-29 13:30:00,2026,Chunichi Dragons,Hiroshima Toyo Carp,0.0,1.0,Final,マツダスタジアム
-20260329-Hanshin_Tigers-Yomiuri_Giants,2026-03-29 14:00:00,2026,Hanshin Tigers,Yomiuri Giants,12.0,6.0,Final,東京ドーム
-20260329-Saitama_Seibu_Lions-Chiba_Lotte_Marines,2026-03-29 14:00:00,2026,Saitama Seibu Lions,Chiba Lotte Marines,4.0,0.0,Final,ZOZOマリン
-20260329-Tokyo_Yakult_Swallows-Yokohama_DeNA_BayStars,2026-03-29 14:00:00,2026,Tokyo Yakult Swallows,Yokohama DeNA BayStars,5.0,3.0,Final,横 浜
-20260331-Fukuoka_SoftBank_Hawks-Tohoku_Rakuten_Golden_Eagles,2026-03-31 16:00:00,2026,Fukuoka SoftBank Hawks,Tohoku Rakuten Golden Eagles,4.0,2.0,Final,楽天モバイル
-20260331-Hiroshima_Toyo_Carp-Tokyo_Yakult_Swallows,2026-03-31 18:00:00,2026,Hiroshima Toyo Carp,Tokyo Yakult Swallows,3.0,8.0,Final,神 宮
-20260331-Orix_Buffaloes-Saitama_Seibu_Lions,2026-03-31 18:00:00,2026,Orix Buffaloes,Saitama Seibu Lions,3.0,5.0,Final,ベルーナドーム
-20260331-Yokohama_DeNA_BayStars-Hanshin_Tigers,2026-03-31 18:00:00,2026,Yokohama DeNA BayStars,Hanshin Tigers,1.0,4.0,Final,京セラD大阪
-20260331-Yomiuri_Giants-Chunichi_Dragons,2026-03-31 18:15:00,2026,Yomiuri Giants,Chunichi Dragons,5.0,2.0,Final,バンテリンドーム
-20260331-Chiba_Lotte_Marines-Hokkaido_Nippon-Ham_Fighters,2026-03-31 18:30:00,2026,Chiba Lotte Marines,Hokkaido Nippon-Ham Fighters,0.0,9.0,Final,エスコンＦ
+20251001-Chunichi_Dragons-Yomiuri_Giants,2025-10-01 18:00:00,2025,Chunichi Dragons,Yomiuri Giants,2,5,Final,東京ドーム
+20251001-Saitama_Seibu_Lions-Orix_Buffaloes,2025-10-01 18:00:00,2025,Saitama Seibu Lions,Orix Buffaloes,5,10,Final,京セラD大阪
+20251001-Tokyo_Yakult_Swallows-Yokohama_DeNA_BayStars,2025-10-01 18:00:00,2025,Tokyo Yakult Swallows,Yokohama DeNA BayStars,6,9,Final,横 浜
+20251002-Saitama_Seibu_Lions-Orix_Buffaloes,2025-10-02 18:00:00,2025,Saitama Seibu Lions,Orix Buffaloes,6,5,Final,京セラD大阪
+20251002-Tokyo_Yakult_Swallows-Hanshin_Tigers,2025-10-02 18:00:00,2025,Tokyo Yakult Swallows,Hanshin Tigers,2,6,Final,甲子園
+20251003-Orix_Buffaloes-Fukuoka_SoftBank_Hawks,2025-10-03 18:00:00,2025,Orix Buffaloes,Fukuoka SoftBank Hawks,2,10,Final,みずほPayPay
+20251003-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2025-10-03 18:00:00,2025,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,6,7,Final,楽天モバイル
+20251003-Tokyo_Yakult_Swallows-Hiroshima_Toyo_Carp,2025-10-03 18:00:00,2025,Tokyo Yakult Swallows,Hiroshima Toyo Carp,6,1,Final,マツダスタジアム
+20251004-Tokyo_Yakult_Swallows-Hiroshima_Toyo_Carp,2025-10-04 13:30:00,2025,Tokyo Yakult Swallows,Hiroshima Toyo Carp,3,1,Final,マツダスタジアム
+20251004-Hokkaido_Nippon-Ham_Fighters-Chiba_Lotte_Marines,2025-10-04 14:00:00,2025,Hokkaido Nippon-Ham Fighters,Chiba Lotte Marines,0,3,Final,ZOZOマリン
+20251004-Saitama_Seibu_Lions-Tohoku_Rakuten_Golden_Eagles,2025-10-04 14:00:00,2025,Saitama Seibu Lions,Tohoku Rakuten Golden Eagles,2,3,Final,楽天モバイル
+20251005-Fukuoka_SoftBank_Hawks-Chiba_Lotte_Marines,2025-10-05 14:00:00,2025,Fukuoka SoftBank Hawks,Chiba Lotte Marines,5,2,Final,ZOZOマリン
+20251005-Orix_Buffaloes-Tohoku_Rakuten_Golden_Eagles,2025-10-05 14:00:00,2025,Orix Buffaloes,Tohoku Rakuten Golden Eagles,2,1,Final,楽天モバイル
+20251011-Orix_Buffaloes-Hokkaido_Nippon-Ham_Fighters,2025-10-11 14:00:00,2025,Orix Buffaloes,Hokkaido Nippon-Ham Fighters,0,2,Final,エスコンＦ
+20251011-Yomiuri_Giants-Yokohama_DeNA_BayStars,2025-10-11 14:00:00,2025,Yomiuri Giants,Yokohama DeNA BayStars,2,6,Final,横 浜
+20251012-Orix_Buffaloes-Hokkaido_Nippon-Ham_Fighters,2025-10-12 14:00:00,2025,Orix Buffaloes,Hokkaido Nippon-Ham Fighters,4,5,Final,エスコンＦ
+20251012-Yomiuri_Giants-Yokohama_DeNA_BayStars,2025-10-12 14:00:00,2025,Yomiuri Giants,Yokohama DeNA BayStars,6,7,Final,横 浜
+20251015-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-15 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,1,2,Final,みずほPayPay
+20251015-Yokohama_DeNA_BayStars-Hanshin_Tigers,2025-10-15 18:00:00,2025,Yokohama DeNA BayStars,Hanshin Tigers,0,2,Final,甲子園
+20251016-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-16 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,0,3,Final,みずほPayPay
+20251016-Yokohama_DeNA_BayStars-Hanshin_Tigers,2025-10-16 18:00:00,2025,Yokohama DeNA BayStars,Hanshin Tigers,3,5,Final,甲子園
+20251017-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-17 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,6,0,Final,みずほPayPay
+20251017-Yokohama_DeNA_BayStars-Hanshin_Tigers,2025-10-17 18:00:00,2025,Yokohama DeNA BayStars,Hanshin Tigers,0,4,Final,甲子園
+20251018-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-18 14:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,9,3,Final,みずほPayPay
+20251019-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-19 13:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,7,1,Final,みずほPayPay
+20251020-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2025-10-20 18:00:00,2025,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,1,2,Final,みずほPayPay
+20251025-Hanshin_Tigers-Fukuoka_SoftBank_Hawks,2025-10-25 18:30:00,2025,Hanshin Tigers,Fukuoka SoftBank Hawks,2,1,Final,みずほPayPay
+20251026-Hanshin_Tigers-Fukuoka_SoftBank_Hawks,2025-10-26 18:30:00,2025,Hanshin Tigers,Fukuoka SoftBank Hawks,1,10,Final,みずほPayPay
+20251028-Fukuoka_SoftBank_Hawks-Hanshin_Tigers,2025-10-28 18:00:00,2025,Fukuoka SoftBank Hawks,Hanshin Tigers,2,1,Final,甲子園
+20251029-Fukuoka_SoftBank_Hawks-Hanshin_Tigers,2025-10-29 18:00:00,2025,Fukuoka SoftBank Hawks,Hanshin Tigers,3,2,Final,甲子園
+20251030-Fukuoka_SoftBank_Hawks-Hanshin_Tigers,2025-10-30 18:00:00,2025,Fukuoka SoftBank Hawks,Hanshin Tigers,3,2,Final,甲子園
+20260327-Chunichi_Dragons-Hiroshima_Toyo_Carp,2026-03-27 18:00:00,2026,Chunichi Dragons,Hiroshima Toyo Carp,5,6,Final,マツダスタジアム
+20260327-Hanshin_Tigers-Yomiuri_Giants,2026-03-27 18:15:00,2026,Hanshin Tigers,Yomiuri Giants,1,3,Final,東京ドーム
+20260327-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2026-03-27 18:30:00,2026,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,5,6,Final,みずほPayPay
+20260327-Saitama_Seibu_Lions-Chiba_Lotte_Marines,2026-03-27 18:30:00,2026,Saitama Seibu Lions,Chiba Lotte Marines,1,3,Final,ZOZOマリン
+20260327-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2026-03-27 18:30:00,2026,Tohoku Rakuten Golden Eagles,Orix Buffaloes,10,0,Final,京セラD大阪
+20260327-Tokyo_Yakult_Swallows-Yokohama_DeNA_BayStars,2026-03-27 18:30:00,2026,Tokyo Yakult Swallows,Yokohama DeNA BayStars,3,2,Final,横 浜
+20260328-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2026-03-28 13:30:00,2026,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,4,6,Final,みずほPayPay
+20260328-Chunichi_Dragons-Hiroshima_Toyo_Carp,2026-03-28 14:00:00,2026,Chunichi Dragons,Hiroshima Toyo Carp,1,2,Final,マツダスタジアム
+20260328-Hanshin_Tigers-Yomiuri_Giants,2026-03-28 14:00:00,2026,Hanshin Tigers,Yomiuri Giants,2,0,Final,東京ドーム
+20260328-Saitama_Seibu_Lions-Chiba_Lotte_Marines,2026-03-28 14:00:00,2026,Saitama Seibu Lions,Chiba Lotte Marines,0,11,Final,ZOZOマリン
+20260328-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2026-03-28 14:00:00,2026,Tohoku Rakuten Golden Eagles,Orix Buffaloes,0,6,Final,京セラD大阪
+20260328-Tokyo_Yakult_Swallows-Yokohama_DeNA_BayStars,2026-03-28 14:00:00,2026,Tokyo Yakult Swallows,Yokohama DeNA BayStars,5,2,Final,横 浜
+20260329-Hokkaido_Nippon-Ham_Fighters-Fukuoka_SoftBank_Hawks,2026-03-29 13:00:00,2026,Hokkaido Nippon-Ham Fighters,Fukuoka SoftBank Hawks,4,8,Final,みずほPayPay
+20260329-Tohoku_Rakuten_Golden_Eagles-Orix_Buffaloes,2026-03-29 13:00:00,2026,Tohoku Rakuten Golden Eagles,Orix Buffaloes,4,5,Final,京セラD大阪
+20260329-Chunichi_Dragons-Hiroshima_Toyo_Carp,2026-03-29 13:30:00,2026,Chunichi Dragons,Hiroshima Toyo Carp,0,1,Final,マツダスタジアム
+20260329-Hanshin_Tigers-Yomiuri_Giants,2026-03-29 14:00:00,2026,Hanshin Tigers,Yomiuri Giants,12,6,Final,東京ドーム
+20260329-Saitama_Seibu_Lions-Chiba_Lotte_Marines,2026-03-29 14:00:00,2026,Saitama Seibu Lions,Chiba Lotte Marines,4,0,Final,ZOZOマリン
+20260329-Tokyo_Yakult_Swallows-Yokohama_DeNA_BayStars,2026-03-29 14:00:00,2026,Tokyo Yakult Swallows,Yokohama DeNA BayStars,5,3,Final,横 浜
+20260331-Fukuoka_SoftBank_Hawks-Tohoku_Rakuten_Golden_Eagles,2026-03-31 16:00:00,2026,Fukuoka SoftBank Hawks,Tohoku Rakuten Golden Eagles,4,2,Final,楽天モバイル
+20260331-Hiroshima_Toyo_Carp-Tokyo_Yakult_Swallows,2026-03-31 18:00:00,2026,Hiroshima Toyo Carp,Tokyo Yakult Swallows,3,8,Final,神 宮
+20260331-Orix_Buffaloes-Saitama_Seibu_Lions,2026-03-31 18:00:00,2026,Orix Buffaloes,Saitama Seibu Lions,3,5,Final,ベルーナドーム
+20260331-Yokohama_DeNA_BayStars-Hanshin_Tigers,2026-03-31 18:00:00,2026,Yokohama DeNA BayStars,Hanshin Tigers,1,4,Final,京セラD大阪
+20260331-Yomiuri_Giants-Chunichi_Dragons,2026-03-31 18:15:00,2026,Yomiuri Giants,Chunichi Dragons,5,2,Final,バンテリンドーム
+20260331-Chiba_Lotte_Marines-Hokkaido_Nippon-Ham_Fighters,2026-03-31 18:30:00,2026,Chiba Lotte Marines,Hokkaido Nippon-Ham Fighters,0,9,Final,エスコンＦ
 20260401-Fukuoka_SoftBank_Hawks-Tohoku_Rakuten_Golden_Eagles,2026-04-01 13:00:00,2026,Fukuoka SoftBank Hawks,Tohoku Rakuten Golden Eagles,6.0,1.0,Final,楽天モバイル
 20260401-Hiroshima_Toyo_Carp-Tokyo_Yakult_Swallows,2026-04-01 18:00:00,2026,Hiroshima Toyo Carp,Tokyo Yakult Swallows,,,Postponed,神 宮
 20260401-Orix_Buffaloes-Saitama_Seibu_Lions,2026-04-01 18:00:00,2026,Orix Buffaloes,Saitama Seibu Lions,4.0,0.0,Final,ベルーナドーム

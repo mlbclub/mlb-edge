@@ -80,13 +80,13 @@
   },
   "runtime": {
     "sklearn": "1.9.0",
-    "numpy": "2.3.5",
-    "pandas": "3.0.1"
+    "numpy": "2.5.2",
+    "pandas": "3.0.5"
   },
   "input_sha256": {
-    "games_2024_2026.csv": "8b287bd2e2661ccbf70d1ac69ad5bb4482b73c43469252c141254ca691d47eef",
-    "games_v2.csv": "9b808685530143aac336a1271f44c66bea2328963857bffa218d25005d20ff3c",
-    "game_details_v2.json": "5b24f756831c0d627365ed0189a3539d319d728d791da913498bb4dc31b92e71",
+    "games_2024_2026.csv": "841f029b68c99a41c1bffd58353c279029ee6124df382843dfc4cc2da80ca251",
+    "games_v2.csv": "f77d810ac44e4adcf86f274905c99a66ee95486e1ffbbc8d5a8db5a62495091a",
+    "game_details_v2.json": "b4129a09de7bb34f0e5dde14d60d366ebc1700ac39dee33fb1b11c2752055d24",
     "npb_v1.joblib": "feb4eb5470c0ab6fa1fb7f978703c7208cb0ff186155abe415d56c3192a2c72b"
   }
 }
