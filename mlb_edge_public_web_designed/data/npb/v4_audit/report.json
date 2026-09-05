@@ -1,0 +1,81 @@
+{
+  "selected": {
+    "id": 5,
+    "group": "ratings",
+    "half_life": 30,
+    "c": 1.0,
+    "cols": [
+      "rest_diff",
+      "attack_diff_30",
+      "defense_diff_30",
+      "margin_diff_30",
+      "scoring_context_30"
+    ],
+    "games": 872,
+    "accuracy": 0.5412844036697247,
+    "log_loss": 0.7768660429020778,
+    "brier": 0.5128329065998867,
+    "conf_55_games": 274,
+    "conf_55_accuracy": 0.6131386861313869,
+    "conf_60_games": 29,
+    "conf_60_accuracy": 0.6551724137931034
+  },
+  "baseline_search": {
+    "games": 872,
+    "accuracy": 0.518348623853211,
+    "log_loss": 0.7907453576863216,
+    "brier": 0.5215957328707274,
+    "conf_55_games": 183,
+    "conf_55_accuracy": 0.5792349726775956,
+    "conf_60_games": 26,
+    "conf_60_accuracy": 0.46153846153846156
+  },
+  "train_games": 3315,
+  "confirmation_v2": {
+    "games": 450,
+    "accuracy": 0.5533333333333333,
+    "log_loss": 0.7815181432540779,
+    "brier": 0.5132714410349444,
+    "conf_55_games": 137,
+    "conf_55_accuracy": 0.5912408759124088,
+    "conf_60_games": 9,
+    "conf_60_accuracy": 0.4444444444444444
+  },
+  "confirmation_v4": {
+    "games": 450,
+    "accuracy": 0.5755555555555556,
+    "log_loss": 0.772795339677802,
+    "brier": 0.5053628261621195,
+    "conf_55_games": 188,
+    "conf_55_accuracy": 0.6223404255319149,
+    "conf_60_games": 76,
+    "conf_60_accuracy": 0.6710526315789473
+  },
+  "monitoring_v2": {
+    "games": 727,
+    "accuracy": 0.5749656121045392,
+    "log_loss": 0.7619696331667454,
+    "brier": 0.5050453823684956,
+    "conf_55_games": 265,
+    "conf_55_accuracy": 0.6226415094339622,
+    "conf_60_games": 61,
+    "conf_60_accuracy": 0.5901639344262295
+  },
+  "monitoring_v4": {
+    "games": 727,
+    "accuracy": 0.5570839064649243,
+    "log_loss": 0.7634595031022058,
+    "brier": 0.5051868581657281,
+    "conf_55_games": 287,
+    "conf_55_accuracy": 0.6027874564459931,
+    "conf_60_games": 86,
+    "conf_60_accuracy": 0.6511627906976745
+  },
+  "confirmation_reasons": [],
+  "monitoring_reasons": [
+    "accuracy_gain_below_one_percentage_point"
+  ],
+  "promote": false,
+  "operating_model": "v2",
+  "totals": "V2 unchanged"
+}

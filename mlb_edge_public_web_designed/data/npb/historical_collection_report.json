@@ -1,0 +1,70 @@
+{
+  "sources": [
+    {
+      "source": "https://npb.jp/games/2022/schedule_03_detail.html",
+      "rows": 36
+    },
+    {
+      "source": "https://npb.jp/games/2022/schedule_04_detail.html",
+      "rows": 140
+    },
+    {
+      "source": "https://npb.jp/games/2022/schedule_05_detail.html",
+      "rows": 150
+    },
+    {
+      "source": "https://npb.jp/games/2022/schedule_06_detail.html",
+      "rows": 130
+    },
+    {
+      "source": "https://npb.jp/games/2022/schedule_07_detail.html",
+      "rows": 135
+    },
+    {
+      "source": "https://npb.jp/games/2022/schedule_08_detail.html",
+      "rows": 154
+    },
+    {
+      "source": "https://npb.jp/games/2022/schedule_09_detail.html",
+      "rows": 137
+    },
+    {
+      "source": "https://npb.jp/games/2022/schedule_10_detail.html",
+      "rows": 28
+    },
+    {
+      "source": "https://npb.jp/games/2023/schedule_03_detail.html",
+      "rows": 6
+    },
+    {
+      "source": "https://npb.jp/games/2023/schedule_04_detail.html",
+      "rows": 145
+    },
+    {
+      "source": "https://npb.jp/games/2023/schedule_05_detail.html",
+      "rows": 149
+    },
+    {
+      "source": "https://npb.jp/games/2023/schedule_06_detail.html",
+      "rows": 140
+    },
+    {
+      "source": "https://npb.jp/games/2023/schedule_07_detail.html",
+      "rows": 130
+    },
+    {
+      "source": "https://npb.jp/games/2023/schedule_08_detail.html",
+      "rows": 158
+    },
+    {
+      "source": "https://npb.jp/games/2023/schedule_09_detail.html",
+      "rows": 143
+    },
+    {
+      "source": "https://npb.jp/games/2023/schedule_10_detail.html",
+      "rows": 37
+    }
+  ],
+  "rows": 1818,
+  "completed_club_games": 1750
+}

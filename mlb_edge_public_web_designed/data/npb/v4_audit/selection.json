@@ -1,0 +1,21 @@
+{
+  "id": 5,
+  "group": "ratings",
+  "half_life": 30,
+  "c": 1.0,
+  "cols": [
+    "rest_diff",
+    "attack_diff_30",
+    "defense_diff_30",
+    "margin_diff_30",
+    "scoring_context_30"
+  ],
+  "games": 872,
+  "accuracy": 0.5412844036697247,
+  "log_loss": 0.7768660429020778,
+  "brier": 0.5128329065998867,
+  "conf_55_games": 274,
+  "conf_55_accuracy": 0.6131386861313869,
+  "conf_60_games": 29,
+  "conf_60_accuracy": 0.6551724137931034
+}

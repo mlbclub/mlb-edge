@@ -1,0 +1,285 @@
+{
+  "history": "Official 2022-2023 schedules; extended training through 2025 only",
+  "search": "2024 H2 + 2025 H1",
+  "confirmation": "2025 H2; no reselection",
+  "specs": [
+    {
+      "group": "elo",
+      "half_life": 30,
+      "c": 0.01,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40"
+      ]
+    },
+    {
+      "group": "elo",
+      "half_life": 30,
+      "c": 0.1,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40"
+      ]
+    },
+    {
+      "group": "elo",
+      "half_life": 30,
+      "c": 1.0,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40"
+      ]
+    },
+    {
+      "group": "ratings",
+      "half_life": 30,
+      "c": 0.01,
+      "cols": [
+        "rest_diff",
+        "attack_diff_30",
+        "defense_diff_30",
+        "margin_diff_30",
+        "scoring_context_30"
+      ]
+    },
+    {
+      "group": "ratings",
+      "half_life": 30,
+      "c": 0.1,
+      "cols": [
+        "rest_diff",
+        "attack_diff_30",
+        "defense_diff_30",
+        "margin_diff_30",
+        "scoring_context_30"
+      ]
+    },
+    {
+      "group": "ratings",
+      "half_life": 30,
+      "c": 1.0,
+      "cols": [
+        "rest_diff",
+        "attack_diff_30",
+        "defense_diff_30",
+        "margin_diff_30",
+        "scoring_context_30"
+      ]
+    },
+    {
+      "group": "combined",
+      "half_life": 30,
+      "c": 0.01,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40",
+        "attack_diff_30",
+        "defense_diff_30",
+        "margin_diff_30",
+        "scoring_context_30"
+      ]
+    },
+    {
+      "group": "combined",
+      "half_life": 30,
+      "c": 0.1,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40",
+        "attack_diff_30",
+        "defense_diff_30",
+        "margin_diff_30",
+        "scoring_context_30"
+      ]
+    },
+    {
+      "group": "combined",
+      "half_life": 30,
+      "c": 1.0,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40",
+        "attack_diff_30",
+        "defense_diff_30",
+        "margin_diff_30",
+        "scoring_context_30"
+      ]
+    },
+    {
+      "group": "ratings",
+      "half_life": 60,
+      "c": 0.01,
+      "cols": [
+        "rest_diff",
+        "attack_diff_60",
+        "defense_diff_60",
+        "margin_diff_60",
+        "scoring_context_60"
+      ]
+    },
+    {
+      "group": "ratings",
+      "half_life": 60,
+      "c": 0.1,
+      "cols": [
+        "rest_diff",
+        "attack_diff_60",
+        "defense_diff_60",
+        "margin_diff_60",
+        "scoring_context_60"
+      ]
+    },
+    {
+      "group": "ratings",
+      "half_life": 60,
+      "c": 1.0,
+      "cols": [
+        "rest_diff",
+        "attack_diff_60",
+        "defense_diff_60",
+        "margin_diff_60",
+        "scoring_context_60"
+      ]
+    },
+    {
+      "group": "combined",
+      "half_life": 60,
+      "c": 0.01,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40",
+        "attack_diff_60",
+        "defense_diff_60",
+        "margin_diff_60",
+        "scoring_context_60"
+      ]
+    },
+    {
+      "group": "combined",
+      "half_life": 60,
+      "c": 0.1,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40",
+        "attack_diff_60",
+        "defense_diff_60",
+        "margin_diff_60",
+        "scoring_context_60"
+      ]
+    },
+    {
+      "group": "combined",
+      "half_life": 60,
+      "c": 1.0,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40",
+        "attack_diff_60",
+        "defense_diff_60",
+        "margin_diff_60",
+        "scoring_context_60"
+      ]
+    },
+    {
+      "group": "ratings",
+      "half_life": 120,
+      "c": 0.01,
+      "cols": [
+        "rest_diff",
+        "attack_diff_120",
+        "defense_diff_120",
+        "margin_diff_120",
+        "scoring_context_120"
+      ]
+    },
+    {
+      "group": "ratings",
+      "half_life": 120,
+      "c": 0.1,
+      "cols": [
+        "rest_diff",
+        "attack_diff_120",
+        "defense_diff_120",
+        "margin_diff_120",
+        "scoring_context_120"
+      ]
+    },
+    {
+      "group": "ratings",
+      "half_life": 120,
+      "c": 1.0,
+      "cols": [
+        "rest_diff",
+        "attack_diff_120",
+        "defense_diff_120",
+        "margin_diff_120",
+        "scoring_context_120"
+      ]
+    },
+    {
+      "group": "combined",
+      "half_life": 120,
+      "c": 0.01,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40",
+        "attack_diff_120",
+        "defense_diff_120",
+        "margin_diff_120",
+        "scoring_context_120"
+      ]
+    },
+    {
+      "group": "combined",
+      "half_life": 120,
+      "c": 0.1,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40",
+        "attack_diff_120",
+        "defense_diff_120",
+        "margin_diff_120",
+        "scoring_context_120"
+      ]
+    },
+    {
+      "group": "combined",
+      "half_life": 120,
+      "c": 1.0,
+      "cols": [
+        "rest_diff",
+        "elo_10",
+        "elo_20",
+        "elo_40",
+        "attack_diff_120",
+        "defense_diff_120",
+        "margin_diff_120",
+        "scoring_context_120"
+      ]
+    }
+  ],
+  "promotion_rule": "Same V3 rule: >=1pp gain and proper score / confidence nonregression at BOTH stages",
+  "monitoring": "2026 already observed, not an untouched test set"
+}
