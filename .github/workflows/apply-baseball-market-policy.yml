@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'mlb_edge_public_web_designed/scripts/apply_baseball_market_policy.py'
+      - '.github/workflows/apply-baseball-market-policy.yml'
   workflow_dispatch:
 
 permissions:
@@ -23,6 +24,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: mlb_edge_public_web_designed/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
       - name: Apply shared baseball market policy
         run: python scripts/apply_baseball_market_policy.py
       - name: Syntax checks
