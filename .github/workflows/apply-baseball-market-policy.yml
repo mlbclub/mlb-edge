@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'mlb_edge_public_web_designed/scripts/apply_baseball_market_policy.py'
+      - 'mlb_edge_public_web_designed/tests/test_ranked_picks.py'
       - '.github/workflows/apply-baseball-market-policy.yml'
   workflow_dispatch:
 
