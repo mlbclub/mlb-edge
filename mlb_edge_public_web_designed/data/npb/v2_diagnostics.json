@@ -1,0 +1,92 @@
+{
+  "selection_period": "2024-2025 only",
+  "holdout_period": "2026",
+  "wdl_selection": {
+    "candidate": "core",
+    "C": 0.01,
+    "dev_log_loss": 0.7876044753152855
+  },
+  "total_selection": {
+    "candidate": "starter",
+    "dev_total_mae": 3.1321672524126742
+  },
+  "v1_holdout": {
+    "games": 605,
+    "accuracy": 0.5652892561983471,
+    "log_loss": 0.7596753690134486,
+    "total_mae": 3.1735800541554138,
+    "conf_55_games": 219,
+    "conf_55_accuracy": 0.6118721461187214,
+    "conf_60_games": 54,
+    "conf_60_accuracy": 0.5555555555555556
+  },
+  "v2_holdout": {
+    "games": 605,
+    "accuracy": 0.5752066115702479,
+    "log_loss": 0.7581656270755949,
+    "total_mae": 3.154391169759405,
+    "conf_55_games": 231,
+    "conf_55_accuracy": 0.6147186147186147,
+    "conf_60_games": 60,
+    "conf_60_accuracy": 0.6
+  },
+  "detail_coverage": 1.0,
+  "operating_model": "v2",
+  "retention_reasons": [],
+  "historical_starter_limitation": "Actual first pitcher identity from final box; historical pregame announcement timestamps unavailable. Current-game stats excluded. Live unknown starters stay missing.",
+  "tolerances": {
+    "accuracy_drop": 0.005,
+    "log_loss_increase": 0.01,
+    "total_mae_increase": 0.05,
+    "confidence_accuracy_drop": 0.02,
+    "min_holdout": 200,
+    "min_detail_coverage": 0.9
+  },
+  "train_games": 1630,
+  "totals_residuals": "out-of-fold 2024-2025; no in-sample or holdout residuals",
+  "v2_full_holdout": {
+    "games": 727,
+    "accuracy": 0.5749656121045392,
+    "log_loss": 0.7619696331667454,
+    "total_mae": 3.1692898334041804,
+    "conf_55_games": 265,
+    "conf_55_accuracy": 0.6226415094339622,
+    "conf_60_games": 61,
+    "conf_60_accuracy": 0.5901639344262295
+  },
+  "v1_corrected_inputs_paired_holdout": {
+    "games": 605,
+    "accuracy": 0.5752066115702479,
+    "log_loss": 0.7581656270755948,
+    "total_mae": 3.1601379133351837,
+    "conf_55_games": 231,
+    "conf_55_accuracy": 0.6147186147186147,
+    "conf_60_games": 60,
+    "conf_60_accuracy": 0.6
+  },
+  "v1_corrected_inputs_full_holdout": {
+    "games": 727,
+    "accuracy": 0.5749656121045392,
+    "log_loss": 0.7619696331667454,
+    "total_mae": 3.1839746228142425,
+    "conf_55_games": 265,
+    "conf_55_accuracy": 0.6226415094339622,
+    "conf_60_games": 61,
+    "conf_60_accuracy": 0.5901639344262295
+  },
+  "cohort_repair": {
+    "method": "Exact PTCP154 byte-decoding reversal of official team aliases, verified against official matchup/date/scores",
+    "remapped_games": 29
+  },
+  "runtime": {
+    "sklearn": "1.9.0",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1"
+  },
+  "input_sha256": {
+    "games_2024_2026.csv": "8b287bd2e2661ccbf70d1ac69ad5bb4482b73c43469252c141254ca691d47eef",
+    "games_v2.csv": "9b808685530143aac336a1271f44c66bea2328963857bffa218d25005d20ff3c",
+    "game_details_v2.json": "5b24f756831c0d627365ed0189a3539d319d728d791da913498bb4dc31b92e71",
+    "npb_v1.joblib": "feb4eb5470c0ab6fa1fb7f978703c7208cb0ff186155abe415d56c3192a2c72b"
+  }
+}

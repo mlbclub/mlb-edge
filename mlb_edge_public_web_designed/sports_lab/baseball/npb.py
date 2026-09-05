@@ -324,53 +324,89 @@ def _conditional_side_prob(raw_prob: float, draw_prob: float) -> float:
     return min(1.0, max(0.0, float(raw_prob) / denom))
 
 
+def market_candidates(event, probabilities, pred_total, residuals):
+    """Every quoted W/D/L or total line; rank raw wins, keep pushes separate."""
+    candidates = []
+    if not event:
+        return candidates
+    for book in event.get('bookmakers', []):
+        title = book.get('title') or book.get('key') or 'unknown'
+        for market in book.get('markets', []):
+            outcomes = market.get('outcomes', [])
+            three_way = any(str(o.get('name', '')).lower() in {'draw', 'tie'} for o in outcomes)
+            for o in outcomes:
+                try:
+                    odds = float(o.get('price'))
+                    if not math.isfinite(odds) or odds <= 1:
+                        continue
+                    if market.get('key') == 'h2h':
+                        name = o.get('name')
+                        side = 'home' if name == event.get('home_team') else 'away' if name == event.get('away_team') else 'draw' if str(name).lower() in {'draw', 'tie'} else None
+                        if side is None:
+                            continue
+                        prob = probabilities[side]
+                        push = probabilities['draw'] if not three_way and side != 'draw' else 0.0
+                        pick = 'DRAW' if side == 'draw' else name
+                        kind = 'moneyline'
+                    elif market.get('key') == 'totals':
+                        side, line = str(o.get('name', '')).lower(), float(o.get('point'))
+                        if side not in {'over', 'under'} or not math.isfinite(line):
+                            continue
+                        op, up, push = _total_probs(pred_total, line, residuals)
+                        prob = (op if side == 'over' else up)*(1-push)
+                        pick, kind = f'{side.upper()} {line:g}', 'total'
+                    else:
+                        continue  # No spread model: never invent margin probabilities.
+                    candidates.append({'market': kind, 'pick': pick, 'model_hit_prob': prob,
+                                       'raw_win_prob': prob, 'push_prob': push, 'odds': odds,
+                                       'book': title, 'ev': prob*odds+push-1})
+                except (TypeError, ValueError):
+                    continue
+    return candidates
+
+
 def predict_today(games: pd.DataFrame | None = None, features: pd.DataFrame | None = None, bundle=None):
     if games is None: games = pd.read_csv(RAW_GAMES, parse_dates=["game_date"])
     if features is None: features = pd.read_csv(FEATURES, parse_dates=["game_date"])
     if bundle is None: bundle = joblib.load(MODEL_FILE)
     today = datetime.now(JST).date()
     rows = features[pd.to_datetime(features.game_date).dt.date == today].copy()
-    rows = rows[rows.status != "Final"].copy()
+    rows = rows[rows.status.eq("Scheduled")].copy()
+    now = pd.Timestamp(datetime.now(JST)).tz_localize(None)
+    rows = rows[pd.to_datetime(rows.game_date) > now]
     cfg = get_league("npb")
     events, quota = OddsAPI().current_sport(cfg.odds_sport_key, markets="h2h,spreads,totals")
     classes = list(bundle["clf"].named_steps["clf"].classes_)
-    outputs, best_per_game = [], []
+    outputs, best_per_game, all_candidates = [], [], []
+    model_features = bundle['features']
+    total_features = bundle.get('total_features', model_features)
     for _, r in rows.iterrows():
-        probs = bundle["clf"].predict_proba(pd.DataFrame([r[MODEL_FEATURES].to_dict()]))[0]
+        probs = bundle["clf"].predict_proba(pd.DataFrame([r[model_features].to_dict()]))[0]
         pm = {c: float(probs[i]) for i, c in enumerate(classes)}
         home_p, away_p, draw_p = pm.get("home",0.0), pm.get("away",0.0), pm.get("draw",0.0)
-        total_pred = float(bundle["total_model"].predict(pd.DataFrame([r[MODEL_FEATURES].to_dict()]))[0])
+        total_pred = float(bundle["total_model"].predict(pd.DataFrame([r[total_features].to_dict()]))[0])
         event = find_event(events, str(r.home), str(r.away))
         market = summarize_event_three_way(event)
         rec = {
             "game_id":r.game_id,"game_date":r.game_date,"away":r.away,"home":r.home,
             "home_model":home_p,"draw_model":draw_p,"away_model":away_p,"pred_total":total_pred,
-            **market,
+            'model_version': bundle['model_version'], **market,
         }
-        candidates = []
-        for side, prob, label in (("home",home_p,str(r.home)),("away",away_p,str(r.away))):
-            odds = market.get(f"{side}_ml_odds")
-            if odds and float(odds) > 1:
-                hit = _conditional_side_prob(prob, draw_p)
-                candidates.append({"market":"moneyline","pick":label,"model_hit_prob":hit,"raw_win_prob":prob,"push_prob":draw_p,"odds":float(odds),"book":market.get(f"{side}_ml_book"),"ev":hit*float(odds)-1})
-        if market.get("draw_ml_odds") and float(market["draw_ml_odds"]) > 1:
-            odds=float(market["draw_ml_odds"])
-            candidates.append({"market":"moneyline","pick":"DRAW","model_hit_prob":draw_p,"raw_win_prob":draw_p,"push_prob":0.0,"odds":odds,"book":market.get("draw_ml_book"),"ev":draw_p*odds-1})
-        line = market.get("total_line")
+        line = market.get('total_line')
         if line is not None:
-            op, up, push = _total_probs(total_pred, float(line), bundle["residuals"])
-            rec.update({"over_model":op,"under_model":up,"total_push_prob":push})
-            for side, prob in (("over",op),("under",up)):
-                odds=market.get(f"{side}_odds")
-                if odds and float(odds)>1:
-                    candidates.append({"market":"total","pick":f"{side.upper()} {line:g}","model_hit_prob":prob,"raw_win_prob":prob*(1-push),"push_prob":push,"odds":float(odds),"book":market.get(f"{side}_book"),"ev":prob*float(odds)-1})
+            op, up, push = _total_probs(total_pred, float(line), bundle['residuals'])
+            rec.update({'over_model': op*(1-push), 'under_model': up*(1-push), 'total_push_prob': push})
+        candidates = market_candidates(event, pm, total_pred, bundle['residuals'])
+        all_candidates.extend({'game_id':r.game_id, 'away':r.away, 'home':r.home, **c} for c in candidates)
         outputs.append(rec)
         if candidates:
             best=max(candidates,key=lambda x:(x["model_hit_prob"],x["ev"]))
             best_per_game.append({"game_id":r.game_id,"away":r.away,"home":r.home,**best})
-    out=pd.DataFrame(outputs); picks=pd.DataFrame(best_per_game)
+    out=pd.DataFrame(outputs) if outputs else pd.DataFrame(columns=['game_id','game_date','away','home','home_model','draw_model','away_model','pred_total','model_version'])
+    picks=pd.DataFrame(best_per_game) if best_per_game else pd.DataFrame(columns=['game_id','away','home','market','pick','model_hit_prob','raw_win_prob','push_prob','odds','book','ev'])
     if len(picks): picks=picks.sort_values(["model_hit_prob","ev"],ascending=False).head(10)
     out.to_csv(TODAY_FILE,index=False); picks.to_csv(TOP10_FILE,index=False)
+    pd.DataFrame(all_candidates).to_csv(DATA_DIR / 'today_candidates.csv', index=False)
     print(f"[saved] {TODAY_FILE} ({len(out)} games)")
     print(f"[saved] {TOP10_FILE} ({len(picks)} picks)")
     print(f"[NPB odds quota] {quota}")

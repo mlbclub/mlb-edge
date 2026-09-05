@@ -6,6 +6,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: npb-model-main
+  cancel-in-progress: false
+
 jobs:
   build-npb:
     runs-on: ubuntu-latest
@@ -30,15 +34,32 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Syntax check NPB modules
-        run: python -m py_compile sports_lab/registry.py sports_lab/baseball/npb.py run_npb_pipeline.py mlb_model/odds.py
+        run: python -m py_compile sports_lab/baseball/npb.py sports_lab/baseball/npb_details.py sports_lab/baseball/npb_v2.py run_npb_v2_pipeline.py
 
       - name: Unit test NPB helpers
-        run: python -m unittest tests.test_npb
+        run: python -m unittest discover -s tests -p 'test_npb*.py'
+
+      - name: Restore official NPB page cache
+        uses: actions/cache@v4
+        with:
+          path: mlb_edge_public_web_designed/data/npb/official_cache
+          key: npb-official-v2-${{ github.run_id }}
+          restore-keys: npb-official-v2-
 
       - name: Collect NPB data, train model and create today predictions
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-        run: python run_npb_pipeline.py
+        run: python run_npb_v2_pipeline.py
+
+      - name: Preserve NPB diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npb-v2-diagnostics
+          path: |
+            mlb_edge_public_web_designed/data/npb/*report*
+            mlb_edge_public_web_designed/data/npb/v2_*.json
+            mlb_edge_public_web_designed/data/npb/v2_*.csv
 
       - name: Save NPB model data
         run: |
@@ -48,6 +69,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No new NPB data."
           else
-            git commit -m "Update NPB model data"
+            git commit -m "Update NPB V2 evaluation and operating predictions"
             git push
           fi
