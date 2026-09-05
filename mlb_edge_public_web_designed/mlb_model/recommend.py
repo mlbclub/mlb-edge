@@ -87,6 +87,41 @@ def hit_rank(c):
     return (candidate_hit_prob(c), float(c.get('ev') or 0))
 
 
+def is_market_underdog(c: dict) -> bool:
+    """True when the quoted market makes this moneyline side the underdog."""
+    if c.get("market") != "moneyline":
+        return False
+    if c.get("rule_market") == "underdog_moneyline":
+        return True
+    try:
+        market_prob = c.get("market_prob")
+        return market_prob is not None and float(market_prob) < 0.5
+    except (TypeError, ValueError):
+        return False
+
+
+def actionable_underdog(c: dict, rules: dict | None = None) -> bool:
+    """Keep real underdogs visible without inflating their hit probability.
+
+    The underdog must clear the predeclared underdog rule: at least 40% model
+    probability, +5.5pp edge and +5% EV by default.  Ranking still uses the
+    actual model probability first; price/value only break ties afterwards.
+    """
+    if not available_candidate(c) or not is_market_underdog(c):
+        return False
+    rules = rules or DEFAULT_RULES
+    return qualifies(c, rules)
+
+
+def underdog_rank(c: dict):
+    return (
+        candidate_hit_prob(c),
+        float(c.get("edge") or 0),
+        float(c.get("ev") or 0),
+        float(c.get("odds") or 0),
+    )
+
+
 def strict_betting_candidate(c: dict) -> bool:
     market = c.get("market")
     floor = BETTING_FLOORS.get(market)
@@ -101,7 +136,7 @@ def strict_betting_candidate(c: dict) -> bool:
 
 
 def select_betting_picks(game_candidate_pairs: list[tuple[dict, dict]], max_picks: int = TOP_PICKS):
-    """Rank all available markets by hit probability, one per game, top N."""
+    """Hit-rate board: rank all available markets by actual hit probability."""
     best_by_game: dict[object, tuple[dict, dict]] = {}
     for game, c in game_candidate_pairs:
         if not available_candidate(c):
@@ -115,10 +150,37 @@ def select_betting_picks(game_candidate_pairs: list[tuple[dict, dict]], max_pick
     return picks[: max(0, int(max_picks))]
 
 
+def select_underdog_picks(game_candidate_pairs: list[tuple[dict, dict]], max_picks: int = TOP_PICKS, rules: dict | None = None):
+    """Separate underdog board so strong market dogs are never hidden by favorites."""
+    rules = rules or DEFAULT_RULES
+    best_by_game: dict[object, tuple[dict, dict]] = {}
+    for game, c in game_candidate_pairs:
+        if not actionable_underdog(c, rules):
+            continue
+        key = game.get("game_pk") or (game.get("game_date"), game.get("away"), game.get("home"))
+        current = best_by_game.get(key)
+        if current is None or underdog_rank(c) > underdog_rank(current[1]):
+            best_by_game[key] = (game, c)
+    picks = list(best_by_game.values())
+    picks.sort(key=lambda gc: underdog_rank(gc[1]), reverse=True)
+    return picks[: max(0, int(max_picks))]
+
+
 def choose_recommendation(candidates: list[dict], rules: dict):
     valid = [c for c in candidates if available_candidate(c)]
     if not valid:
         return {"label": "NO BET", "market": None, "reason": "배당 정보 대기"}
     best = max(valid, key=hit_rank).copy()
+    dogs = [c for c in valid if actionable_underdog(c, rules)]
+    if dogs:
+        dog = max(dogs, key=underdog_rank)
+        best["underdog_alternative"] = {
+            "pick": dog.get("pick"),
+            "model_prob": candidate_hit_prob(dog),
+            "edge": dog.get("edge"),
+            "ev": dog.get("ev"),
+            "odds": dog.get("odds"),
+            "book": dog.get("book"),
+        }
     best["label"] = "BET"
     return best
