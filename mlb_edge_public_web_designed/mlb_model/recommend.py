@@ -5,6 +5,7 @@ import math
 from pathlib import Path
 
 from .config import PICK_RULES_FILE
+from sports_lab.baseball.market_policy import annotate_candidate, classify_market_probability
 TOP_PICKS = 10
 
 DEFAULT_RULES = {
@@ -88,29 +89,29 @@ def hit_rank(c):
 
 
 def is_market_underdog(c: dict) -> bool:
-    """True when the quoted market makes this moneyline side the underdog."""
+    """Market-relative dog detection; no absolute decimal-odds cutoff."""
     if c.get("market") != "moneyline":
         return False
-    if c.get("rule_market") == "underdog_moneyline":
-        return True
-    try:
-        market_prob = c.get("market_prob")
-        return market_prob is not None and float(market_prob) < 0.5
-    except (TypeError, ValueError):
-        return False
+    status = classify_market_probability(c.get("market_prob"))
+    if status is not None:
+        return status != "favorite"
+    return c.get("rule_market") == "underdog_moneyline"
 
 
 def actionable_underdog(c: dict, rules: dict | None = None) -> bool:
-    """Keep real underdogs visible without inflating their hit probability.
+    """Surface any genuine market underdog that the model prices above market.
 
-    The underdog must clear the predeclared underdog rule: at least 40% model
-    probability, +5.5pp edge and +5% EV by default.  Ranking still uses the
-    actual model probability first; price/value only break ties afterwards.
+    No minimum odds, model-probability, edge or EV gate is imposed here. A 1.90
+    slight underdog can qualify just as a 2.50 dog can. We only require positive
+    model-vs-market edge and positive EV; main ranking remains hit-probability-first.
     """
+    c = annotate_candidate(c)
     if not available_candidate(c) or not is_market_underdog(c):
         return False
-    rules = rules or DEFAULT_RULES
-    return qualifies(c, rules)
+    try:
+        return float(c.get("edge")) > 0 and float(c.get("ev")) > 0
+    except (TypeError, ValueError):
+        return False
 
 
 def underdog_rank(c: dict):
@@ -141,6 +142,7 @@ def select_betting_picks(game_candidate_pairs: list[tuple[dict, dict]], max_pick
     for game, c in game_candidate_pairs:
         if not available_candidate(c):
             continue
+        c = annotate_candidate(dict(c))
         key = game.get("game_pk") or (game.get("game_date"), game.get("away"), game.get("home"))
         current = best_by_game.get(key)
         if current is None or hit_rank(c) > hit_rank(current[1]):
@@ -155,6 +157,7 @@ def select_underdog_picks(game_candidate_pairs: list[tuple[dict, dict]], max_pic
     rules = rules or DEFAULT_RULES
     best_by_game: dict[object, tuple[dict, dict]] = {}
     for game, c in game_candidate_pairs:
+        c = annotate_candidate(dict(c))
         if not actionable_underdog(c, rules):
             continue
         key = game.get("game_pk") or (game.get("game_date"), game.get("away"), game.get("home"))
@@ -167,7 +170,7 @@ def select_underdog_picks(game_candidate_pairs: list[tuple[dict, dict]], max_pic
 
 
 def choose_recommendation(candidates: list[dict], rules: dict):
-    valid = [c for c in candidates if available_candidate(c)]
+    valid = [annotate_candidate(dict(c)) for c in candidates if available_candidate(c)]
     if not valid:
         return {"label": "NO BET", "market": None, "reason": "배당 정보 대기"}
     best = max(valid, key=hit_rank).copy()

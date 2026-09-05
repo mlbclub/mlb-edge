@@ -23,6 +23,7 @@ from mlb_model.config import MODEL_FILE, TEAM_GAMES, PICK_RULES_FILE
 from mlb_model.live import predict_date
 from mlb_model.runtime import prediction_revision
 from mlb_model.card_view import pitcher_label, team_details_html
+from sports_lab.baseball.market_policy import market_status_ko
 from mlb_model.recommend import (
     TOP_PICKS,
     betting_rank_score,
@@ -300,9 +301,11 @@ def game_card_html(g, selected_map):
 def bet_card_html(g, c, rank):
     prob = candidate_hit_prob(c)
     grade = pick_grade(prob)
+    status = c.get("market_status_ko") or (market_status_ko(c.get("market_prob")) if c.get("market") == "moneyline" else None)
+    status_badge = f'<span class="grade">{html.escape(status)}</span>' if status and status != "-" else ""
     dt = game_dt_kst(g)
     deadline = dt.strftime("%m/%d %H:%M KST") if dt else "경기 시작 전"
-    return f'''<div class="bet-card"><div class="bet-rank">BET #{rank} · {market_ko(c.get('market'))}<span class="grade">{grade}</span></div><div class="bet-match">{html.escape(team_ko(g['away']))} vs {html.escape(team_ko(g['home']))}</div><div class="bet-title">{html.escape(pick_ko(c.get('pick')))}</div><div class="deadline">참여 마감 · {deadline}</div><div class="bet-stats"><div class="bet-stat"><span>적중확률</span><strong>{score100(prob)}</strong></div><div class="bet-stat"><span>현재 배당</span><strong>{price(c.get('odds'))}</strong></div><div class="bet-stat"><span>신뢰등급</span><strong class="green">{grade}</strong></div><div class="bet-stat"><span>시장 우위</span><strong class="green">{pct(c.get('edge'), True)}</strong></div></div></div>'''
+    return f'''<div class="bet-card"><div class="bet-rank">BET #{rank} · {market_ko(c.get('market'))}{status_badge}<span class="grade">{grade}</span></div><div class="bet-match">{html.escape(team_ko(g['away']))} vs {html.escape(team_ko(g['home']))}</div><div class="bet-title">{html.escape(pick_ko(c.get('pick')))}</div><div class="deadline">참여 마감 · {deadline}</div><div class="bet-stats"><div class="bet-stat"><span>적중확률</span><strong>{score100(prob)}</strong></div><div class="bet-stat"><span>현재 배당</span><strong>{price(c.get('odds'))}</strong></div><div class="bet-stat"><span>신뢰등급</span><strong class="green">{grade}</strong></div><div class="bet-stat"><span>시장 우위</span><strong class="green">{pct(c.get('edge'), True)}</strong></div></div></div>'''
 
 
 def detail_card(g, title, cols, rows):
@@ -506,6 +509,7 @@ elif page == "승 · 패":
             ("적중점수", [score100(g.get('away_model')), score100(g.get('home_model'))]),
             ("현재 배당", [price(g.get('away_ml_odds')), price(g.get('home_ml_odds'))]),
             ("시장확률", [pct(g.get('away_market_novig')), pct(g.get('home_market_novig'))]),
+            ("시장구분", [market_status_ko(g.get('away_market_novig')), market_status_ko(g.get('home_market_novig'))]),
             ("Edge", [pct(ae, True), pct(he, True)]),
         ]), unsafe_allow_html=True)
 

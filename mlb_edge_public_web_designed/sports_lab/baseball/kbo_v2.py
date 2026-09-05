@@ -23,6 +23,7 @@ from sklearn.preprocessing import StandardScaler
 
 from mlb_model.odds import OddsAPI, find_event, summarize_event_three_way
 from sports_lab.baseball.kbo import SCHEDULE_URL, _parse_schedule_row, _team_name
+from sports_lab.baseball.market_policy import annotate_candidate, market_status_ko
 from sports_lab.registry import get_league
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -856,6 +857,8 @@ def predict_today_v2(bundle, games: pd.DataFrame, features_df: pd.DataFrame):
             "over_prob": over_cond, "under_prob": under_cond, "total_push_prob": push_prob,
             **odds,
         }
+        rec["away_market_status"] = market_status_ko(odds.get("away_market_novig"))
+        rec["home_market_status"] = market_status_ko(odds.get("home_market_novig"))
         pred_rows.append(rec)
 
         candidates = []
@@ -868,12 +871,15 @@ def predict_today_v2(bundle, games: pd.DataFrame, features_df: pd.DataFrame):
             price = odds.get(f"{side}_ml_odds")
             book = odds.get(f"{side}_ml_book")
             if price is not None:
-                candidates.append({
+                candidate = {
                     "game_id": r["game_id"], "away": r["away"], "home": r["home"],
                     "market": "moneyline", "pick": label, "model_hit_prob": hitp,
                     "raw_win_prob": winp, "push_prob": 0.0 if has_draw_price else p_draw,
                     "odds": price, "book": book, "ev": _ev(winp, price, 0.0 if has_draw_price else p_draw),
-                })
+                    "market_prob": odds.get(f"{side}_market_novig"),
+                }
+                annotate_candidate(candidate)
+                candidates.append(candidate)
         if has_draw_price and odds.get("draw_ml_odds") is not None:
             winp = pmap.get("draw", 0.0)
             candidates.append({

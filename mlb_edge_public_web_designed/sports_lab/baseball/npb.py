@@ -21,6 +21,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from mlb_model.odds import OddsAPI, find_event, summarize_event_three_way
+from sports_lab.baseball.market_policy import annotate_candidate, market_status_ko, no_vig_outcome_probability
 from sports_lab.registry import get_league
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -357,9 +358,13 @@ def market_candidates(event, probabilities, pred_total, residuals):
                         pick, kind = f'{side.upper()} {line:g}', 'total'
                     else:
                         continue  # No spread model: never invent margin probabilities.
-                    candidates.append({'market': kind, 'pick': pick, 'model_hit_prob': prob,
-                                       'raw_win_prob': prob, 'push_prob': push, 'odds': odds,
-                                       'book': title, 'ev': prob*odds+push-1})
+                    candidate = {'market': kind, 'pick': pick, 'model_hit_prob': prob,
+                                 'raw_win_prob': prob, 'push_prob': push, 'odds': odds,
+                                 'book': title, 'ev': prob*odds+push-1}
+                    if kind == 'moneyline' and side in {'home', 'away'}:
+                        candidate['market_prob'] = no_vig_outcome_probability(outcomes, o)
+                        annotate_candidate(candidate)
+                    candidates.append(candidate)
                 except (TypeError, ValueError):
                     continue
     return candidates
@@ -392,6 +397,8 @@ def predict_today(games: pd.DataFrame | None = None, features: pd.DataFrame | No
             "home_model":home_p,"draw_model":draw_p,"away_model":away_p,"pred_total":total_pred,
             'model_version': bundle['model_version'], **market,
         }
+        rec['away_market_status'] = market_status_ko(market.get('away_market_novig'))
+        rec['home_market_status'] = market_status_ko(market.get('home_market_novig'))
         line = market.get('total_line')
         if line is not None:
             op, up, push = _total_probs(total_pred, float(line), bundle['residuals'])
