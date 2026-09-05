@@ -2,6 +2,7 @@ import unittest
 
 import numpy as np
 
+from sports_lab.baseball.kbo_starters import extract_starters, parse_first_json
 from sports_lab.baseball.kbo_v2 import _parse_ip, _pitcher_summary, _total_probs
 
 
@@ -29,6 +30,24 @@ class KboV2Tests(unittest.TestCase):
         over, under, push = _total_probs(9.0, 9.0, residuals)
         self.assertGreater(push, 0)
         self.assertAlmostEqual(over + under, 1.0, places=6)
+
+    def test_lenient_json_parser_ignores_trailing_html(self):
+        raw = '{"d":"{\\"game\\":[{\\"AWAY_NM\\":\\"KIA\\",\\"HOME_NM\\":\\"LG\\",\\"T_PIT_P_NM\\":\\"Away SP\\",\\"B_PIT_P_NM\\":\\"Home SP\\"}]}"}\n<!DOCTYPE html><html><body>error</body></html>'
+        parsed = parse_first_json(raw)
+        self.assertIn("d", parsed)
+        starters = extract_starters(parsed)
+        self.assertEqual(starters[("KIA Tigers", "LG Twins")], ("Away SP", "Home SP"))
+
+    def test_starter_extraction_requires_both_names(self):
+        payload = {
+            "game": [
+                {"AWAY_NM": "KIA", "HOME_NM": "LG", "T_PIT_P_NM": "Away SP", "B_PIT_P_NM": ""},
+                {"AWAY_NM": "삼성", "HOME_NM": "두산", "T_PIT_P_NM": "Samsung SP", "B_PIT_P_NM": "Doosan SP"},
+            ]
+        }
+        starters = extract_starters(payload)
+        self.assertNotIn(("KIA Tigers", "LG Twins"), starters)
+        self.assertEqual(starters[("Samsung Lions", "Doosan Bears")], ("Samsung SP", "Doosan SP"))
 
 
 if __name__ == "__main__":
