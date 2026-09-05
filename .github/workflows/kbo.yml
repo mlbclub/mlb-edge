@@ -30,7 +30,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Syntax check KBO V2 modules
-        run: python -m py_compile sports_lab/registry.py sports_lab/baseball/kbo.py sports_lab/baseball/kbo_v2.py run_kbo_v2_pipeline.py mlb_model/odds.py
+        run: python -m py_compile sports_lab/registry.py sports_lab/baseball/kbo.py sports_lab/baseball/kbo_v2.py sports_lab/baseball/kbo_starters.py run_kbo_v2_pipeline.py mlb_model/odds.py
 
       - name: Unit test KBO V2 helpers
         run: python -m unittest tests.test_kbo_v2
