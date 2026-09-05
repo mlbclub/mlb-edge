@@ -2266,11 +2266,11 @@ game_id,game_date,season,away,home,away_score,home_score,status,stadium,note
 20260904-KT_Wiz-KIA_Tigers,2026-09-04 18:30:00,2026,KT Wiz,KIA Tigers,3.0,4.0,Final,광주,-
 20260904-NC_Dinos-Kiwoom_Heroes,2026-09-04 18:30:00,2026,NC Dinos,Kiwoom Heroes,6.0,1.0,Final,고척,-
 20260904-Samsung_Lions-LG_Twins,2026-09-04 18:30:00,2026,Samsung Lions,LG Twins,3.0,4.0,Final,잠실,-
-20260905-Doosan_Bears-SSG_Landers,2026-09-05 17:00:00,2026,Doosan Bears,SSG Landers,,,Scheduled,문학,-
-20260905-Hanwha_Eagles-Lotte_Giants,2026-09-05 17:00:00,2026,Hanwha Eagles,Lotte Giants,,,Scheduled,사직,-
-20260905-KT_Wiz-KIA_Tigers,2026-09-05 17:00:00,2026,KT Wiz,KIA Tigers,,,Scheduled,광주,-
-20260905-NC_Dinos-Kiwoom_Heroes,2026-09-05 17:00:00,2026,NC Dinos,Kiwoom Heroes,,,Scheduled,고척,-
-20260905-Samsung_Lions-LG_Twins,2026-09-05 17:00:00,2026,Samsung Lions,LG Twins,,,Scheduled,잠실,-
+20260905-Doosan_Bears-SSG_Landers,2026-09-05 17:00:00,2026,Doosan Bears,SSG Landers,0.0,0.0,Final,문학,-
+20260905-Hanwha_Eagles-Lotte_Giants,2026-09-05 17:00:00,2026,Hanwha Eagles,Lotte Giants,0.0,0.0,Final,사직,-
+20260905-KT_Wiz-KIA_Tigers,2026-09-05 17:00:00,2026,KT Wiz,KIA Tigers,0.0,0.0,Final,광주,-
+20260905-NC_Dinos-Kiwoom_Heroes,2026-09-05 17:00:00,2026,NC Dinos,Kiwoom Heroes,0.0,0.0,Final,고척,-
+20260905-Samsung_Lions-LG_Twins,2026-09-05 17:00:00,2026,Samsung Lions,LG Twins,0.0,0.0,Final,잠실,-
 20260906-NC_Dinos-Kiwoom_Heroes,2026-09-06 14:00:00,2026,NC Dinos,Kiwoom Heroes,,,Scheduled,고척,-
 20260906-Doosan_Bears-SSG_Landers,2026-09-06 17:00:00,2026,Doosan Bears,SSG Landers,,,Scheduled,문학,-
 20260906-Hanwha_Eagles-Lotte_Giants,2026-09-06 17:00:00,2026,Hanwha Eagles,Lotte Giants,,,Scheduled,사직,-
