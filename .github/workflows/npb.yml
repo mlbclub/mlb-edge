@@ -2,6 +2,9 @@ name: Build NPB model
 
 on:
   workflow_dispatch:
+  schedule:
+    # 11:30 JST/KST daily. Runs before the earliest common NPB first pitch.
+    - cron: '30 2 * * *'
 
 permissions:
   contents: write
@@ -34,10 +37,12 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Syntax check NPB modules
-        run: python -m py_compile sports_lab/baseball/npb.py sports_lab/baseball/npb_details.py sports_lab/baseball/npb_v2.py run_npb_v2_pipeline.py
+        run: python -m py_compile sports_lab/baseball/market_policy.py sports_lab/baseball/npb.py sports_lab/baseball/npb_details.py sports_lab/baseball/npb_v2.py run_npb_v2_pipeline.py
 
-      - name: Unit test NPB helpers
-        run: python -m unittest discover -s tests -p 'test_npb*.py'
+      - name: Unit test NPB helpers and shared market policy
+        run: |
+          python -m unittest discover -s tests -p 'test_npb*.py'
+          python -m unittest tests.test_market_policy
 
       - name: Restore official NPB page cache
         uses: actions/cache@v4
@@ -70,5 +75,6 @@ jobs:
             echo "No new NPB data."
           else
             git commit -m "Update NPB V2 evaluation and operating predictions"
+            git pull --rebase origin main
             git push
           fi
