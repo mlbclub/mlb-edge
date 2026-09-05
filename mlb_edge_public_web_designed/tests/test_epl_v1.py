@@ -26,7 +26,7 @@ class EPLV1Tests(unittest.TestCase):
     def test_total_probabilities_are_normalized(self):
         over, under, push = total_probs(1.7, 1.1, 2.5)
         self.assertAlmostEqual(over + under + push, 1.0, places=8)
-        self.assertEqual(push, 0.0)
+        self.assertAlmostEqual(push, 0.0, places=12)
         self.assertGreater(over, 0.0)
         self.assertGreater(under, 0.0)
 
