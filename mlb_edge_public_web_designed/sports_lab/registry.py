@@ -30,7 +30,7 @@ LEAGUES: dict[str, LeagueConfig] = {
     "npb": LeagueConfig(
         key="npb", sport="baseball", label="NPB", label_ko="NPB",
         odds_sport_key="baseball_npb", timezone="Asia/Tokyo",
-        outcome_type="three_way", primary_markets=("h2h", "spreads", "totals"), enabled=False,
+        outcome_type="three_way", primary_markets=("h2h", "spreads", "totals"), enabled=True,
     ),
     "epl": LeagueConfig(
         key="epl", sport="soccer", label="Premier League", label_ko="프리미어리그",
