@@ -1,91 +1,91 @@
 team_id,team,rank,pitcher_id,name,role,active_verified,checked_at,chart_date,source
-110,BAL,1,552640,Andrew Kittredge,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-110,BAL,2,666974,Yennier Cano,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-110,BAL,3,670329,Rico Garcia,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-111,BOS,1,547973,Aroldis Chapman,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-111,BOS,2,676477,Garrett Whitlock,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-111,BOS,3,669062,Erik Miller,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-147,NYY,1,670280,David Bednar,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-147,NYY,2,621112,Paul Blackburn,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-147,NYY,3,687396,Brent Headrick,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-139,TB,1,641329,Bryan Baker,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-139,TB,2,687330,Kevin Kelly,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-139,TB,3,669330,Tyler Wells,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-141,TOR,1,686973,Louis Varland,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-141,TOR,2,643511,Tyler Rogers,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-141,TOR,3,689254,Mason Fluharty,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-145,CHW,1,691799,Grant Taylor,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-145,CHW,2,663542,Bryan Hudson,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-145,CHW,3,656794,Sean Newcomb,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-114,CLE,1,671922,Cade Smith,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-114,CLE,2,683769,Hunter Gaddis,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-114,CLE,3,681870,Erik Sabrowski,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-116,DET,1,445276,Kenley Jansen,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-116,DET,2,621097,Jacob Waguespack,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-116,DET,3,805427,Drew Sommers,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-118,KC,1,674444,Steven Cruz,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-118,KC,2,663878,Nate Pearson,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-118,KC,3,518886,Craig Kimbrel,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-142,MIN,1,672782,Yoendrys Gómez,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-142,MIN,2,656546,Jeff Hoffman,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-142,MIN,3,621345,A.J. Minter,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-133,ATH,1,663687,Hogan Harris,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-133,ATH,2,665660,Elvis Alvarado,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-133,ATH,3,665622,Luis Medina,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-117,HOU,1,623352,Josh Hader,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-117,HOU,2,650556,Bryan Abreu,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-117,HOU,3,595345,Steven Okert,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-108,LAA,1,690829,Ben Joyce,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-108,LAA,2,670245,Ryan Watson,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-108,LAA,3,642048,Tayler Saucedo,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-136,SEA,1,662253,Andrés Muñoz,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-136,SEA,2,660825,Eduard Bazardo,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-136,SEA,3,642100,Gabe Speier,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-140,TEX,1,656641,Jacob Latz,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-140,TEX,2,596001,Jakob Junis,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-140,TEX,3,681217,Chase Silseth,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-144,ATL,1,628452,Raisel Iglesias,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-144,ATL,2,800311,Didier Fuentes,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-144,ATL,3,669276,Dylan Lee,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-146,MIA,1,676534,Calvin Faucher,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-146,MIA,2,656848,Michael Petersen,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-146,MIA,3,694795,Josh Ekness,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-121,NYM,1,673540,Kodai Senga,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-121,NYM,2,650960,Daniel Duarte,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-121,NYM,3,681320,Nate Lavender,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-143,PHI,1,661395,Jhoan Duran,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-143,PHI,2,680742,Jonathan Bowlan,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-143,PHI,3,689147,Orion Kerkering,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-120,WAS,1,687377,Orlando Ribalta,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-120,WAS,2,680899,Erik Tolman,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-120,WAS,3,690925,Clayton Beeter,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-112,CHC,1,657097,Jacob Webb,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-112,CHC,2,694037,Daniel Palencia,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-112,CHC,3,669020,Ryan Rolison,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-113,CIN,1,641941,Emilio Pagán,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-113,CIN,2,656271,Brock Burke,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-113,CIN,3,682825,Luis Mey,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-158,MIL,1,656730,Trevor Megill,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-158,MIL,2,682842,Abner Uribe,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-158,MIL,3,676879,Aaron Ashby,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-134,PIT,1,682254,Mason Montgomery,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-134,PIT,2,596133,Luke Weaver,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-134,PIT,3,642397,Gregory Soto,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-138,STL,1,676617,Riley O'Brien,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-138,STL,2,592773,Ryne Stanek,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-138,STL,3,703725,Luis Gastelum,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-109,ARI,1,666661,Juan Morillo,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-109,ARI,2,805299,Brandyn Garcia,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-109,ARI,3,642528,Jonathan Loáisiga,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-115,COL,1,605447,Jordan Romano,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-115,COL,2,657514,Brennan Bernardino,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-115,COL,3,677955,Jaden Hill,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-119,LAD,1,656945,Tanner Scott,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-119,LAD,2,683618,Edgardo Henriquez,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-119,LAD,3,676263,Jack Dreyer,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-135,SD,1,695243,Mason Miller,마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-135,SD,2,670970,Adrian Morejon,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-135,SD,3,699134,Bradgley Rodriguez,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-137,SF,1,681916,Dylan Smith,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-137,SF,2,693313,Carson Seymour,공동 마무리,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
-137,SF,3,671345,Jason Foley,셋업 후보,True,2026-09-04T16:42:18.558274+00:00,2026-09-03,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+110,BAL,1,552640,Andrew Kittredge,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+110,BAL,2,666974,Yennier Cano,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+110,BAL,3,670329,Rico Garcia,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+111,BOS,1,547973,Aroldis Chapman,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+111,BOS,2,676477,Garrett Whitlock,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+111,BOS,3,669062,Erik Miller,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+147,NYY,1,670280,David Bednar,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+147,NYY,2,621112,Paul Blackburn,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+147,NYY,3,687396,Brent Headrick,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+139,TB,1,641329,Bryan Baker,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+139,TB,2,669330,Tyler Wells,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+139,TB,3,687330,Kevin Kelly,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+141,TOR,1,686973,Louis Varland,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+141,TOR,2,643511,Tyler Rogers,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+141,TOR,3,689254,Mason Fluharty,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+145,CHW,1,691799,Grant Taylor,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+145,CHW,2,663542,Bryan Hudson,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+145,CHW,3,656794,Sean Newcomb,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+114,CLE,1,671922,Cade Smith,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+114,CLE,2,683769,Hunter Gaddis,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+114,CLE,3,681870,Erik Sabrowski,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+116,DET,1,445276,Kenley Jansen,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+116,DET,2,621097,Jacob Waguespack,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+116,DET,3,805427,Drew Sommers,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+118,KC,1,674444,Steven Cruz,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+118,KC,2,663878,Nate Pearson,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+118,KC,3,518886,Craig Kimbrel,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+142,MIN,1,672782,Yoendrys Gómez,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+142,MIN,2,656546,Jeff Hoffman,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+142,MIN,3,621345,A.J. Minter,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+133,ATH,1,663687,Hogan Harris,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+133,ATH,2,665660,Elvis Alvarado,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+133,ATH,3,665622,Luis Medina,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+117,HOU,1,623352,Josh Hader,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+117,HOU,2,650556,Bryan Abreu,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+117,HOU,3,805123,AJ Blubaugh,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+108,LAA,1,690829,Ben Joyce,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+108,LAA,2,670245,Ryan Watson,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+108,LAA,3,642048,Tayler Saucedo,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+136,SEA,1,662253,Andrés Muñoz,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+136,SEA,2,660825,Eduard Bazardo,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+136,SEA,3,642100,Gabe Speier,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+140,TEX,1,656641,Jacob Latz,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+140,TEX,2,596001,Jakob Junis,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+140,TEX,3,681217,Chase Silseth,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+144,ATL,1,628452,Raisel Iglesias,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+144,ATL,2,800311,Didier Fuentes,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+144,ATL,3,669276,Dylan Lee,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+146,MIA,1,676534,Calvin Faucher,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+146,MIA,2,656848,Michael Petersen,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+146,MIA,3,694795,Josh Ekness,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+121,NYM,1,673540,Kodai Senga,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+121,NYM,2,650960,Daniel Duarte,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+121,NYM,3,681320,Nate Lavender,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+143,PHI,1,661395,Jhoan Duran,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+143,PHI,2,680742,Jonathan Bowlan,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+143,PHI,3,689147,Orion Kerkering,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+120,WAS,1,687377,Orlando Ribalta,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+120,WAS,2,680899,Erik Tolman,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+120,WAS,3,690925,Clayton Beeter,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+112,CHC,1,657097,Jacob Webb,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+112,CHC,2,694037,Daniel Palencia,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+112,CHC,3,669020,Ryan Rolison,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+113,CIN,1,641941,Emilio Pagán,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+113,CIN,2,656271,Brock Burke,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+113,CIN,3,682825,Luis Mey,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+158,MIL,1,656730,Trevor Megill,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+158,MIL,2,682842,Abner Uribe,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+158,MIL,3,676879,Aaron Ashby,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+134,PIT,1,682254,Mason Montgomery,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+134,PIT,2,596133,Luke Weaver,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+134,PIT,3,642397,Gregory Soto,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+138,STL,1,676617,Riley O'Brien,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+138,STL,2,592773,Ryne Stanek,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+138,STL,3,703725,Luis Gastelum,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+109,ARI,1,666661,Juan Morillo,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+109,ARI,2,805299,Brandyn Garcia,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+109,ARI,3,642528,Jonathan Loáisiga,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+115,COL,1,605447,Jordan Romano,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+115,COL,2,657514,Brennan Bernardino,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+115,COL,3,677955,Jaden Hill,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+119,LAD,1,656945,Tanner Scott,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+119,LAD,2,683618,Edgardo Henriquez,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+119,LAD,3,676263,Jack Dreyer,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+135,SD,1,695243,Mason Miller,마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+135,SD,2,670970,Adrian Morejon,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+135,SD,3,699134,Bradgley Rodriguez,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+137,SF,1,681916,Dylan Smith,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+137,SF,2,693313,Carson Seymour,공동 마무리,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
+137,SF,3,671345,Jason Foley,셋업 후보,True,2026-09-05T09:15:55.193686+00:00,2026-09-04,https://closermonkey.com/2026/09/04/updated-closer-depth-chart/
