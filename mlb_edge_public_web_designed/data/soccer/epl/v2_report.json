@@ -1,0 +1,69 @@
+{
+  "model_version": "sports-lab-epl-v2",
+  "selected": {
+    "candidate": "shooting",
+    "C": 0.01,
+    "goal_alpha": 0.3,
+    "poisson_blend": 1.0,
+    "dev_log_loss": 0.966970774569305
+  },
+  "features": [
+    "elo_home_prob",
+    "diff_ppg_r5",
+    "diff_ppg_r10",
+    "diff_gd_r5",
+    "diff_gd_r10",
+    "diff_gf_r10",
+    "diff_ga_r10",
+    "home_home_ppg_r10",
+    "away_away_ppg_r10",
+    "home_home_gd_r10",
+    "away_away_gd_r10",
+    "diff_rest_days",
+    "diff_shots_for_r5",
+    "diff_shots_for_r10",
+    "diff_shots_against_r5",
+    "diff_shots_against_r10",
+    "diff_sot_for_r5",
+    "diff_sot_for_r10",
+    "diff_sot_against_r5",
+    "diff_sot_against_r10",
+    "diff_corners_for_r5",
+    "diff_corners_for_r10",
+    "diff_corners_against_r5",
+    "diff_corners_against_r10"
+  ],
+  "holdout_2025_26": {
+    "games": 380,
+    "accuracy": 0.4842105263157895,
+    "log_loss": 1.0273196127834683,
+    "conf_45_games": 264,
+    "conf_45_accuracy": 0.5454545454545454,
+    "conf_50_games": 188,
+    "conf_50_accuracy": 0.5691489361702128,
+    "conf_55_games": 120,
+    "conf_55_accuracy": 0.6,
+    "conf_60_games": 75,
+    "conf_60_accuracy": 0.6266666666666667,
+    "total_goals_mae": 1.2436265083000442
+  },
+  "monitor_2026_27": {
+    "games": 20,
+    "accuracy": 0.45,
+    "log_loss": 0.988960319509099,
+    "conf_45_games": 9,
+    "conf_45_accuracy": 0.6666666666666666,
+    "conf_50_games": 8,
+    "conf_50_accuracy": 0.625,
+    "conf_55_games": 6,
+    "conf_55_accuracy": 0.8333333333333334,
+    "conf_60_games": 3,
+    "conf_60_accuracy": 1.0
+  },
+  "v1_holdout_reference": {
+    "accuracy": 0.4789473684210526,
+    "log_loss": 1.0378327885927257,
+    "conf_55_accuracy": 0.5757575757575758,
+    "conf_60_accuracy": 0.6126126126126126
+  }
+}
