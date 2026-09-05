@@ -2,9 +2,16 @@ name: Build KBO model
 
 on:
   workflow_dispatch:
+  schedule:
+    # 12:00 KST/JST daily. Staggered after NPB to avoid simultaneous pushes.
+    - cron: '0 3 * * *'
 
 permissions:
   contents: write
+
+concurrency:
+  group: kbo-model-main
+  cancel-in-progress: false
 
 jobs:
   build-kbo:
@@ -30,10 +37,12 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Syntax check KBO V2 modules
-        run: python -m py_compile sports_lab/registry.py sports_lab/baseball/kbo.py sports_lab/baseball/kbo_v2.py sports_lab/baseball/kbo_starters.py run_kbo_v2_pipeline.py mlb_model/odds.py
+        run: python -m py_compile sports_lab/registry.py sports_lab/baseball/market_policy.py sports_lab/baseball/kbo.py sports_lab/baseball/kbo_v2.py sports_lab/baseball/kbo_starters.py run_kbo_v2_pipeline.py mlb_model/odds.py
 
-      - name: Unit test KBO V2 helpers
-        run: python -m unittest tests.test_kbo_v2
+      - name: Unit test KBO V2 helpers and shared market policy
+        run: |
+          python -m unittest tests.test_kbo_v2
+          python -m unittest tests.test_market_policy
 
       - name: Collect and cache official KBO boxscore detail
         run: |
@@ -52,6 +61,7 @@ jobs:
             echo "No new KBO detail cache."
           else
             git commit -m "Update KBO V2 detail cache"
+            git pull --rebase origin main
             git push
           fi
 
@@ -69,5 +79,6 @@ jobs:
             echo "No new KBO V2 data."
           else
             git commit -m "Update KBO V2 model data"
+            git pull --rebase origin main
             git push
           fi
