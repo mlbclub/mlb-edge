@@ -35,7 +35,7 @@ class RankedPickTests(unittest.TestCase):
         hit_board = select_betting_picks(pairs)
         self.assertEqual(hit_board[0][1]['pick'], 'FAV A')
         dogs = select_underdog_picks(pairs)
-        self.assertEqual([c['pick'] for _, c in dogs], ['DOG A', 'DOG B'])
+        self.assertEqual([c['pick'] for _, c in dogs], ['DOG A', 'DOG B', 'WEAK DOG'])
         self.assertEqual(dogs[0][1]['model_prob'], .47)
         rec = choose_recommendation([fav1, dog1], {})
         self.assertEqual(rec['pick'], 'FAV A')
