@@ -1,0 +1,2 @@
+model_version,C,train_games,test_games,2026_accuracy,2026_log_loss,2026_total_mae,2026_conf_55_games,2026_conf_55_accuracy,2026_conf_60_games,2026_conf_60_accuracy
+sports-lab-npb-v1-core,0.01,1630,605,0.5652892561983471,0.7596753690134486,3.1733369211887337,219,0.6118721461187214,54,0.5555555555555556
